@@ -7,14 +7,14 @@ SQAURE_GRID_DIMENSION = 400 # It will be a 400x400 square grid inside the marker
 STATIC_VIDEO_FPS = 29.97
 MOVING_VIDEO_FPS = 30.01
 
-COIN_1_VIDEO_CAMERA_STATIC_PATH = 'data/cam1-static/coin1.mov'
-COIN_1_VIDEO_CAMERA_MOVING_PATH = 'data/cam2-moving_light/coin1.mp4'
-COIN_2_VIDEO_CAMERA_STATIC_PATH = 'data/cam1-static/coin2.mov'
-COIN_2_VIDEO_CAMERA_MOVING_PATH = 'data/cam2-moving_light/coin2.mp4'
-COIN_3_VIDEO_CAMERA_STATIC_PATH = 'data/cam1-static/coin3.mov'
-COIN_3_VIDEO_CAMERA_MOVING_PATH = 'data/cam2-moving_light/coin3.mp4'
-COIN_4_VIDEO_CAMERA_STATIC_PATH = 'data/cam1-static/coin4.mov'
-COIN_4_VIDEO_CAMERA_MOVING_PATH = 'data/cam2-moving_light/coin4.mp4'
+COIN_1_VIDEO_CAMERA_STATIC_PATH = 'assets/cam1-static/coin1.mov'
+COIN_1_VIDEO_CAMERA_MOVING_PATH = 'assets/cam2-moving_light/coin1.mp4'
+COIN_2_VIDEO_CAMERA_STATIC_PATH = 'assets/cam1-static/coin2.mov'
+COIN_2_VIDEO_CAMERA_MOVING_PATH = 'assets/cam2-moving_light/coin2.mp4'
+COIN_3_VIDEO_CAMERA_STATIC_PATH = 'assets/cam1-static/coin3.mov'
+COIN_3_VIDEO_CAMERA_MOVING_PATH = 'assets/cam2-moving_light/coin3.mp4'
+COIN_4_VIDEO_CAMERA_STATIC_PATH = 'assets/cam1-static/coin4.mov'
+COIN_4_VIDEO_CAMERA_MOVING_PATH = 'assets/cam2-moving_light/coin4.mp4'
 
 FILE_1_STATIC_CAMERA_DELAY = 2.724  # [seconds] (static) 3.609 - 0.885 (moving)
 FILE_2_STATIC_CAMERA_DELAY = 2.024  # [seconds] (static) 2.995 - 0.971 (moving)

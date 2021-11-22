@@ -8,8 +8,8 @@ VIDEO_CAMERA_CHOOSEN = 2
 CHESSBOARD_SIZE = (9, 6)
 SKIP_INTERVAL = 20
 
-VIDEO_CAMERA_STATIC_PATH = 'data/cam1-static/calibration.mov'
-VIDEO_CAMERA_MOVING_PATH = 'data/cam2-moving_light/calibration.mp4'
+VIDEO_CAMERA_STATIC_PATH = 'assets/cam1-static/calibration.mov'
+VIDEO_CAMERA_MOVING_PATH = 'assets/cam2-moving_light/calibration.mp4'
 
 if VIDEO_CAMERA_CHOOSEN == 1:
     CHOOSEN_VIDEO = VIDEO_CAMERA_STATIC_PATH
