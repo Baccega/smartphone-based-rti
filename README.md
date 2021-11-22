@@ -1,9 +1,10 @@
 # 🐍📷  Smartphone Based RTI
 
-Reflectance Transformation Imaging (RTI) using OpenCV in python.
+Reflectance Transformation Imaging (RTI) using footage of two smartphones without requiring an expensive light dome, created in **Python** utilizing **OpenCV** .
 
-This project is the assignment for the course "Geometric and 3D Computer Vision (year 2020/2021)".
-See <b>[FinalProject.pdf](FinalProject.pdf)</b> for more details on the assignment and to download the required assets.
+This project is the assignment for the course **Geometric and 3D Computer Vision 2020/2021**.
+
+See **[FinalProject.pdf](FinalProject.pdf)** for more details on the assignment and to download the required assets.
 
 ## Usage
 
