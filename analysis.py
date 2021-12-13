@@ -1,201 +1,75 @@
 import cv2 as cv
 import numpy as np
+import utils
+import os
 import constants
-import features_detector
-
-from utils import (
-    loadIntrinsics,
-    sortCorners,
-    outerContour,
-)
-
-STATIC_IMAGE_WINDOW_TITLE = 'Static camera feed'
-
-MARKER_THRESHOLD = 69
-BLUR_KERNEL_SIZE = 37
-BLUR_ITERATIONS = 1
-
-OUTER_SQUARE_PERIMETER = 2000
-INNER_SQUARE_PERIMETER = 1000
+import ffmpeg
 
 
-def nothing(x):
-    pass
+def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
+    print("\t— Generating aligned video: {}".format(video_path))
+    ffmpeg.input(not_aligned_video_path, itsoffset=delay).filter(
+        "fps", fps=constants.ALIGNED_VIDEO_FPS
+    ).output(video_path).run()
 
 
-def image_blur(image, blur_kernel_size, iterations=1):
-    for k in range(0, iterations):
-        image = cv.GaussianBlur(image, (blur_kernel_size, blur_kernel_size), 0)
-    return image
+def main(
+    not_aligned_static_video_path,
+    not_aligned_moving_video_path,
+    moving_camera_delay,
+    static_video_path,
+    moving_video_path,
+):
+    print(
+        "*** Analysis *** \nStatic_Video: '{}' \nMoving_Video: '{}'".format(
+            not_aligned_static_video_path, not_aligned_moving_video_path
+        )
+    )
 
+    # Generate aligned videos if not already done
+    if (not os.path.exists(static_video_path)) or (
+        not os.path.exists(moving_video_path)
+    ):
+        generateAlignedVideo(not_aligned_static_video_path, static_video_path)
+        generateAlignedVideo(
+            not_aligned_moving_video_path, moving_video_path, moving_camera_delay
+        )
 
-def findRectanglePatterns(firstFrame):
-    # Threshold the image using Otsu algorithm
-    gray = cv.cvtColor(firstFrame, cv.COLOR_RGBA2GRAY)
-    thresh = cv.adaptiveThreshold(
-        gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 7, 2)
-    kernel = np.ones((3,3), np.uint8)
-    thresh = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel)
-    
-    # thresh = cv.threshold(
-    #     gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
-    # cv.imshow(STATIC_IMAGE_WINDOW_TITLE, thresh)
-    # cv.waitKey(1)
+    # From moving get lightdir and timestamp
 
-    # Find all the possible contours in thresholded image
-    contours, _ = cv.findContours(
-        thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    # From static get every pixel value for each light direction and timestamp:
+    # (timestamp 45.0, lightdir [x,y,0]) -> pixelvalues
 
-    winSize = (16, 16)
-    zeroZone = (-1, -1)
-    criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, 200, 0.1)
-    minContourLength = 30
-    polys = []
-    for contour in contours:
-        if len(contour) >= minContourLength:
-            # We approximate a polygon, we are only interested in rectangles (4 points, convex)
-            valore = cv.getTrackbarPos(
-                'MARKER_THRESHOLD', STATIC_IMAGE_WINDOW_TITLE)
-            epsilon = (valore / 100) * cv.arcLength(contour, True)
-            curve = cv.approxPolyDP(contour, epsilon, True)
-            print(len(curve))
-            if len(curve) == 4 and cv.isContourConvex(curve):
-                # We use cornerSubPix for floating point refinement
-                curve = cv.cornerSubPix(gray, np.float32(
-                    curve), winSize, zeroZone, criteria)
-                sortedCurve = sortCorners(curve)
-                score = outerContour(sortedCurve.astype(np.int32), gray)
-                polys.append((sortedCurve, score))
+    # Data interpolation
 
-    # We sort the found rectangles by score descending, using outerContour function
-    # The function calculates the mean of the border inside the rectangle: it must be around full black
-    # It's safe to take the first entry as a valid pattern if it exists
-    polys.sort(key=lambda x: x[1], reverse=False)
-    return [p[0] for p in polys]
+    # MOVING:
 
-# def findOuterSquare(img):
-#     # gray = ut.enchant_brightness_and_contrast(static_frame)
-#     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    # TIME && LIGHTDIR
 
-#     blur_kernel_size = cv.getTrackbarPos('BLUR_KERNEL_SIZE', STATIC_IMAGE_WINDOW_TITLE)
-#     blur_iterations = cv.getTrackbarPos('BLUR_ITERATIONS', STATIC_IMAGE_WINDOW_TITLE)
-#     if(blur_kernel_size % 2 == 0):
-#         blur_kernel_size = blur_kernel_size + 1
-#     blurred = image_blur(gray, blur_kernel_size, blur_iterations)
-#     # blurred = cv.GaussianBlur(gray, (blur_kernel_size, blur_kernel_size), 0)
-#     # blurred = cv.GaussianBlur(gray, (BLUR_KERNEL_SIZE, BLUR_KERNEL_SIZE), 0)
+    # STATIC:
 
-#     marker_threshold = cv.getTrackbarPos('MARKER_THRESHOLD', STATIC_IMAGE_WINDOW_TITLE)
-#     (_, thresh) = cv.threshold(blurred, marker_threshold, 255, cv.THRESH_BINARY)
-#     # (_, thresh) = cv.threshold(blurred, MARKER_THRESHOLD, 255, cv.THRESH_BINARY)
+    # RECT -> DIVIDE IN 400 -> VALUE BASED ON TIME
 
-#     print('Thresh: ' , marker_threshold , ', Blur: ' , blur_kernel_size, ', Iterations: ', blur_iterations)
-#     cv.imshow(STATIC_IMAGE_WINDOW_TITLE, thresh)
-
-#     sigma = 0.4
-#     v = np.median(img)
-#     lower = int(max(0, (1.0 - sigma) * v))
-#     upper = int(min(255, (1.0 + sigma) * v))
-
-#     imageedges = cv.Canny(thresh, lower, upper)
-#     contours, _ = cv.findContours(
-#         imageedges, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
-
-#     # for contour in contours:
-#     #     perimeter = cv.arcLength(contour, closed=True)
-
-#     # filteredContours = [contour for contour in contours if cv.arcLength(
-#     #     contour, closed=True) > OUTER_SQUARE_PERIMETER]
-
-#     return filteredContours
-
-
-def main():
-    print("Analysis")
-
-    static_video = cv.VideoCapture(constants.CHOOSEN_VIDEO_STATIC_PATH)
-    moving_video = cv.VideoCapture(constants.CHOOSEN_VIDEO_MOVING_PATH)
-
-    FPS_DIFFERENCE = constants.MOVING_VIDEO_FPS - constants.STATIC_VIDEO_FPS
-
-    # Syncing the static video to the moving video by skipping the
-    static_video.set(cv.CAP_PROP_POS_FRAMES, int(
-        constants.STATIC_VIDEO_FPS * constants.CHOOSEN_VIDEO_DELAY))
-
-    flag = 1
-
-    cv.namedWindow(STATIC_IMAGE_WINDOW_TITLE)
-    cv.createTrackbar('MARKER_THRESHOLD',
-                      STATIC_IMAGE_WINDOW_TITLE, 1, 10, nothing)
-    # cv.createTrackbar('BLUR_KERNEL_SIZE',
-    #                   STATIC_IMAGE_WINDOW_TITLE, BLUR_KERNEL_SIZE, 40, nothing)
-    # cv.createTrackbar('BLUR_ITERATIONS',
-    #                   STATIC_IMAGE_WINDOW_TITLE, BLUR_ITERATIONS, 20, nothing)
-
-    # Load our video and read the first frame
-    # We will use the first frame to find the reference rectangles and colors for the point cloud
-
-    K_static, dist_static = loadIntrinsics(
-        constants.CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)
-    K_moving, dist_moving = loadIntrinsics(
-        constants.CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
-
-    while(flag):
-        is_static_valid, static_frame_distorted = static_video.read()
-        is_moving_valid, moving_frame_distorted = moving_video.read()
-
-        if(is_static_valid and is_moving_valid):
-            static_frame = cv.undistort(
-                static_frame_distorted, K_static, dist_static)
-            moving_frame = cv.undistort(
-                moving_frame_distorted, K_moving, dist_moving)
-            # outerSquareContours = findOuterSquare(static_frame)
-            # cv.drawContours(
-            #     static_frame, outerSquareContours, -1, (0, 0, 255), 6)
-            polys = findRectanglePatterns(moving_frame)
-            # print(polys)
-
-            polys = [p.astype(np.int32) for p in polys]
-
-            if len(polys) > 0:
-                rect = polys[0]
-                cv.drawContours(moving_frame, [rect], -1, (0, 0, 255))
-
-            # cv.drawContours(
-            #     moving_frame, outerSquareContours, -1, (0, 0, 255), 6)
-
-            # cv.imshow("Altro", static_frame)
-            cv.imshow(STATIC_IMAGE_WINDOW_TITLE, moving_frame)
-            cv.waitKey(1)
-
-        else:
-            flag = 0
-    cv.destroyAllWindows()
-
-    # For each frame
-    # Find the marker
-    # Calculate light direction
-    # Find pixel value
-    # Save values to data structure
-
-    # Interpolation
-
-
-    #  TODO
-    # flusso ottico
-
-    #  trovare pallina:
-
-        #  findHomography ?
-        #   prendo i quattro quadrati ai corners e trovo quello con la media di pixels maggiore (quello che ha dei pixel bianchi)
-        # 
-        #   img show [startX:endX, startY:endY]   
-
-    #  angolo:
-    #  posizione_pixel = intrinsics * view_matrix * posizione_punto
-    #  posizione_pixel -> 
-
-    #  view_matrix to angle
 
 if __name__ == "__main__":
-    main()
+    coin = 1
+    (
+        not_aligned_static_video_path,
+        not_aligned_moving_video_path,
+        moving_camera_delay,
+        static_video_path,
+        moving_video_path,
+    ) = utils.getChoosenCoinVideosPaths(coin)
+
+    if (not os.path.exists(constants.CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)) or (
+        not os.path.exists(constants.CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
+    ):
+        raise (Exception("You need to run the calibration before the analysis!"))
+
+    main(
+        not_aligned_static_video_path,
+        not_aligned_moving_video_path,
+        moving_camera_delay,
+        static_video_path,
+        moving_video_path,
+    )

@@ -21,9 +21,9 @@ def outerContour(contour, gray, margin=10):
     return mean[0]
 
 
-def sortCorners(corners):
+def sortCorners(image, corners):
     """
-    Sorts an array of corners clockwise.
+    Sorts an array of corners based on the circle of the marker.
     """
     center = np.sum(corners, axis=0) / len(corners)
 
@@ -43,3 +43,40 @@ def loadIntrinsics(path=constants.CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH):
     K = intrinsics.getNode("K").mat()
     dist = intrinsics.getNode("dist").mat()
     return K, dist
+
+
+def getChoosenCoinVideosPaths(coin):
+    if coin == 1:
+        return (
+            constants.COIN_1_VIDEO_CAMERA_STATIC_PATH,
+            constants.COIN_1_VIDEO_CAMERA_MOVING_PATH,
+            constants.FILE_1_MOVING_CAMERA_DELAY,
+            constants.COIN_1_ALIGNED_VIDEO_STATIC_PATH,
+            constants.COIN_1_ALIGNED_VIDEO_MOVING_PATH,
+        )
+    elif coin == 2:
+        return (
+            constants.COIN_2_VIDEO_CAMERA_STATIC_PATH,
+            constants.COIN_2_VIDEO_CAMERA_MOVING_PATH,
+            constants.FILE_2_MOVING_CAMERA_DELAY,
+            constants.COIN_2_ALIGNED_VIDEO_STATIC_PATH,
+            constants.COIN_2_ALIGNED_VIDEO_MOVING_PATH,
+        )
+    elif coin == 3:
+        return (
+            constants.COIN_3_VIDEO_CAMERA_STATIC_PATH,
+            constants.COIN_3_VIDEO_CAMERA_MOVING_PATH,
+            constants.FILE_3_MOVING_CAMERA_DELAY,
+            constants.COIN_3_ALIGNED_VIDEO_STATIC_PATH,
+            constants.COIN_3_ALIGNED_VIDEO_MOVING_PATH,
+        )
+    elif coin == 4:
+        return (
+            constants.COIN_4_VIDEO_CAMERA_STATIC_PATH,
+            constants.COIN_4_VIDEO_CAMERA_MOVING_PATH,
+            constants.FILE_4_MOVING_CAMERA_DELAY,
+            constants.COIN_4_ALIGNED_VIDEO_STATIC_PATH,
+            constants.COIN_4_ALIGNED_VIDEO_MOVING_PATH,
+        )
+    else:
+        raise Exception("Invaild coin selected")
