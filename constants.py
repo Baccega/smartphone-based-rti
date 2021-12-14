@@ -13,9 +13,8 @@ CALIBRATION_FRAME_SKIP_INTERVAL = 40  # We just need some, not all
 
 SQAURE_GRID_DIMENSION = 400  # It will be a 400x400 square grid inside the marker
 
-STATIC_VIDEO_FPS = 29.97
-MOVING_VIDEO_FPS = 30.01
-
+# STATIC_VIDEO_FPS = 29.97
+# MOVING_VIDEO_FPS = 30.01
 ALIGNED_VIDEO_FPS = 30
 
 COIN_1_VIDEO_CAMERA_STATIC_PATH = "assets/cam1 - static/coin1.mov"
@@ -46,3 +45,6 @@ COIN_3_ALIGNED_VIDEO_MOVING_PATH = "data/3_moving_aligned_video.mp4"
 
 COIN_4_ALIGNED_VIDEO_STATIC_PATH = "data/4_static_aligned_video.mov"
 COIN_4_ALIGNED_VIDEO_MOVING_PATH = "data/4_moving_aligned_video.mp4"
+
+STATIC_CAMERA_FEED_WINDOW_TITLE = "Static camera feed"
+MOVING_CAMERA_FEED_WINDOW_TITLE = "Moving camera feed"
