@@ -16,6 +16,9 @@ SQAURE_GRID_DIMENSION = 400  # It will be a 400x400 square grid inside the marke
 # STATIC_VIDEO_FPS = 29.97
 # MOVING_VIDEO_FPS = 30.01
 ALIGNED_VIDEO_FPS = 30
+ANALYSIS_FRAME_SKIP = 15  # It will skip this frames each iteration during analysis
+
+OPTICAL_FLUX_FAILURES_LIMIT = 5
 
 COIN_1_VIDEO_CAMERA_STATIC_PATH = "assets/cam1 - static/coin1.mov"
 COIN_1_VIDEO_CAMERA_MOVING_PATH = "assets/cam2 - moving light/coin1.mp4"
