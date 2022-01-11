@@ -1,12 +1,14 @@
 import cv2 as cv
 import numpy as np
-from features_detector import FeaturesDetector
+from features_detector import (
+    extrapolateLightDirectionFromFrame,
+    extrapolatePixelIntensitiesFromFrame,
+)
 from utils import loadIntrinsics, getChoosenCoinVideosPaths
 import os
 from constants import (
     ALIGNED_VIDEO_FPS,
     ANALYSIS_FRAME_SKIP,
-    OPTICAL_FLUX_FAILURES_LIMIT,
     STATIC_CAMERA_FEED_WINDOW_TITLE,
     MOVING_CAMERA_FEED_WINDOW_TITLE,
     CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH,
@@ -24,7 +26,7 @@ def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
     ).output(video_path).run()
 
 
-def getLightDirectionData(static_video_path, moving_video_path):
+def extrapolateDataFromVideos(static_video_path, moving_video_path):
     cv.namedWindow(STATIC_CAMERA_FEED_WINDOW_TITLE)
     cv.namedWindow(MOVING_CAMERA_FEED_WINDOW_TITLE)
 
@@ -38,46 +40,48 @@ def getLightDirectionData(static_video_path, moving_video_path):
 
     data = []
 
-    features_detector = FeaturesDetector()
-
     max_frames = min(
         static_video.get(cv.CAP_PROP_FRAME_COUNT),
         moving_video.get(cv.CAP_PROP_FRAME_COUNT),
     )
-    current_frame_count, failures = 0
+    current_frame_count = 0
     flag = True
     while flag:
-        is_static_valid, static_frame_distorted = static_video.read()
+        # is_static_valid, static_frame_distorted = static_video.read()
+        is_static_valid = True
         is_moving_valid, moving_frame_distorted = moving_video.read()
 
         if is_static_valid and is_moving_valid:
-            static_frame = cv.undistort(static_frame_distorted, K_static, dist_static)
+            # static_frame = cv.undistort(static_frame_distorted, K_static, dist_static)
             moving_frame = cv.undistort(moving_frame_distorted, K_moving, dist_moving)
 
             # TODO Flusso ottico?
-            frame_data = features_detector.extrapolateDataFromFrame(
-                static_frame=static_frame, moving_frame=moving_frame
-            )
+            light_direction = extrapolateLightDirectionFromFrame(moving_frame)
+            # pixel_intensities = (
+            #     extrapolatePixelIntensitiesFromFrame(
+            #         static_frame
+            #     )
+            # )
 
-            if frame_data:
-                failures = 0
-                data.append(frame_data)
-            else:
-                failures += 1
-                if failures > OPTICAL_FLUX_FAILURES_LIMIT:
-                    features_detector.exceededFailureLimit()
-
-            data.append()
+            # if light_direction and pixel_intensities:
+            #     data.append(
+            #         (
+            #             current_frame_count * ANALYSIS_FRAME_SKIP,
+            #             light_direction,
+            #             pixel_intensities,
+            #         )
+            #     )
 
             # Video output during analysis
-            cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
+            # cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
             cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
             cv.waitKey(1)
 
             # Frame skip
             current_frame_count += ANALYSIS_FRAME_SKIP
             if max_frames > current_frame_count:
-                static_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
+                # if max_frames > current_frame_count and ANALYSIS_FRAME_SKIP != 1: ?
+                # static_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
                 moving_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
             else:
                 flag = False
@@ -113,11 +117,8 @@ def main(
             not_aligned_moving_video_path, moving_video_path, moving_camera_delay
         )
 
-    # From moving get lightdir and timestamp
-    light_direction_data = getLightDirectionData(static_video_path, moving_video_path)
-
-    # From static get every pixel value for each light direction and timestamp:
-    # (timestamp 45.0, lightdir [x,y,0]) -> pixelvalues
+    # [(frameNumber, lightDir, pixelIntensity)]
+    extrapolated_data = extrapolateDataFromVideos(static_video_path, moving_video_path)
 
     # Data interpolation
 

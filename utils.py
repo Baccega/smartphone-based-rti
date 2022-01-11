@@ -80,3 +80,57 @@ def getChoosenCoinVideosPaths(coin):
         )
     else:
         raise Exception("Invaild coin selected")
+
+
+def findLightDirection(moving_frame, static_corners, moving_corners):
+    moving_frame = cv2.cvtColor(moving_frame, cv2.COLOR_BGR2GRAY)
+    image_size = moving_frame.shape[::-1]
+
+    M, D = getCameraIntrinsics(constants.CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
+    z_axis = 1
+    flags = cv2.CALIB_USE_INTRINSIC_GUESS
+
+    points_3d = np.float32(
+        [
+            (static_corners[point][0], static_corners[point][1], z_axis)
+            for point in range(0, len(static_corners))
+        ]
+    )
+    points_2d = np.float32(
+        [
+            (moving_corners[point][0], moving_corners[point][1])
+            for point in range(0, len(moving_corners))
+        ]
+    )
+
+    # perform a camera calibration to get R and T
+    (ret, matrix, distortion, r_vecs, t_vecs) = cv2.calibrateCamera(
+        [points_3d], [points_2d], image_size, cameraMatrix=M, distCoeffs=D, flags=flags
+    )
+    R = cv2.Rodrigues(r_vecs[0])[0]
+    T = t_vecs[0]
+
+    light_direction = -np.matrix(R).T * np.matrix(T)
+    light_direction = np.array(light_direction).flatten()
+
+    print(light_direction)
+    return light_direction.all()
+    # return None
+
+
+def getCameraIntrinsics(calibration_file_path):
+    import os
+
+    """
+    Get camera intrinsic matrix and distorsion
+    :param calibration_file_path: file path to intrinsics file
+    """
+    if not os.path.isfile(calibration_file_path):
+        raise Exception("intrinsics file not found!")
+    else:
+        # Read intrinsics to file
+        Kfile = cv2.FileStorage(calibration_file_path, cv2.FILE_STORAGE_READ)
+        matrix = Kfile.getNode("K").mat()
+        distortion = Kfile.getNode("distortion").mat()
+
+    return matrix, distortion
