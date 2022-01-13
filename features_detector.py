@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 
-from utils import findLightDirection, outerContour, sortCorners
+from utils import outerContour, sortCorners
 
 
 ACCURACY = 1
@@ -16,16 +16,13 @@ ROI3 = 125
 ROI4 = ROI3 + 50
 
 
-def extrapolateLightDirectionFromFrame(frame):
-    gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    homography, corners, warped_frame = findRectanglePatternHomography(gray_frame)
-
-    return False
+# def extrapolateLightDirectionFromFrame(frame):
+#     return False
 
 
-def extrapolatePixelIntensitiesFromFrame(frame):
-    # print("pixel intensities")
-    return True
+# def extrapolatePixelIntensitiesFromFrame(frame):
+#     # print("pixel intensities")
+#     return True
 
 
 def checkBlankArea(warped):

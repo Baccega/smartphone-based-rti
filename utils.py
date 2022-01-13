@@ -92,13 +92,13 @@ def findLightDirection(moving_frame, static_corners, moving_corners):
 
     points_3d = np.float32(
         [
-            (static_corners[point][0], static_corners[point][1], z_axis)
+            (static_corners[point][0][0], static_corners[point][0][1], z_axis)
             for point in range(0, len(static_corners))
         ]
     )
     points_2d = np.float32(
         [
-            (moving_corners[point][0], moving_corners[point][1])
+            (moving_corners[point][0][0], moving_corners[point][0][1])
             for point in range(0, len(moving_corners))
         ]
     )

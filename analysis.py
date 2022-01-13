@@ -1,10 +1,9 @@
 import cv2 as cv
 import numpy as np
 from features_detector import (
-    extrapolateLightDirectionFromFrame,
-    extrapolatePixelIntensitiesFromFrame,
+    findRectanglePatternHomography,
 )
-from utils import loadIntrinsics, getChoosenCoinVideosPaths
+from utils import findLightDirection, loadIntrinsics, getChoosenCoinVideosPaths
 import os
 from constants import (
     ALIGNED_VIDEO_FPS,
@@ -47,35 +46,51 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
     current_frame_count = 0
     flag = True
     while flag:
-        # is_static_valid, static_frame_distorted = static_video.read()
+        is_static_valid, static_frame_distorted = static_video.read()
         is_static_valid = True
         is_moving_valid, moving_frame_distorted = moving_video.read()
 
         if is_static_valid and is_moving_valid:
-            # static_frame = cv.undistort(static_frame_distorted, K_static, dist_static)
+            static_frame = cv.undistort(static_frame_distorted, K_static, dist_static)
             moving_frame = cv.undistort(moving_frame_distorted, K_moving, dist_moving)
 
-            # TODO Flusso ottico?
-            light_direction = extrapolateLightDirectionFromFrame(moving_frame)
-            # pixel_intensities = (
-            #     extrapolatePixelIntensitiesFromFrame(
-            #         static_frame
-            #     )
-            # )
+            static_gray_frame = cv.cvtColor(static_frame, cv.COLOR_BGR2GRAY)
+            moving_gray_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
+            (
+                static_homography,
+                static_corners,
+                static_warped_frame,
+            ) = findRectanglePatternHomography(static_gray_frame)
+            (
+                moving_homography,
+                moving_corners,
+                moving_warped_frame,
+            ) = findRectanglePatternHomography(moving_gray_frame)
 
-            # if light_direction and pixel_intensities:
-            #     data.append(
-            #         (
-            #             current_frame_count * ANALYSIS_FRAME_SKIP,
-            #             light_direction,
-            #             pixel_intensities,
-            #         )
-            #     )
+            if static_corners is not None and moving_corners is not None:
+                # TODO Flusso ottico?
+                light_direction = findLightDirection(
+                    moving_frame, static_corners, moving_corners
+                )
+                # pixel_intensities = (
+                #     extrapolatePixelIntensitiesFromFrame(
+                #         static_frame
+                #     )
+                # )
 
-            # Video output during analysis
-            # cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
-            cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
-            cv.waitKey(1)
+                # if light_direction and pixel_intensities:
+                #     data.append(
+                #         (
+                #             current_frame_count * ANALYSIS_FRAME_SKIP,
+                #             light_direction,
+                #             pixel_intensities,
+                #         )
+                #     )
+
+                # Video output during analysis
+                # cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
+                cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
+                cv.waitKey(1)
 
             # Frame skip
             current_frame_count += ANALYSIS_FRAME_SKIP
