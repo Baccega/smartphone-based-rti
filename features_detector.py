@@ -68,8 +68,8 @@ def findRectanglePatternHomography(gray):
                 warped = rotated
                 currMax = rotatedScore
 
-        cv.imshow("warped", warped)
-        cv.waitKey(1)
+        # cv.imshow("warped", warped)
+        # cv.waitKey(1)
 
         # We return the Homography, Corners and the Warped Image
         return M, biggerContour, warped
@@ -147,8 +147,8 @@ def extrapolateLightDirectionFromFrame_old(frame):
         homography = cv.findHomography(corners, destPoints)[0]
         print(homography)
         warped = cv.warpPerspective(frame, homography, (512, 512))
-        cv.imshow("warped", warped)
-        cv.waitKey(1)
+        # cv.imshow("warped", warped)
+        # cv.waitKey(1)
 
         # def findRectanglePatternHomography(gray):
 

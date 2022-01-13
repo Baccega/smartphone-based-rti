@@ -72,6 +72,17 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
                 light_direction = findLightDirection(
                     moving_frame, static_corners, moving_corners
                 )
+
+                print(light_direction)
+
+                static_frame = cv.line(
+                    static_frame,
+                    (int(light_direction[0]), int(light_direction[1])),
+                    static_corners[0][0],
+                    (255, 0, 0),
+                    3,
+                )
+
                 # pixel_intensities = (
                 #     extrapolatePixelIntensitiesFromFrame(
                 #         static_frame
@@ -87,19 +98,20 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
                 #         )
                 #     )
 
-                # Video output during analysis
-                # cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
-                cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
-                cv.waitKey(1)
+            # Video output during analysis
+            cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
+            cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
+            cv.waitKey(1)
 
             # Frame skip
             current_frame_count += ANALYSIS_FRAME_SKIP
-            if max_frames > current_frame_count:
-                # if max_frames > current_frame_count and ANALYSIS_FRAME_SKIP != 1: ?
-                # static_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
-                moving_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
-            else:
+            if max_frames < current_frame_count:
                 flag = False
+
+            if ANALYSIS_FRAME_SKIP > 1:
+                static_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
+                moving_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
+
         else:
             flag = False
 

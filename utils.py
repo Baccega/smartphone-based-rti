@@ -113,8 +113,7 @@ def findLightDirection(moving_frame, static_corners, moving_corners):
     light_direction = -np.matrix(R).T * np.matrix(T)
     light_direction = np.array(light_direction).flatten()
 
-    print(light_direction)
-    return light_direction.all()
+    return light_direction
     # return None
 
 
