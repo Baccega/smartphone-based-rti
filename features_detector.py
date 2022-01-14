@@ -35,13 +35,13 @@ def checkBlankArea(warped):
     return mean[0]
 
 
-def findRectanglePatternHomography(gray):
+def findRectanglePatternHomography(gray, choosen_camera):
     """
     Given a gray image, find the rectangle pattern and estimate homography matrix
     """
 
     # We use findRectanglePatterns and we keep the first (best) result
-    polys = findRectanglePatterns(gray)
+    polys = findRectanglePatterns(gray, choosen_camera)
     if len(polys) > 0:
         biggerContour = polys[0]
 
@@ -76,12 +76,17 @@ def findRectanglePatternHomography(gray):
     return None, None, None
 
 
-def findRectanglePatterns(gray):
-    thresh = cv.adaptiveThreshold(
-        gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 7, 2
-    )
+def findRectanglePatterns(gray, choosen_camera):
+    if choosen_camera == "static":
+        thresh = cv.adaptiveThreshold(
+            gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 17, 4
+        )
+    else:
+        thresh = cv.adaptiveThreshold(
+            gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 7, 2
+        )
     kernel = np.ones((3, 3), np.uint8)
-    thresh = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel)
+    thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel)
     # cv.imshow("threshold", thresh)
     # cv.waitKey(1)
 
@@ -112,8 +117,8 @@ def findRectanglePatterns(gray):
     # It's safe to take the first entry as a valid pattern if it exists
     polys.sort(key=lambda x: x[1], reverse=False)
     # print(polys)
+
     return [p[0].astype(np.int32) for p in polys if p[1] < 40 and area > 40000]
-    # return polys
 
 
 def extrapolateLightDirectionFromFrame_old(frame):

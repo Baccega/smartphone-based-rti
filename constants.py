@@ -1,4 +1,4 @@
-# --- CAMERA_CALIBRATION
+# --- CAMERA CALIBRATION CONSTANTS
 
 CALIBRATION_CAMERA_STATIC_PATH = "assets/cam1 - static/calibration.mov"
 CALIBRATION_CAMERA_MOVING_PATH = "assets/cam2 - moving light/calibration.mp4"
@@ -9,7 +9,7 @@ CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH = "data/moving_intrinsics.xml"
 CHESSBOARD_SIZE = (6, 9)
 CALIBRATION_FRAME_SKIP_INTERVAL = 40  # We just need some, not all
 
-# --- ANALYSIS
+# --- ANALYSIS CONSTANTS
 
 SQAURE_GRID_DIMENSION = 400  # It will be a 400x400 square grid inside the marker
 
@@ -18,7 +18,15 @@ SQAURE_GRID_DIMENSION = 400  # It will be a 400x400 square grid inside the marke
 ALIGNED_VIDEO_FPS = 30
 ANALYSIS_FRAME_SKIP = 1  # It will skip this frames each iteration during analysis
 
-# OPTICAL_FLOW_FAILURES_LIMIT = 5
+# ---  DEBUG CONSTANTS
+
+STATIC_CAMERA_FEED_WINDOW_TITLE = "Static camera feed"
+MOVING_CAMERA_FEED_WINDOW_TITLE = "Moving camera feed"
+LIGHT_DIRECTION_WINDOW_TITLE = "Light direction"
+
+LIGHT_DIRECTION_WINDOW_SIZE = 256
+
+# ---  FILE NAMES CONSTANTS
 
 COIN_1_VIDEO_CAMERA_STATIC_PATH = "assets/cam1 - static/coin1.mov"
 COIN_1_VIDEO_CAMERA_MOVING_PATH = "assets/cam2 - moving light/coin1.mp4"
@@ -48,6 +56,3 @@ COIN_3_ALIGNED_VIDEO_MOVING_PATH = "data/3_moving_aligned_video.mp4"
 
 COIN_4_ALIGNED_VIDEO_STATIC_PATH = "data/4_static_aligned_video.mov"
 COIN_4_ALIGNED_VIDEO_MOVING_PATH = "data/4_moving_aligned_video.mp4"
-
-STATIC_CAMERA_FEED_WINDOW_TITLE = "Static camera feed"
-MOVING_CAMERA_FEED_WINDOW_TITLE = "Moving camera feed"

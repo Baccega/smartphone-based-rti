@@ -1,9 +1,12 @@
 import cv2 as cv
 import numpy as np
-from features_detector import (
-    findRectanglePatternHomography,
+from features_detector import findRectanglePatternHomography, findRectanglePatterns
+from utils import (
+    findLightDirection,
+    loadIntrinsics,
+    getChoosenCoinVideosPaths,
+    showLightDirection,
 )
-from utils import findLightDirection, loadIntrinsics, getChoosenCoinVideosPaths
 import os
 from constants import (
     ALIGNED_VIDEO_FPS,
@@ -60,28 +63,24 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
                 static_homography,
                 static_corners,
                 static_warped_frame,
-            ) = findRectanglePatternHomography(static_gray_frame)
+            ) = findRectanglePatternHomography(static_gray_frame, "static")
             (
                 moving_homography,
                 moving_corners,
                 moving_warped_frame,
-            ) = findRectanglePatternHomography(moving_gray_frame)
+            ) = findRectanglePatternHomography(moving_gray_frame, "moving")
 
             if static_corners is not None and moving_corners is not None:
-                # TODO Flusso ottico?
                 light_direction = findLightDirection(
-                    moving_frame, static_corners, moving_corners
-                )
-
-                print(light_direction)
-
-                static_frame = cv.line(
                     static_frame,
-                    (int(light_direction[0]), int(light_direction[1])),
-                    static_corners[0][0],
-                    (255, 0, 0),
-                    3,
+                    moving_frame,
+                    static_corners,
+                    moving_corners,
                 )
+
+                # print(light_direction)
+
+                showLightDirection(light_direction)
 
                 # pixel_intensities = (
                 #     extrapolatePixelIntensitiesFromFrame(
@@ -97,6 +96,11 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
                 #             pixel_intensities,
                 #         )
                 #     )
+
+                static_frame = cv.drawContours(
+                    static_frame, [static_corners], -1, (0, 0, 255), 3
+                )
+                # cv.imshow("warped_static", static_warped_frame)
 
             # Video output during analysis
             cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)

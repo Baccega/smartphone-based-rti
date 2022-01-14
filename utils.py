@@ -1,4 +1,4 @@
-import cv2
+import cv2 as cv
 import numpy as np
 import math
 import constants
@@ -12,12 +12,12 @@ def outerContour(contour, gray, margin=10):
     # We create two masks, one with the poly and one with the poly eroded
     kernel = np.ones((margin, margin), np.uint8)
     mask = np.zeros(gray.shape[:2], dtype=np.uint8)
-    cv2.fillConvexPoly(mask, contour, 255)
-    eroded = cv2.erode(mask, kernel)
-    mask = cv2.bitwise_xor(eroded, mask)
+    cv.fillConvexPoly(mask, contour, 255)
+    eroded = cv.erode(mask, kernel)
+    mask = cv.bitwise_xor(eroded, mask)
 
     # We calculate the mean with the two XORed mask
-    mean = cv2.mean(gray, mask)
+    mean = cv.mean(gray, mask)
     return mean[0]
 
 
@@ -39,7 +39,7 @@ def loadIntrinsics(path=constants.CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH):
     """
     Loads camera intrinsics from an xml file. Uses a default path if not provided (intrinsics.xml).
     """
-    intrinsics = cv2.FileStorage(path, cv2.FILE_STORAGE_READ)
+    intrinsics = cv.FileStorage(path, cv.FILE_STORAGE_READ)
     K = intrinsics.getNode("K").mat()
     dist = intrinsics.getNode("dist").mat()
     return K, dist
@@ -82,13 +82,13 @@ def getChoosenCoinVideosPaths(coin):
         raise Exception("Invaild coin selected")
 
 
-def findLightDirection(moving_frame, static_corners, moving_corners):
-    moving_frame = cv2.cvtColor(moving_frame, cv2.COLOR_BGR2GRAY)
+def findLightDirection(static_frame, moving_frame, static_corners, moving_corners):
+    moving_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
     image_size = moving_frame.shape[::-1]
 
     M, D = getCameraIntrinsics(constants.CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
     z_axis = 1
-    flags = cv2.CALIB_USE_INTRINSIC_GUESS
+    flags = cv.CALIB_USE_INTRINSIC_GUESS
 
     points_3d = np.float32(
         [
@@ -104,17 +104,20 @@ def findLightDirection(moving_frame, static_corners, moving_corners):
     )
 
     # perform a camera calibration to get R and T
-    (ret, matrix, distortion, r_vecs, t_vecs) = cv2.calibrateCamera(
+    (ret, matrix, distortion, r_vecs, t_vecs) = cv.calibrateCamera(
         [points_3d], [points_2d], image_size, cameraMatrix=M, distCoeffs=D, flags=flags
     )
-    R = cv2.Rodrigues(r_vecs[0])[0]
+    R = cv.Rodrigues(r_vecs[0])[0]
     T = t_vecs[0]
 
-    light_direction = -np.matrix(R).T * np.matrix(T)
-    light_direction = np.array(light_direction).flatten()
+    pose = -np.matrix(R).T * np.matrix(T)
+    pose = np.array(pose).flatten()
 
-    return light_direction
-    # return None
+    h2, w2 = int(static_frame.shape[0] / 2), int(static_frame.shape[1] / 2)
+    p = (h2, w2, 0)
+    l = (pose - p) / np.linalg.norm(pose - p)
+
+    return l
 
 
 def getCameraIntrinsics(calibration_file_path):
@@ -128,8 +131,39 @@ def getCameraIntrinsics(calibration_file_path):
         raise Exception("intrinsics file not found!")
     else:
         # Read intrinsics to file
-        Kfile = cv2.FileStorage(calibration_file_path, cv2.FILE_STORAGE_READ)
+        Kfile = cv.FileStorage(calibration_file_path, cv.FILE_STORAGE_READ)
         matrix = Kfile.getNode("K").mat()
         distortion = Kfile.getNode("distortion").mat()
 
     return matrix, distortion
+
+
+def showLightDirection(light_direction):
+    blank_image = np.zeros(
+        shape=[
+            constants.LIGHT_DIRECTION_WINDOW_SIZE,
+            constants.LIGHT_DIRECTION_WINDOW_SIZE,
+            3,
+        ],
+        dtype=np.uint8,
+    )
+
+    half_size = int(constants.LIGHT_DIRECTION_WINDOW_SIZE / 2)
+
+    cv.line(
+        blank_image,
+        (half_size, half_size),
+        (
+            int((light_direction[0] * half_size) + half_size),
+            int((light_direction[1] * half_size) + half_size),
+        ),
+        (255, 255, 255),
+    )
+    cv.circle(
+        blank_image,
+        (half_size, half_size),
+        half_size,
+        (255, 255, 255),
+    )
+
+    cv.imshow("Light direction", blank_image)
