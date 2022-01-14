@@ -82,6 +82,14 @@ def getChoosenCoinVideosPaths(coin):
         raise Exception("Invaild coin selected")
 
 
+def findPixelIntensities(static_frame):
+    roi = static_frame[
+        720 : 720 + 460,
+        320 : 320 + 460,
+    ]
+    return roi
+
+
 def findLightDirection(static_frame, moving_frame, static_corners, moving_corners):
     moving_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
     image_size = moving_frame.shape[::-1]

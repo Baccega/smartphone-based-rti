@@ -3,6 +3,7 @@ import numpy as np
 from features_detector import findRectanglePatternHomography, findRectanglePatterns
 from utils import (
     findLightDirection,
+    findPixelIntensities,
     loadIntrinsics,
     getChoosenCoinVideosPaths,
     showLightDirection,
@@ -82,11 +83,7 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
 
                 showLightDirection(light_direction)
 
-                # pixel_intensities = (
-                #     extrapolatePixelIntensitiesFromFrame(
-                #         static_frame
-                #     )
-                # )
+                pixel_intensities = findPixelIntensities(static_frame)
 
                 # if light_direction and pixel_intensities:
                 #     data.append(
