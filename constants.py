@@ -56,3 +56,5 @@ COIN_3_ALIGNED_VIDEO_MOVING_PATH = "data/3_moving_aligned_video.mp4"
 
 COIN_4_ALIGNED_VIDEO_STATIC_PATH = "data/4_static_aligned_video.mov"
 COIN_4_ALIGNED_VIDEO_MOVING_PATH = "data/4_moving_aligned_video.mp4"
+
+EXTRACTED_DATA_FILE_PATH = "data/extracted_data.npz"

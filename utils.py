@@ -87,7 +87,20 @@ def findPixelIntensities(static_frame):
         720 : 720 + 460,
         320 : 320 + 460,
     ]
-    return roi
+    roi_full_size = cv.cvtColor(roi, cv.COLOR_BGR2HSV)
+
+    roi = cv.resize(
+        roi_full_size,
+        (constants.SQAURE_GRID_DIMENSION, constants.SQAURE_GRID_DIMENSION),
+    )
+
+    data = []
+
+    for y in range(constants.SQAURE_GRID_DIMENSION):
+        for x in range(constants.SQAURE_GRID_DIMENSION):
+            data.append(roi[:, :, 2][x][y])
+
+    return data
 
 
 def findLightDirection(static_frame, moving_frame, static_corners, moving_corners):
@@ -175,3 +188,9 @@ def showLightDirection(light_direction):
     )
 
     cv.imshow("Light direction", blank_image)
+
+
+def writeDataFile(data):
+    print("writeDatafile: ", constants.EXTRACTED_DATA_FILE_PATH)
+
+    np.savez_compressed(constants.EXTRACTED_DATA_FILE_PATH, data)

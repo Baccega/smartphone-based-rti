@@ -7,11 +7,13 @@ from utils import (
     loadIntrinsics,
     getChoosenCoinVideosPaths,
     showLightDirection,
+    writeDataFile,
 )
 import os
 from constants import (
     ALIGNED_VIDEO_FPS,
     ANALYSIS_FRAME_SKIP,
+    EXTRACTED_DATA_FILE_PATH,
     STATIC_CAMERA_FEED_WINDOW_TITLE,
     MOVING_CAMERA_FEED_WINDOW_TITLE,
     CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH,
@@ -79,30 +81,35 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
                     moving_corners,
                 )
 
-                # print(light_direction)
-
                 showLightDirection(light_direction)
 
                 pixel_intensities = findPixelIntensities(static_frame)
 
-                # if light_direction and pixel_intensities:
-                #     data.append(
-                #         (
-                #             current_frame_count * ANALYSIS_FRAME_SKIP,
-                #             light_direction,
-                #             pixel_intensities,
-                #         )
-                #     )
+                if light_direction is not None and pixel_intensities is not None:
+                    for i in range(len(pixel_intensities)):
+                        data.append(
+                            (
+                                light_direction[0],
+                                light_direction[1],
+                                pixel_intensities[i],
+                            )
+                        )
 
                 static_frame = cv.drawContours(
                     static_frame, [static_corners], -1, (0, 0, 255), 3
                 )
-                # cv.imshow("warped_static", static_warped_frame)
+                # cv.imshow("warped_moving", moving_warped_frame)
 
             # Video output during analysis
             cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
             cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
-            cv.waitKey(1)
+
+            if cv.waitKey(1) & 0xFF == ord("q"):
+                flag = False
+            # if cv.waitKey(1) & 0xFF == ord("p"q):  # Pause
+            #     isPaused = False
+            # if cv.waitKey(1) & 0xFF == ord("c"):  # Continue
+            #     isPaused = True
 
             # Frame skip
             current_frame_count += ANALYSIS_FRAME_SKIP
@@ -120,7 +127,7 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
     moving_video.release()
     cv.destroyAllWindows()
 
-    return data
+    return np.asarray(data, dtype=object)
 
 
 def main(
@@ -145,8 +152,14 @@ def main(
             not_aligned_moving_video_path, moving_video_path, moving_camera_delay
         )
 
-    # [(frameNumber, lightDir, pixelIntensity)]
+    # [(lightDir_x, lightDir_y, pixelIntensity)]
     extrapolated_data = extrapolateDataFromVideos(static_video_path, moving_video_path)
+
+    writeDataFile(extrapolated_data)
+
+    # loaded_data = np.load(EXTRACTED_DATA_FILE_PATH, allow_pickle=True)
+    # print(loaded_data["arr_0"][0][0])
+    # cv.imshow("test", loaded_data["arr_0"][0][1])
 
     # Data interpolation
 
