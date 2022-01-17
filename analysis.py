@@ -4,6 +4,7 @@ from features_detector import findRectanglePatternHomography, findRectanglePatte
 from utils import (
     findLightDirection,
     findPixelIntensities,
+    loadDataFile,
     loadIntrinsics,
     getChoosenCoinVideosPaths,
     showLightDirection,
@@ -13,7 +14,6 @@ import os
 from constants import (
     ALIGNED_VIDEO_FPS,
     ANALYSIS_FRAME_SKIP,
-    EXTRACTED_DATA_FILE_PATH,
     STATIC_CAMERA_FEED_WINDOW_TITLE,
     MOVING_CAMERA_FEED_WINDOW_TITLE,
     CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH,
@@ -31,7 +31,7 @@ def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
     ).output(video_path).run()
 
 
-def extrapolateDataFromVideos(static_video_path, moving_video_path):
+def extractDataFromVideos(static_video_path, moving_video_path):
     cv.namedWindow(STATIC_CAMERA_FEED_WINDOW_TITLE)
     cv.namedWindow(MOVING_CAMERA_FEED_WINDOW_TITLE)
 
@@ -106,14 +106,15 @@ def extrapolateDataFromVideos(static_video_path, moving_video_path):
 
             if cv.waitKey(1) & 0xFF == ord("q"):
                 flag = False
-            # if cv.waitKey(1) & 0xFF == ord("p"q):  # Pause
+            # if cv.waitKey(1) & 0xFF == ord("p"):  # Pause
             #     isPaused = False
             # if cv.waitKey(1) & 0xFF == ord("c"):  # Continue
             #     isPaused = True
 
             # Frame skip
             current_frame_count += ANALYSIS_FRAME_SKIP
-            if max_frames < current_frame_count:
+            # if max_frames < current_frame_count:
+            if max_frames < current_frame_count or current_frame_count > 270:
                 flag = False
 
             if ANALYSIS_FRAME_SKIP > 1:
@@ -136,7 +137,9 @@ def main(
     moving_camera_delay,
     static_video_path,
     moving_video_path,
+    extracted_data_file_path,
 ):
+    extracted_data = None
     print(
         "*** Analysis *** \nStatic_Video: '{}' \nMoving_Video: '{}'".format(
             not_aligned_static_video_path, not_aligned_moving_video_path
@@ -152,12 +155,17 @@ def main(
             not_aligned_moving_video_path, moving_video_path, moving_camera_delay
         )
 
-    # [(lightDir_x, lightDir_y, pixelIntensity)]
-    extrapolated_data = extrapolateDataFromVideos(static_video_path, moving_video_path)
+    if not os.path.exists(extracted_data_file_path):
+        # [(lightDir_x, lightDir_y, pixelIntensity)]
+        extracted_data = extractDataFromVideos(static_video_path, moving_video_path)
+        writeDataFile(extracted_data_file_path, extracted_data)
 
-    writeDataFile(extrapolated_data)
+    if extracted_data is not None:
+        loaded_data = extracted_data
+    else:
+        loaded_data = loadDataFile(extracted_data_file_path)
 
-    # loaded_data = np.load(EXTRACTED_DATA_FILE_PATH, allow_pickle=True)
+    print("Data:", loaded_data[0][0], loaded_data[0][1], loaded_data[0][2])
     # print(loaded_data["arr_0"][0][0])
     # cv.imshow("test", loaded_data["arr_0"][0][1])
 
@@ -172,6 +180,7 @@ if __name__ == "__main__":
         moving_camera_delay,
         static_video_path,
         moving_video_path,
+        extracted_data_file_path,
     ) = getChoosenCoinVideosPaths(coin)
 
     if (not os.path.exists(CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)) or (
@@ -185,4 +194,5 @@ if __name__ == "__main__":
         moving_camera_delay,
         static_video_path,
         moving_video_path,
+        extracted_data_file_path,
     )

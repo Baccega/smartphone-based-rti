@@ -16,7 +16,7 @@ SQAURE_GRID_DIMENSION = 400  # It will be a 400x400 square grid inside the marke
 # STATIC_VIDEO_FPS = 29.97
 # MOVING_VIDEO_FPS = 30.01
 ALIGNED_VIDEO_FPS = 30
-ANALYSIS_FRAME_SKIP = 1  # It will skip this frames each iteration during analysis
+ANALYSIS_FRAME_SKIP = 10  # It will skip this frames each iteration during analysis
 
 # ---  DEBUG CONSTANTS
 
@@ -57,4 +57,7 @@ COIN_3_ALIGNED_VIDEO_MOVING_PATH = "data/3_moving_aligned_video.mp4"
 COIN_4_ALIGNED_VIDEO_STATIC_PATH = "data/4_static_aligned_video.mov"
 COIN_4_ALIGNED_VIDEO_MOVING_PATH = "data/4_moving_aligned_video.mp4"
 
-EXTRACTED_DATA_FILE_PATH = "data/extracted_data.npz"
+COIN_1_EXTRACTED_DATA_FILE_PATH = "data/1_extracted_data.npz"
+COIN_2_EXTRACTED_DATA_FILE_PATH = "data/2_extracted_data.npz"
+COIN_3_EXTRACTED_DATA_FILE_PATH = "data/3_extracted_data.npz"
+COIN_4_EXTRACTED_DATA_FILE_PATH = "data/4_extracted_data.npz"

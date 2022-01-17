@@ -53,6 +53,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.FILE_1_MOVING_CAMERA_DELAY,
             constants.COIN_1_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_1_ALIGNED_VIDEO_MOVING_PATH,
+            constants.COIN_1_EXTRACTED_DATA_FILE_PATH,
         )
     elif coin == 2:
         return (
@@ -61,6 +62,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.FILE_2_MOVING_CAMERA_DELAY,
             constants.COIN_2_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_2_ALIGNED_VIDEO_MOVING_PATH,
+            constants.COIN_2_EXTRACTED_DATA_FILE_PATH,
         )
     elif coin == 3:
         return (
@@ -69,6 +71,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.FILE_3_MOVING_CAMERA_DELAY,
             constants.COIN_3_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_3_ALIGNED_VIDEO_MOVING_PATH,
+            constants.COIN_3_EXTRACTED_DATA_FILE_PATH,
         )
     elif coin == 4:
         return (
@@ -77,6 +80,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.FILE_4_MOVING_CAMERA_DELAY,
             constants.COIN_4_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_4_ALIGNED_VIDEO_MOVING_PATH,
+            constants.COIN_4_EXTRACTED_DATA_FILE_PATH,
         )
     else:
         raise Exception("Invaild coin selected")
@@ -190,7 +194,14 @@ def showLightDirection(light_direction):
     cv.imshow("Light direction", blank_image)
 
 
-def writeDataFile(data):
-    print("writeDatafile: ", constants.EXTRACTED_DATA_FILE_PATH)
+def writeDataFile(extracted_data_file_path, extracted_data):
+    print("Saving extracted data into '{}'...".format(extracted_data_file_path))
+    np.savez_compressed(extracted_data_file_path, extracted_data)
+    print("Saved!")
 
-    np.savez_compressed(constants.EXTRACTED_DATA_FILE_PATH, data)
+
+def loadDataFile(extracted_data_file_path):
+    print("Loading extracted data file '{}'...".format(extracted_data_file_path))
+    loaded_data = np.load(extracted_data_file_path, allow_pickle=True)["arr_0"]
+    print("Loaded!")
+    return loaded_data
