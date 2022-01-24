@@ -87,8 +87,9 @@ def findRectanglePatterns(gray, choosen_camera):
         )
     kernel = np.ones((3, 3), np.uint8)
     thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel)
-    # cv.imshow("threshold", thresh)
-    # cv.waitKey(1)
+    # if choosen_camera == "moving":
+    #     cv.imshow("threshold", thresh)
+    #     cv.waitKey(1)
 
     # Find all the possible contours in thresholded image
     contours, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)

@@ -1,9 +1,11 @@
 import cv2 as cv
 import numpy as np
 from features_detector import findRectanglePatternHomography, findRectanglePatterns
+from interpolation import interpolate_data
 from utils import (
     findLightDirection,
     findPixelIntensities,
+    fromLightDirToIndex,
     loadDataFile,
     loadIntrinsics,
     getChoosenCoinVideosPaths,
@@ -14,6 +16,7 @@ import os
 from constants import (
     ALIGNED_VIDEO_FPS,
     ANALYSIS_FRAME_SKIP,
+    SQAURE_GRID_DIMENSION,
     STATIC_CAMERA_FEED_WINDOW_TITLE,
     MOVING_CAMERA_FEED_WINDOW_TITLE,
     CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH,
@@ -43,7 +46,10 @@ def extractDataFromVideos(static_video_path, moving_video_path):
     K_static, dist_static = loadIntrinsics(CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)
     K_moving, dist_moving = loadIntrinsics(CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
 
-    data = []
+    data = [
+        [[] * SQAURE_GRID_DIMENSION] * SQAURE_GRID_DIMENSION
+        for i in range(SQAURE_GRID_DIMENSION)
+    ]
 
     max_frames = min(
         static_video.get(cv.CAP_PROP_FRAME_COUNT),
@@ -85,15 +91,20 @@ def extractDataFromVideos(static_video_path, moving_video_path):
 
                 pixel_intensities = findPixelIntensities(static_frame)
 
+                # Saving data points to data structure
                 if light_direction is not None and pixel_intensities is not None:
-                    for i in range(len(pixel_intensities)):
-                        data.append(
-                            (
-                                light_direction[0],
-                                light_direction[1],
-                                pixel_intensities[i],
-                            )
-                        )
+                    for x in range(len(pixel_intensities)):
+                        for y in range(len(pixel_intensities)):
+                            data_point = {
+                                "{}|{}".format(
+                                    fromLightDirToIndex(light_direction[0]),
+                                    fromLightDirToIndex(light_direction[1]),
+                                ): pixel_intensities[x][y]
+                            }
+                            if type(data[x][y]) is dict:
+                                data[x][y].update(data_point)
+                            else:
+                                data[x][y] = data_point
 
                 static_frame = cv.drawContours(
                     static_frame, [static_corners], -1, (0, 0, 255), 3
@@ -128,7 +139,7 @@ def extractDataFromVideos(static_video_path, moving_video_path):
     moving_video.release()
     cv.destroyAllWindows()
 
-    return np.asarray(data, dtype=object)
+    return np.asarray(data)
 
 
 def main(
@@ -138,8 +149,10 @@ def main(
     static_video_path,
     moving_video_path,
     extracted_data_file_path,
+    interpolated_data_file_path,
 ):
     extracted_data = None
+    interpolated_data = None
     print(
         "*** Analysis *** \nStatic_Video: '{}' \nMoving_Video: '{}'".format(
             not_aligned_static_video_path, not_aligned_moving_video_path
@@ -155,21 +168,32 @@ def main(
             not_aligned_moving_video_path, moving_video_path, moving_camera_delay
         )
 
+    # if True or not os.path.exists(extracted_data_file_path):
     if not os.path.exists(extracted_data_file_path):
-        # [(lightDir_x, lightDir_y, pixelIntensity)]
+        # [for each x, y : [[lightDirs_x], [lightDirs_y], [pixelIntensities])]]
         extracted_data = extractDataFromVideos(static_video_path, moving_video_path)
         writeDataFile(extracted_data_file_path, extracted_data)
 
     if extracted_data is not None:
-        loaded_data = extracted_data
+        loaded_extracted_data = extracted_data
     else:
-        loaded_data = loadDataFile(extracted_data_file_path)
+        loaded_extracted_data = loadDataFile(extracted_data_file_path)
 
-    print("Data:", loaded_data[0][0], loaded_data[0][1], loaded_data[0][2])
-    # print(loaded_data["arr_0"][0][0])
-    # cv.imshow("test", loaded_data["arr_0"][0][1])
+    key = list(loaded_extracted_data[0][0].keys())[0]
+
+    print("Data {}:".format(key), loaded_extracted_data[0][0][key])
 
     # Data interpolation
+    # if True or not os.path.exists(interpolated_data_file_path):
+    if not os.path.exists(interpolated_data_file_path):
+        interpolation_mode = 1
+        interpolated_data = interpolate_data(loaded_extracted_data, interpolation_mode)
+        writeDataFile(interpolated_data_file_path, interpolated_data)
+
+    # if interpolated_data is not None:
+    #     loaded_interpolated_data = interpolated_data
+    # else:
+    #     loaded_interpolated_data = loadDataFile(interpolated_data_file_path)
 
 
 if __name__ == "__main__":
@@ -181,6 +205,7 @@ if __name__ == "__main__":
         static_video_path,
         moving_video_path,
         extracted_data_file_path,
+        interpolated_data_file_path,
     ) = getChoosenCoinVideosPaths(coin)
 
     if (not os.path.exists(CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)) or (
@@ -195,4 +220,5 @@ if __name__ == "__main__":
         static_video_path,
         moving_video_path,
         extracted_data_file_path,
+        interpolated_data_file_path,
     )

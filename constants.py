@@ -11,12 +11,10 @@ CALIBRATION_FRAME_SKIP_INTERVAL = 40  # We just need some, not all
 
 # --- ANALYSIS CONSTANTS
 
-SQAURE_GRID_DIMENSION = 400  # It will be a 400x400 square grid inside the marker
+SQAURE_GRID_DIMENSION = 200  # It will be a 400x400 square grid inside the marker
 
-# STATIC_VIDEO_FPS = 29.97
-# MOVING_VIDEO_FPS = 30.01
 ALIGNED_VIDEO_FPS = 30
-ANALYSIS_FRAME_SKIP = 10  # It will skip this frames each iteration during analysis
+ANALYSIS_FRAME_SKIP = 5  # It will skip this frames each iteration during analysis
 
 # ---  DEBUG CONSTANTS
 
@@ -61,3 +59,8 @@ COIN_1_EXTRACTED_DATA_FILE_PATH = "data/1_extracted_data.npz"
 COIN_2_EXTRACTED_DATA_FILE_PATH = "data/2_extracted_data.npz"
 COIN_3_EXTRACTED_DATA_FILE_PATH = "data/3_extracted_data.npz"
 COIN_4_EXTRACTED_DATA_FILE_PATH = "data/4_extracted_data.npz"
+
+COIN_1_INTERPOLATED_DATA_FILE_PATH = "data/1_interpolated_data.npz"
+COIN_2_INTERPOLATED_DATA_FILE_PATH = "data/2_interpolated_data.npz"
+COIN_3_INTERPOLATED_DATA_FILE_PATH = "data/3_interpolated_data.npz"
+COIN_4_INTERPOLATED_DATA_FILE_PATH = "data/4_interpolated_data.npz"

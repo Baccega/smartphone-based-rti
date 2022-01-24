@@ -54,6 +54,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.COIN_1_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_1_ALIGNED_VIDEO_MOVING_PATH,
             constants.COIN_1_EXTRACTED_DATA_FILE_PATH,
+            constants.COIN_1_INTERPOLATED_DATA_FILE_PATH,
         )
     elif coin == 2:
         return (
@@ -63,6 +64,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.COIN_2_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_2_ALIGNED_VIDEO_MOVING_PATH,
             constants.COIN_2_EXTRACTED_DATA_FILE_PATH,
+            constants.COIN_2_INTERPOLATED_DATA_FILE_PATH,
         )
     elif coin == 3:
         return (
@@ -72,6 +74,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.COIN_3_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_3_ALIGNED_VIDEO_MOVING_PATH,
             constants.COIN_3_EXTRACTED_DATA_FILE_PATH,
+            constants.COIN_3_INTERPOLATED_DATA_FILE_PATH,
         )
     elif coin == 4:
         return (
@@ -81,6 +84,7 @@ def getChoosenCoinVideosPaths(coin):
             constants.COIN_4_ALIGNED_VIDEO_STATIC_PATH,
             constants.COIN_4_ALIGNED_VIDEO_MOVING_PATH,
             constants.COIN_4_EXTRACTED_DATA_FILE_PATH,
+            constants.COIN_4_INTERPOLATED_DATA_FILE_PATH,
         )
     else:
         raise Exception("Invaild coin selected")
@@ -98,13 +102,7 @@ def findPixelIntensities(static_frame):
         (constants.SQAURE_GRID_DIMENSION, constants.SQAURE_GRID_DIMENSION),
     )
 
-    data = []
-
-    for y in range(constants.SQAURE_GRID_DIMENSION):
-        for x in range(constants.SQAURE_GRID_DIMENSION):
-            data.append(roi[:, :, 2][x][y])
-
-    return data
+    return roi[:, :, 2]
 
 
 def findLightDirection(static_frame, moving_frame, static_corners, moving_corners):
@@ -192,6 +190,10 @@ def showLightDirection(light_direction):
     )
 
     cv.imshow("Light direction", blank_image)
+
+
+def fromLightDirToIndex(lightDir):
+    return int(np.around(lightDir, decimals=2) * 100)
 
 
 def writeDataFile(extracted_data_file_path, extracted_data):
