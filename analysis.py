@@ -1,7 +1,14 @@
 import cv2 as cv
 import numpy as np
-from features_detector import findRectanglePatternHomography, findRectanglePatterns
+from features_detector import findRectanglePatternHomography
 from interpolation import interpolate_data
+from myIO import (
+    inputAlignedVideos,
+    inputCoin,
+    inputExtractedData,
+    inputInterpolatedData,
+    inputInterpolatedMode,
+)
 from utils import (
     findLightDirection,
     findPixelIntensities,
@@ -153,23 +160,15 @@ def main(
 ):
     extracted_data = None
     interpolated_data = None
-    print(
-        "*** Analysis *** \nStatic_Video: '{}' \nMoving_Video: '{}'".format(
-            not_aligned_static_video_path, not_aligned_moving_video_path
-        )
-    )
 
     # Generate aligned videos if not already done
-    if (not os.path.exists(static_video_path)) or (
-        not os.path.exists(moving_video_path)
-    ):
+    if inputAlignedVideos(static_video_path, moving_video_path):
         generateAlignedVideo(not_aligned_static_video_path, static_video_path)
         generateAlignedVideo(
             not_aligned_moving_video_path, moving_video_path, moving_camera_delay
         )
 
-    # if True or not os.path.exists(extracted_data_file_path):
-    if not os.path.exists(extracted_data_file_path):
+    if inputExtractedData(extracted_data_file_path):
         # [for each x, y : [[lightDirs_x], [lightDirs_y], [pixelIntensities])]]
         extracted_data = extractDataFromVideos(static_video_path, moving_video_path)
         writeDataFile(extracted_data_file_path, extracted_data)
@@ -180,13 +179,11 @@ def main(
         loaded_extracted_data = loadDataFile(extracted_data_file_path)
 
     key = list(loaded_extracted_data[0][0].keys())[0]
-
     print("Data {}:".format(key), loaded_extracted_data[0][0][key])
 
     # Data interpolation
-    # if True or not os.path.exists(interpolated_data_file_path):
-    if not os.path.exists(interpolated_data_file_path):
-        interpolation_mode = 1
+    if inputInterpolatedData(interpolated_data_file_path):
+        interpolation_mode = inputInterpolatedMode()
         interpolated_data = interpolate_data(loaded_extracted_data, interpolation_mode)
         writeDataFile(interpolated_data_file_path, interpolated_data)
 
@@ -197,7 +194,7 @@ def main(
 
 
 if __name__ == "__main__":
-    coin = 1
+    coin = inputCoin()
     (
         not_aligned_static_video_path,
         not_aligned_moving_video_path,
@@ -213,6 +210,12 @@ if __name__ == "__main__":
     ):
         raise (Exception("You need to run the calibration before the analysis!"))
 
+    print(
+        "*** Analysis *** \n\tStatic_Video: '{}' \n\tMoving_Video: '{}'".format(
+            not_aligned_static_video_path, not_aligned_moving_video_path
+        )
+    )
+
     main(
         not_aligned_static_video_path,
         not_aligned_moving_video_path,
@@ -222,3 +225,5 @@ if __name__ == "__main__":
         extracted_data_file_path,
         interpolated_data_file_path,
     )
+
+    print("All Done!")
