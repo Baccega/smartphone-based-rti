@@ -33,6 +33,7 @@ def askIfFilesExist(files, message):
             doesFilesExists = False
     if doesFilesExists:
         return safeBoolInput(message)
+    return True
 
 
 def inputCoin():

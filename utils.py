@@ -193,7 +193,7 @@ def showLightDirection(light_direction):
 
 
 def fromLightDirToIndex(lightDir):
-    return int(np.around(lightDir, decimals=2) * 100)
+    return int(np.around(lightDir, decimals=2) * 100) + 100
 
 
 def writeDataFile(extracted_data_file_path, extracted_data):

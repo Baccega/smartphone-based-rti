@@ -169,7 +169,7 @@ def main(
         )
 
     if inputExtractedData(extracted_data_file_path):
-        # [for each x, y : [[lightDirs_x], [lightDirs_y], [pixelIntensities])]]
+        # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
         extracted_data = extractDataFromVideos(static_video_path, moving_video_path)
         writeDataFile(extracted_data_file_path, extracted_data)
 
