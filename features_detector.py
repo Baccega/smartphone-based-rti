@@ -56,14 +56,16 @@ def findRectanglePatternHomography(gray, choosen_camera):
         # To do this we iterate through all the possible 90 degrees rotations to find the one with a blank tile (upper right).
         # We have the checkBlankArea function that returns the color of our check area, we simply find the minimum.
 
+        currentContour = biggerContour
         currMax = checkBlankArea(warped)
         for i in range(4):
             # Find homography and warped image with that rotation
-            biggerContour = np.roll(biggerContour, shift=1, axis=0)
-            M2 = cv.findHomography(biggerContour, destPoints)[0]
+            currentContour = np.roll(currentContour, shift=1, axis=0)
+            M2 = cv.findHomography(currentContour, destPoints)[0]
             rotated = cv.warpPerspective(gray, M2, (WARPED_W, WARPED_H))
             rotatedScore = checkBlankArea(rotated)
             if rotatedScore > currMax:
+                biggerContour = currentContour
                 M = M2
                 warped = rotated
                 currMax = rotatedScore

@@ -131,8 +131,7 @@ def extractDataFromVideos(static_video_path, moving_video_path):
 
             # Frame skip
             current_frame_count += ANALYSIS_FRAME_SKIP
-            # if max_frames < current_frame_count:
-            if max_frames < current_frame_count or current_frame_count > 270:
+            if max_frames < current_frame_count:
                 flag = False
 
             if ANALYSIS_FRAME_SKIP > 1:

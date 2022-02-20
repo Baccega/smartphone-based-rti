@@ -140,6 +140,8 @@ def findLightDirection(static_frame, moving_frame, static_corners, moving_corner
     p = (h2, w2, 0)
     l = (pose - p) / np.linalg.norm(pose - p)
 
+    # -1 ≤ l[0] ≤ +1
+    # -1 ≤ l[1] ≤ +1
     return l
 
 
