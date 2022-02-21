@@ -34,7 +34,7 @@ def interpolate_data(data, mode):
 
                 for x1 in range(200):
                     for y1 in range(200):
-                        interpolated_data[x][y][x1][y1] = rbf_interpolation(x1, y1)
+                        interpolated_data[x1][y1][x][y] = rbf_interpolation(x1, y1)
             else:
                 print("OUCH")
                 # _interpolate_RBF()

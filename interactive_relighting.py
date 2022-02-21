@@ -21,25 +21,6 @@ prevDirX = None
 prevDirY = None
 
 
-def nothing(x):
-    pass
-
-
-def updateFrameData(data, dirX, dirY):
-    newFrame = np.zeros(
-        shape=[
-            SQAURE_GRID_DIMENSION,
-            SQAURE_GRID_DIMENSION,
-            3,
-        ],
-        dtype=np.uint8,
-    )
-    for x in range(SQAURE_GRID_DIMENSION):
-        for y in range(SQAURE_GRID_DIMENSION):
-            newFrame[x][y] = data[x][y][dirX][dirY]
-    return newFrame
-
-
 def mouse_click(event, x, y, flags, param):
     global dirX, dirY
     if event == cv.EVENT_LBUTTONDOWN:
@@ -69,9 +50,10 @@ def main(interpolated_data_file_path):
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
-            frame = updateFrameData(data, dirX, dirY)
+            for x in range(200):
+                for y in range(200):
+                    frame[x][y] = data[dirX][dirY][x][y]
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
-            cv.setMouseCallback(INPUT_LIGHT_DIRECTION_WINDOW_TITLE, mouse_click)
             prevDirX = dirX
             prevDirY = dirY
 
