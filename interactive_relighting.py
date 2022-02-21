@@ -19,15 +19,27 @@ dirX = 69
 dirY = 172
 prevDirX = None
 prevDirY = None
+isDragging = False
 
 
 def mouse_click(event, x, y, flags, param):
-    global dirX, dirY
-    if event == cv.EVENT_LBUTTONDOWN:
+    global dirX, dirY, isDragging
+
+    def click():
+        global dirX, dirY
         boundedX, boundedY = boundXY(x, y)
-        print("Clicked | x: {} ; y: {}".format(boundedX, boundedY))
+        print("New light direction: (x: {} ; y: {})".format(boundedX, boundedY))
         dirX = boundedX
         dirY = boundedY
+
+    if not isDragging and event == cv.EVENT_LBUTTONDOWN:
+        click()
+        isDragging = True
+    if isDragging and event == cv.EVENT_MOUSEMOVE:
+        click()
+    if isDragging and event == cv.EVENT_LBUTTONUP:
+        click()
+        isDragging = False
 
 
 def main(interpolated_data_file_path):
