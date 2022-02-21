@@ -1,10 +1,24 @@
 import os
 import cv2 as cv
 import numpy as np
-from constants import INTERPOLATED_WINDOW_TITLE, SQAURE_GRID_DIMENSION
+from constants import (
+    INPUT_LIGHT_DIRECTION_WINDOW_TITLE,
+    INTERPOLATED_WINDOW_TITLE,
+    SQAURE_GRID_DIMENSION,
+)
 
 from myIO import inputCoin
-from utils import getChoosenCoinVideosPaths, loadDataFile
+from utils import (
+    boundXY,
+    createLightDirectionFrame,
+    getChoosenCoinVideosPaths,
+    loadDataFile,
+)
+
+dirX = 69
+dirY = 172
+prevDirX = None
+prevDirY = None
 
 
 def nothing(x):
@@ -12,7 +26,6 @@ def nothing(x):
 
 
 def updateFrameData(data, dirX, dirY):
-    print("Updating frame")
     newFrame = np.zeros(
         shape=[
             SQAURE_GRID_DIMENSION,
@@ -27,11 +40,17 @@ def updateFrameData(data, dirX, dirY):
     return newFrame
 
 
+def mouse_click(event, x, y, flags, param):
+    global dirX, dirY
+    if event == cv.EVENT_LBUTTONDOWN:
+        boundedX, boundedY = boundXY(x, y)
+        print("Clicked | x: {} ; y: {}".format(boundedX, boundedY))
+        dirX = boundedX
+        dirY = boundedY
+
+
 def main(interpolated_data_file_path):
-    dirX = 69
-    dirY = 172
-    prevDirX = None
-    prevDirY = None
+    global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
             SQAURE_GRID_DIMENSION,
@@ -40,34 +59,24 @@ def main(interpolated_data_file_path):
         ],
         dtype=np.uint8,
     )
-    cv.namedWindow(INTERPOLATED_WINDOW_TITLE)
-    cv.createTrackbar(
-        "x",
-        INTERPOLATED_WINDOW_TITLE,
-        dirX,
-        200,
-        nothing,
-    )
-    cv.createTrackbar(
-        "y",
-        INTERPOLATED_WINDOW_TITLE,
-        dirY,
-        200,
-        nothing,
-    )
+
+    cv.namedWindow(INPUT_LIGHT_DIRECTION_WINDOW_TITLE)
+    lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
+    cv.setMouseCallback(INPUT_LIGHT_DIRECTION_WINDOW_TITLE, mouse_click)
 
     data = loadDataFile(interpolated_data_file_path)
 
     flag = True
     while flag:
-        dirX = cv.getTrackbarPos("x", INTERPOLATED_WINDOW_TITLE)
-        dirY = cv.getTrackbarPos("y", INTERPOLATED_WINDOW_TITLE)
         if prevDirX != dirX or prevDirY != dirY:
             frame = updateFrameData(data, dirX, dirY)
+            lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
+            cv.setMouseCallback(INPUT_LIGHT_DIRECTION_WINDOW_TITLE, mouse_click)
             prevDirX = dirX
             prevDirY = dirY
 
         cv.imshow(INTERPOLATED_WINDOW_TITLE, frame)
+        cv.imshow(INPUT_LIGHT_DIRECTION_WINDOW_TITLE, lightDirectionFrame)
 
         if cv.waitKey(1) & 0xFF == ord("q"):
             flag = False

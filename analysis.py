@@ -10,13 +10,13 @@ from myIO import (
     inputInterpolatedMode,
 )
 from utils import (
+    createLightDirectionFrame,
     findLightDirection,
     findPixelIntensities,
     fromLightDirToIndex,
     loadDataFile,
     loadIntrinsics,
     getChoosenCoinVideosPaths,
-    showLightDirection,
     writeDataFile,
 )
 import os
@@ -94,7 +94,8 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                     moving_corners,
                 )
 
-                showLightDirection(light_direction)
+                lightDirectionFrame = createLightDirectionFrame(fromLightDirToIndex(light_direction))
+                cv.imshow("Light direction", lightDirectionFrame)
 
                 pixel_intensities = findPixelIntensities(static_frame)
 

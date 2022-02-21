@@ -163,7 +163,7 @@ def getCameraIntrinsics(calibration_file_path):
     return matrix, distortion
 
 
-def showLightDirection(light_direction):
+def createLightDirectionFrame(light_direction):
     blank_image = np.zeros(
         shape=[
             constants.LIGHT_DIRECTION_WINDOW_SIZE,
@@ -178,10 +178,7 @@ def showLightDirection(light_direction):
     cv.line(
         blank_image,
         (half_size, half_size),
-        (
-            int((light_direction[0] * half_size) + half_size),
-            int((light_direction[1] * half_size) + half_size),
-        ),
+        (light_direction[0], light_direction[1]),
         (255, 255, 255),
     )
     cv.circle(
@@ -190,8 +187,18 @@ def showLightDirection(light_direction):
         half_size,
         (255, 255, 255),
     )
+    return blank_image
 
-    cv.imshow("Light direction", blank_image)
+
+def boundXY(x, y):
+    half_size = int(constants.LIGHT_DIRECTION_WINDOW_SIZE / 2)
+    if (x - half_size) * (x - half_size) + (y - half_size) * (y - half_size) <= (
+        half_size * half_size
+    ):
+        return (x, y)
+    else:
+        print("OUTSIDE!")
+        return (half_size, half_size)
 
 
 def fromLightDirToIndex(lightDir):
