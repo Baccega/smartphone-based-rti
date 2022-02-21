@@ -20,42 +20,36 @@ from utils import (
     writeDataFile,
 )
 import os
-from constants import (
-    ALIGNED_VIDEO_FPS,
-    ANALYSIS_FRAME_SKIP,
-    SQAURE_GRID_DIMENSION,
-    STATIC_CAMERA_FEED_WINDOW_TITLE,
-    MOVING_CAMERA_FEED_WINDOW_TITLE,
-    CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH,
-    CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH,
-    CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH,
-    CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH,
-)
+from constants import constants
 import ffmpeg
 
 
 def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
     print("\t— Generating aligned video: {}".format(video_path))
     ffmpeg.input(not_aligned_video_path, itsoffset=delay).filter(
-        "fps", fps=ALIGNED_VIDEO_FPS
+        "fps", fps=constants["ALIGNED_VIDEO_FPS"]
     ).output(video_path).run()
 
 
 def extractDataFromVideos(static_video_path, moving_video_path):
-    cv.namedWindow(STATIC_CAMERA_FEED_WINDOW_TITLE)
-    cv.namedWindow(MOVING_CAMERA_FEED_WINDOW_TITLE)
+    cv.namedWindow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"])
+    cv.namedWindow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"])
 
     # Open video files
     static_video = cv.VideoCapture(static_video_path)
     moving_video = cv.VideoCapture(moving_video_path)
 
     # Get camera intrinsics
-    K_static, dist_static = loadIntrinsics(CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)
-    K_moving, dist_moving = loadIntrinsics(CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
+    K_static, dist_static = loadIntrinsics(
+        constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"]
+    )
+    K_moving, dist_moving = loadIntrinsics(
+        constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"]
+    )
 
     data = [
-        [[] * SQAURE_GRID_DIMENSION] * SQAURE_GRID_DIMENSION
-        for i in range(SQAURE_GRID_DIMENSION)
+        [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
+        for i in range(constants["SQAURE_GRID_DIMENSION"])
     ]
 
     max_frames = min(
@@ -94,7 +88,9 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                     moving_corners,
                 )
 
-                lightDirectionFrame = createLightDirectionFrame(fromLightDirToIndex(light_direction))
+                lightDirectionFrame = createLightDirectionFrame(
+                    fromLightDirToIndex(light_direction)
+                )
                 cv.imshow("Light direction", lightDirectionFrame)
 
                 pixel_intensities = findPixelIntensities(static_frame)
@@ -120,8 +116,8 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                 # cv.imshow("warped_moving", moving_warped_frame)
 
             # Video output during analysis
-            cv.imshow(STATIC_CAMERA_FEED_WINDOW_TITLE, static_frame)
-            cv.imshow(MOVING_CAMERA_FEED_WINDOW_TITLE, moving_frame)
+            cv.imshow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"], static_frame)
+            cv.imshow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"], moving_frame)
 
             if cv.waitKey(1) & 0xFF == ord("q"):
                 flag = False
@@ -131,11 +127,11 @@ def extractDataFromVideos(static_video_path, moving_video_path):
             #     isPaused = True
 
             # Frame skip
-            current_frame_count += ANALYSIS_FRAME_SKIP
+            current_frame_count += constants["ANALYSIS_FRAME_SKIP"]
             if max_frames < current_frame_count:
                 flag = False
 
-            if ANALYSIS_FRAME_SKIP > 1:
+            if constants["ANALYSIS_FRAME_SKIP"] > 1:
                 static_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
                 moving_video.set(cv.CAP_PROP_POS_FRAMES, current_frame_count)
 
@@ -157,6 +153,7 @@ def main(
     moving_video_path,
     extracted_data_file_path,
     interpolated_data_file_path,
+    interpolation_mode,
 ):
     extracted_data = None
     interpolated_data = None
@@ -183,7 +180,6 @@ def main(
 
     # Data interpolation
     if inputInterpolatedData(interpolated_data_file_path):
-        interpolation_mode = inputInterpolatedMode()
         interpolated_data = interpolate_data(loaded_extracted_data, interpolation_mode)
         writeDataFile(interpolated_data_file_path, interpolated_data)
 
@@ -195,6 +191,7 @@ def main(
 
 if __name__ == "__main__":
     coin = inputCoin()
+    interpolation_mode = inputInterpolatedMode()
     (
         not_aligned_static_video_path,
         not_aligned_moving_video_path,
@@ -203,10 +200,10 @@ if __name__ == "__main__":
         moving_video_path,
         extracted_data_file_path,
         interpolated_data_file_path,
-    ) = getChoosenCoinVideosPaths(coin)
+    ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
 
-    if (not os.path.exists(CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH)) or (
-        not os.path.exists(CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
+    if (not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"])) or (
+        not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"])
     ):
         raise (Exception("You need to run the calibration before the analysis!"))
 
@@ -224,6 +221,7 @@ if __name__ == "__main__":
         moving_video_path,
         extracted_data_file_path,
         interpolated_data_file_path,
+        interpolation_mode,
     )
 
     print("All Done!")

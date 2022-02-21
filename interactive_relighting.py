@@ -1,13 +1,9 @@
 import os
 import cv2 as cv
 import numpy as np
-from constants import (
-    INPUT_LIGHT_DIRECTION_WINDOW_TITLE,
-    INTERPOLATED_WINDOW_TITLE,
-    SQAURE_GRID_DIMENSION,
-)
+from constants import constants
 
-from myIO import inputCoin
+from myIO import inputCoin, inputInterpolatedMode
 from utils import (
     boundXY,
     createLightDirectionFrame,
@@ -46,16 +42,16 @@ def main(interpolated_data_file_path):
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
-            SQAURE_GRID_DIMENSION,
-            SQAURE_GRID_DIMENSION,
+            constants["SQAURE_GRID_DIMENSION"],
+            constants["SQAURE_GRID_DIMENSION"],
             3,
         ],
         dtype=np.uint8,
     )
 
-    cv.namedWindow(INPUT_LIGHT_DIRECTION_WINDOW_TITLE)
+    cv.namedWindow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"])
     lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
-    cv.setMouseCallback(INPUT_LIGHT_DIRECTION_WINDOW_TITLE, mouse_click)
+    cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
 
     data = loadDataFile(interpolated_data_file_path)
 
@@ -69,8 +65,8 @@ def main(interpolated_data_file_path):
             prevDirX = dirX
             prevDirY = dirY
 
-        cv.imshow(INTERPOLATED_WINDOW_TITLE, frame)
-        cv.imshow(INPUT_LIGHT_DIRECTION_WINDOW_TITLE, lightDirectionFrame)
+        cv.imshow(constants["INTERPOLATED_WINDOW_TITLE"], frame)
+        cv.imshow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], lightDirectionFrame)
 
         if cv.waitKey(1) & 0xFF == ord("q"):
             flag = False
@@ -80,6 +76,7 @@ def main(interpolated_data_file_path):
 
 if __name__ == "__main__":
     coin = inputCoin()
+    interpolation_mode = inputInterpolatedMode()
     (
         not_aligned_static_video_path,
         not_aligned_moving_video_path,
@@ -88,7 +85,7 @@ if __name__ == "__main__":
         moving_video_path,
         extracted_data_file_path,
         interpolated_data_file_path,
-    ) = getChoosenCoinVideosPaths(coin)
+    ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
 
     if not os.path.exists(interpolated_data_file_path):
         raise (

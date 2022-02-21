@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import math
-import constants
+from constants import constants
 
 
 def outerContour(contour, gray, margin=10):
@@ -35,7 +35,7 @@ def sortCorners(image, corners):
     return np.roll(sortedCorners, 2, axis=0)
 
 
-def loadIntrinsics(path=constants.CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH):
+def loadIntrinsics(path=constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"]):
     """
     Loads camera intrinsics from an xml file. Uses a default path if not provided (intrinsics.xml).
     """
@@ -45,49 +45,17 @@ def loadIntrinsics(path=constants.CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH):
     return K, dist
 
 
-def getChoosenCoinVideosPaths(coin):
-    if coin == 1:
-        return (
-            constants.COIN_1_VIDEO_CAMERA_STATIC_PATH,
-            constants.COIN_1_VIDEO_CAMERA_MOVING_PATH,
-            constants.FILE_1_MOVING_CAMERA_DELAY,
-            constants.COIN_1_ALIGNED_VIDEO_STATIC_PATH,
-            constants.COIN_1_ALIGNED_VIDEO_MOVING_PATH,
-            constants.COIN_1_EXTRACTED_DATA_FILE_PATH,
-            constants.COIN_1_INTERPOLATED_DATA_FILE_PATH,
-        )
-    elif coin == 2:
-        return (
-            constants.COIN_2_VIDEO_CAMERA_STATIC_PATH,
-            constants.COIN_2_VIDEO_CAMERA_MOVING_PATH,
-            constants.FILE_2_MOVING_CAMERA_DELAY,
-            constants.COIN_2_ALIGNED_VIDEO_STATIC_PATH,
-            constants.COIN_2_ALIGNED_VIDEO_MOVING_PATH,
-            constants.COIN_2_EXTRACTED_DATA_FILE_PATH,
-            constants.COIN_2_INTERPOLATED_DATA_FILE_PATH,
-        )
-    elif coin == 3:
-        return (
-            constants.COIN_3_VIDEO_CAMERA_STATIC_PATH,
-            constants.COIN_3_VIDEO_CAMERA_MOVING_PATH,
-            constants.FILE_3_MOVING_CAMERA_DELAY,
-            constants.COIN_3_ALIGNED_VIDEO_STATIC_PATH,
-            constants.COIN_3_ALIGNED_VIDEO_MOVING_PATH,
-            constants.COIN_3_EXTRACTED_DATA_FILE_PATH,
-            constants.COIN_3_INTERPOLATED_DATA_FILE_PATH,
-        )
-    elif coin == 4:
-        return (
-            constants.COIN_4_VIDEO_CAMERA_STATIC_PATH,
-            constants.COIN_4_VIDEO_CAMERA_MOVING_PATH,
-            constants.FILE_4_MOVING_CAMERA_DELAY,
-            constants.COIN_4_ALIGNED_VIDEO_STATIC_PATH,
-            constants.COIN_4_ALIGNED_VIDEO_MOVING_PATH,
-            constants.COIN_4_EXTRACTED_DATA_FILE_PATH,
-            constants.COIN_4_INTERPOLATED_DATA_FILE_PATH,
-        )
-    else:
-        raise Exception("Invaild coin selected")
+def getChoosenCoinVideosPaths(coin, interpolation_mode):
+    mode_str = "RBF" if interpolation_mode == 1 else "PTM"
+    return (
+        constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
+        constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
+        constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
+        constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
+        constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
+        constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
+        constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
+    )
 
 
 def findPixelIntensities(static_frame):
@@ -99,7 +67,7 @@ def findPixelIntensities(static_frame):
 
     roi = cv.resize(
         roi_full_size,
-        (constants.SQAURE_GRID_DIMENSION, constants.SQAURE_GRID_DIMENSION),
+        (constants["SQAURE_GRID_DIMENSION"], constants["SQAURE_GRID_DIMENSION"]),
     )
 
     return roi[:, :, 2]
@@ -109,7 +77,7 @@ def findLightDirection(static_frame, moving_frame, static_corners, moving_corner
     moving_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
     image_size = moving_frame.shape[::-1]
 
-    M, D = getCameraIntrinsics(constants.CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH)
+    M, D = getCameraIntrinsics(constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"])
     z_axis = 1
     flags = cv.CALIB_USE_INTRINSIC_GUESS
 
@@ -166,14 +134,14 @@ def getCameraIntrinsics(calibration_file_path):
 def createLightDirectionFrame(light_direction):
     blank_image = np.zeros(
         shape=[
-            constants.LIGHT_DIRECTION_WINDOW_SIZE,
-            constants.LIGHT_DIRECTION_WINDOW_SIZE,
+            constants["LIGHT_DIRECTION_WINDOW_SIZE"],
+            constants["LIGHT_DIRECTION_WINDOW_SIZE"],
             3,
         ],
         dtype=np.uint8,
     )
 
-    half_size = int(constants.LIGHT_DIRECTION_WINDOW_SIZE / 2)
+    half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
 
     cv.line(
         blank_image,
@@ -191,7 +159,7 @@ def createLightDirectionFrame(light_direction):
 
 
 def boundXY(x, y):
-    half_size = int(constants.LIGHT_DIRECTION_WINDOW_SIZE / 2)
+    half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
     if (x - half_size) * (x - half_size) + (y - half_size) * (y - half_size) <= (
         half_size * half_size
     ):

@@ -2,7 +2,7 @@ from scipy.interpolate import Rbf
 import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
-from constants import SQAURE_GRID_DIMENSION
+from constants import constants
 
 
 def interpolate_data(data, mode):
@@ -10,15 +10,15 @@ def interpolate_data(data, mode):
 
     interpolated_data = np.zeros(
         (
-            SQAURE_GRID_DIMENSION,
-            SQAURE_GRID_DIMENSION,
+            constants["SQAURE_GRID_DIMENSION"],
+            constants["SQAURE_GRID_DIMENSION"],
             200,
             200,
         )
     )
 
-    for x in tqdm(range(SQAURE_GRID_DIMENSION)):
-        for y in range(SQAURE_GRID_DIMENSION):
+    for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
+        for y in range(constants["SQAURE_GRID_DIMENSION"]):
             keys = list(data[x][y].keys())
             light_directions_x = [i.split("|")[0] for i in keys]
             light_directions_y = [i.split("|")[1] for i in keys]
