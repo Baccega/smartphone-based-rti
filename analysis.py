@@ -89,7 +89,10 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                 )
 
                 lightDirectionFrame = createLightDirectionFrame(
-                    fromLightDirToIndex(light_direction)
+                    (
+                        fromLightDirToIndex(light_direction[0]),
+                        fromLightDirToIndex(light_direction[1]),
+                    )
                 )
                 cv.imshow("Light direction", lightDirectionFrame)
 
