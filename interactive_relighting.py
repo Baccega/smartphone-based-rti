@@ -60,7 +60,7 @@ def main(interpolated_data_file_path):
         if prevDirX != dirX or prevDirY != dirY:
             for x in range(200):
                 for y in range(200):
-                    frame[x][y] = data[dirX][dirY][x][y]
+                    frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
             prevDirX = dirX
             prevDirY = dirY
