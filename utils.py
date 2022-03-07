@@ -1,3 +1,4 @@
+import os
 import cv2 as cv
 import numpy as np
 import math
@@ -21,9 +22,9 @@ def outerContour(contour, gray, margin=10):
     return mean[0]
 
 
-def sortCorners(image, corners):
+def sortCorners(corners):
     """
-    Sorts an array of corners based on the circle of the marker.
+    Sorts an array of corners clockwise
     """
     center = np.sum(corners, axis=0) / len(corners)
 
@@ -46,6 +47,9 @@ def loadIntrinsics(path=constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"]):
 
 
 def getChoosenCoinVideosPaths(coin, interpolation_mode):
+    """
+    Get constants based on the coin and interpolation mode
+    """
     mode_str = "RBF" if interpolation_mode == 1 else "PTM"
     return (
         constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
@@ -59,6 +63,9 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode):
 
 
 def findPixelIntensities(static_frame):
+    """
+    Get pixel intensities from static_frame frame using an ad-hoc roi
+    """
     roi = static_frame[
         720 : 720 + 460,
         320 : 320 + 460,
@@ -74,6 +81,9 @@ def findPixelIntensities(static_frame):
 
 
 def findLightDirection(static_frame, moving_frame, static_corners, moving_corners):
+    """
+    Get light direction from static_frame and moving frame
+    """
     moving_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
     image_size = moving_frame.shape[::-1]
 
@@ -95,11 +105,11 @@ def findLightDirection(static_frame, moving_frame, static_corners, moving_corner
     )
 
     # perform a camera calibration to get R and T
-    (ret, matrix, distortion, r_vecs, t_vecs) = cv.calibrateCamera(
+    (_, _, _, r_vectors, t_vectors) = cv.calibrateCamera(
         [points_3d], [points_2d], image_size, cameraMatrix=M, distCoeffs=D, flags=flags
     )
-    R = cv.Rodrigues(r_vecs[0])[0]
-    T = t_vecs[0]
+    R = cv.Rodrigues(r_vectors[0])[0]
+    T = t_vectors[0]
 
     pose = -np.matrix(R).T * np.matrix(T)
     pose = np.array(pose).flatten()
@@ -114,24 +124,20 @@ def findLightDirection(static_frame, moving_frame, static_corners, moving_corner
 
 
 def getCameraIntrinsics(calibration_file_path):
-    import os
-
     """
     Get camera intrinsic matrix and distorsion
-    :param calibration_file_path: file path to intrinsics file
     """
-    if not os.path.isfile(calibration_file_path):
-        raise Exception("intrinsics file not found!")
-    else:
-        # Read intrinsics to file
-        Kfile = cv.FileStorage(calibration_file_path, cv.FILE_STORAGE_READ)
-        matrix = Kfile.getNode("K").mat()
-        distortion = Kfile.getNode("distortion").mat()
+    Kfile = cv.FileStorage(calibration_file_path, cv.FILE_STORAGE_READ)
+    intrinsics_matrix = Kfile.getNode("K").mat()
+    distortion_matrix = Kfile.getNode("distortion").mat()
 
-    return matrix, distortion
+    return intrinsics_matrix, distortion_matrix
 
 
 def createLightDirectionFrame(light_direction):
+    """
+    Create a frame to show light direction to user
+    """
     blank_image = np.zeros(
         shape=[
             constants["LIGHT_DIRECTION_WINDOW_SIZE"],
@@ -159,6 +165,9 @@ def createLightDirectionFrame(light_direction):
 
 
 def boundXY(x, y):
+    """
+    Force X and Y to be within the light directions bounds
+    """
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
     if (x - half_size) * (x - half_size) + (y - half_size) * (y - half_size) <= (
         half_size * half_size
@@ -170,16 +179,25 @@ def boundXY(x, y):
 
 
 def fromLightDirToIndex(lightDir):
+    """
+    Transform light direction [-1.0, ..., +1.0] to positive indexes (0, ..., 200)
+    """
     return int(np.around(lightDir, decimals=2) * 100) + 100
 
 
 def writeDataFile(extracted_data_file_path, extracted_data):
+    """
+    Write data file to os
+    """
     print("Saving extracted data into '{}'...".format(extracted_data_file_path))
     np.savez_compressed(extracted_data_file_path, extracted_data)
     print("Saved!")
 
 
 def loadDataFile(extracted_data_file_path):
+    """
+    Load data file from os
+    """
     print("Loading extracted data file '{}'...".format(extracted_data_file_path))
     loaded_data = np.load(extracted_data_file_path, allow_pickle=True)["arr_0"]
     print("Loaded!")

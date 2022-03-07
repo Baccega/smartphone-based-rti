@@ -110,7 +110,7 @@ def findRectanglePatterns(gray, choosen_camera):
                 curve = cv.cornerSubPix(
                     gray, np.float32(curve), winSize, zeroZone, criteria
                 )
-                sortedCurve = sortCorners(gray, curve)
+                sortedCurve = sortCorners(curve)
                 score = outerContour(sortedCurve.astype(np.int32), gray)
                 area = cv.contourArea(sortedCurve.astype(np.int32))
                 polys.append((sortedCurve, score, area))
@@ -122,99 +122,3 @@ def findRectanglePatterns(gray, choosen_camera):
     # print(polys)
 
     return [p[0].astype(np.int32) for p in polys if p[1] < 40 and area > 40000]
-
-
-def extrapolateLightDirectionFromFrame_old(frame):
-    status = np.array([1])
-    corners = None
-    light_direction = None
-
-    polys = findRectanglePatterns(frame)
-
-    if len(polys) > 0:
-        corners = polys[0]
-        gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        # corner_only_frame = np.zeros(gray_frame.shape, np.uint8)
-        cv.drawContours(
-            frame,
-            polys,
-            -1,
-            (255, 255, 255),
-            3,
-            cv.LINE_AA,
-        )
-
-        destPoints: np.ndarray = np.array(
-            [
-                [[0, 512]],
-                [[0, 0]],
-                [[512, 0]],
-                [[512, 512]],
-            ]
-        )
-        homography = cv.findHomography(corners, destPoints)[0]
-        print(homography)
-        warped = cv.warpPerspective(frame, homography, (512, 512))
-        # cv.imshow("warped", warped)
-        # cv.waitKey(1)
-
-        # def findRectanglePatternHomography(gray):
-
-        # cv.imshow("test", corner_only_frame)
-        # cv.waitKey(1)
-
-        # if status.all() and corners is not None and len(corners) == 4:
-        # first_corner = corners[0][0]
-        # second_corner = corners[1][0]
-        # third_corner = corners[2][0]
-        # fourth_corner = corners[3][0]
-
-        #     # Setting up previous_corners for optical flow
-        #     self.previous_corners = corners
-        #     self.previous_frame = frame
-
-        # frame = cv.circle(
-        #     frame,
-        #     (int(first_corner[0]), int(first_corner[1])),
-        #     radius=3,
-        #     color=(0, 0, 255),
-        #     thickness=-1,
-        # )
-        # frame = cv.circle(
-        #     frame,
-        #     (int(second_corner[0]), int(second_corner[1])),
-        #     radius=3,
-        #     color=(0, 255, 0),
-        #     thickness=-1,
-        # )
-        # frame = cv.circle(
-        #     frame,
-        #     (int(third_corner[0]), int(third_corner[1])),
-        #     radius=3,
-        #     color=(255, 0, 0),
-        #     thickness=-1,
-        # )
-        # frame = cv.circle(
-        #     frame,
-        #     (int(fourth_corner[0]), int(fourth_corner[1])),
-        #     radius=3,
-        #     color=(150, 150, 150),
-        #     thickness=-1,
-        # )
-        return True
-    #     # cv.drawContours(frame, [corners], -1, (0, 0, 255))
-
-    #     corners = (
-    #         first_corner,
-    #         second_corner,
-    #         third_corner,
-    #         fourth_corner,
-    #     )
-
-    # Light direction
-    # light_direction = findLightDirection(
-    #     moving_frame, static_corners, moving_corners
-    # )
-
-    # return light_direction
-    return False

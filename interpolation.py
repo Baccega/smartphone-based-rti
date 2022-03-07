@@ -17,6 +17,7 @@ def interpolate_data(data, mode):
         )
     )
 
+    # For every pixel coordinate
     for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
         for y in range(constants["SQAURE_GRID_DIMENSION"]):
             keys = list(data[x][y].keys())
@@ -32,34 +33,36 @@ def interpolate_data(data, mode):
                     function="linear",
                 )
 
+                # For every possible light direction
                 for x1 in range(200):
                     for y1 in range(200):
                         interpolated_data[x1][y1][x][y] = rbf_interpolation(x1, y1)
             else:
-                # compute l_matrix and L_matrix first
-                l_matrix = []
-                L_matrix = []
+                # Compute light projection matrix
+                light_projection_matrix = []
+                luminance_vector = []
                 for i in range(len(pixel_intensities)):
-                    # compute the PTM row for l_matrix
                     lu, lv = int(light_directions_x[i]), int(light_directions_y[i])
                     row = (lu ** 2, lv ** 2, lu * lv, lu, lv, 1.0)
-                    l_matrix.append(row)
-                    # add Luminance to L_matrix
-                    L_matrix.append(pixel_intensities[i])
+                    light_projection_matrix.append(row)
+                light_projection_matrix = np.array(light_projection_matrix)
 
-                l_matrix = np.array(l_matrix)
-                L_matrix = np.array(L_matrix)
+                # Compute luminance vector
+                for i in range(len(pixel_intensities)):
+                    luminance_vector.append(pixel_intensities[i])
+                luminance_vector = np.array(luminance_vector)
 
-                # now we'll fine the a_matrix solving A * a = L
-                # solve with svd decomposition
-                u, s, v = np.linalg.svd(l_matrix)
-                c = np.dot(u.T, L_matrix)
+                # Solve this equation for a (vector of coefficients):
+                # light_projection_matrix * a = luminance_vector
+                # Solving using Singular Value Decomposition (SVD)
+                u, s, v = np.linalg.svd(light_projection_matrix)
+                c = np.dot(u.T, luminance_vector)
                 w = np.divide(c[: len(s)], s)
                 a_matrix = np.dot(v.T, w)
 
+                # For every possible light direction
                 for lv in range(200):
                     for lu in range(200):
-                        # the tuple (lu, lv) means (x, y)
                         l0 = a_matrix[0] * (lu ** 2)
                         l1 = a_matrix[1] * (lv ** 2)
                         l2 = a_matrix[2] * (lu * lv)

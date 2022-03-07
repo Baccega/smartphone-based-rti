@@ -23,7 +23,7 @@ import os
 from constants import constants
 import ffmpeg
 
-
+# Generate aligned videos
 def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
     print("\t— Generating aligned video: {}".format(video_path))
     ffmpeg.input(not_aligned_video_path, itsoffset=delay).filter(
@@ -31,6 +31,7 @@ def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
     ).output(video_path).run()
 
 
+# Extract light direction and pixel intensities data from videos
 def extractDataFromVideos(static_video_path, moving_video_path):
     cv.namedWindow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"])
     cv.namedWindow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"])
@@ -47,6 +48,7 @@ def extractDataFromVideos(static_video_path, moving_video_path):
         constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"]
     )
 
+    # Prepare data structure
     data = [
         [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
         for i in range(constants["SQAURE_GRID_DIMENSION"])
@@ -60,13 +62,13 @@ def extractDataFromVideos(static_video_path, moving_video_path):
     flag = True
     while flag:
         is_static_valid, static_frame_distorted = static_video.read()
-        is_static_valid = True
         is_moving_valid, moving_frame_distorted = moving_video.read()
 
         if is_static_valid and is_moving_valid:
             static_frame = cv.undistort(static_frame_distorted, K_static, dist_static)
             moving_frame = cv.undistort(moving_frame_distorted, K_moving, dist_moving)
 
+            # Get marker's homography and corners from video frames
             static_gray_frame = cv.cvtColor(static_frame, cv.COLOR_BGR2GRAY)
             moving_gray_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
             (
@@ -81,6 +83,7 @@ def extractDataFromVideos(static_video_path, moving_video_path):
             ) = findRectanglePatternHomography(moving_gray_frame, "moving")
 
             if static_corners is not None and moving_corners is not None:
+                # Get light direction from frames and corners
                 light_direction = findLightDirection(
                     static_frame,
                     moving_frame,
@@ -88,6 +91,7 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                     moving_corners,
                 )
 
+                # Create debug light direciton window
                 lightDirectionFrame = createLightDirectionFrame(
                     (
                         fromLightDirToIndex(light_direction[0]),
@@ -96,6 +100,7 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                 )
                 cv.imshow("Light direction", lightDirectionFrame)
 
+                # Get pixel intensities from static frame
                 pixel_intensities = findPixelIntensities(static_frame)
 
                 # Saving data points to data structure
@@ -108,26 +113,25 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                                     fromLightDirToIndex(light_direction[1]),
                                 ): pixel_intensities[x][y]
                             }
+                            # If data[x][y] exists: update
                             if type(data[x][y]) is dict:
                                 data[x][y].update(data_point)
+                            # Else: create it
                             else:
                                 data[x][y] = data_point
 
-                static_frame = cv.drawContours(
-                    static_frame, [static_corners], -1, (0, 0, 255), 3
-                )
+                # static_frame = cv.drawContours(
+                #     static_frame, [static_corners], -1, (0, 0, 255), 3
+                # )
                 # cv.imshow("warped_moving", moving_warped_frame)
 
             # Video output during analysis
             cv.imshow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"], static_frame)
             cv.imshow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"], moving_frame)
 
+            # Quit by pressing 'q'
             if cv.waitKey(1) & 0xFF == ord("q"):
                 flag = False
-            # if cv.waitKey(1) & 0xFF == ord("p"):  # Pause
-            #     isPaused = False
-            # if cv.waitKey(1) & 0xFF == ord("c"):  # Continue
-            #     isPaused = True
 
             # Frame skip
             current_frame_count += constants["ANALYSIS_FRAME_SKIP"]
@@ -161,13 +165,14 @@ def main(
     extracted_data = None
     interpolated_data = None
 
-    # Generate aligned videos if not already done
+    # Ask to generate aligned videos (if they already exists)
     if inputAlignedVideos(static_video_path, moving_video_path):
         generateAlignedVideo(not_aligned_static_video_path, static_video_path)
         generateAlignedVideo(
             not_aligned_moving_video_path, moving_video_path, moving_camera_delay
         )
 
+    # Ask to generate aligned videos (if they already exists)
     if inputExtractedData(extracted_data_file_path):
         # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
         extracted_data = extractDataFromVideos(static_video_path, moving_video_path)
@@ -178,18 +183,10 @@ def main(
     else:
         loaded_extracted_data = loadDataFile(extracted_data_file_path)
 
-    key = list(loaded_extracted_data[0][0].keys())[0]
-    print("Data {}:".format(key), loaded_extracted_data[0][0][key])
-
-    # Data interpolation
+    # Interpolate data from extracted
     if inputInterpolatedData(interpolated_data_file_path):
         interpolated_data = interpolate_data(loaded_extracted_data, interpolation_mode)
         writeDataFile(interpolated_data_file_path, interpolated_data)
-
-    # if interpolated_data is not None:
-    #     loaded_interpolated_data = interpolated_data
-    # else:
-    #     loaded_interpolated_data = loadDataFile(interpolated_data_file_path)
 
 
 if __name__ == "__main__":
