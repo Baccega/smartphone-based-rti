@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import cv2 as cv
 from constants import constants
 
@@ -83,6 +84,10 @@ def calibrate(calibration_video, save_file_path):
 
 def main():
     print("Camera calibration")
+
+    if not os.path.exists("data"):
+        os.makedirs("data")
+
     calibrate(
         constants["CALIBRATION_CAMERA_STATIC_PATH"],
         constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"],
