@@ -13,6 +13,7 @@ constants = {
     # ---  DEBUG CONSTANTS
     "STATIC_CAMERA_FEED_WINDOW_TITLE": "Static camera feed",
     "MOVING_CAMERA_FEED_WINDOW_TITLE": "Moving camera feed",
+    "WARPED_FRAME_WINDOW_TITLE": "Warped moving frame",
     "LIGHT_DIRECTION_WINDOW_TITLE": "Light direction",
     "LIGHT_DIRECTION_WINDOW_SIZE": 200,
     # ---  INTERACTIVE RELIGHTING CONSTANTS

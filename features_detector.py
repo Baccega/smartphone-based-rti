@@ -35,13 +35,13 @@ def checkBlankArea(warped):
     return mean[0]
 
 
-def findRectanglePatternHomography(gray, choosen_camera):
+def findRectanglePatternHomography(gray, choosen_camera, debug_mode):
     """
     Given a gray image, find the rectangle pattern and estimate homography matrix
     """
 
     # We use findRectanglePatterns and we keep the first (best) result
-    polys = findRectanglePatterns(gray, choosen_camera)
+    polys = findRectanglePatterns(gray, choosen_camera, debug_mode)
     if len(polys) > 0:
         biggerContour = polys[0]
 
@@ -70,15 +70,12 @@ def findRectanglePatternHomography(gray, choosen_camera):
                 warped = rotated
                 currMax = rotatedScore
 
-        # cv.imshow("warped", warped)
-        # cv.waitKey(1)
-
         # We return the Homography, Corners and the Warped Image
         return M, biggerContour, warped
     return None, None, None
 
 
-def findRectanglePatterns(gray, choosen_camera):
+def findRectanglePatterns(gray, choosen_camera, debug_mode):
     if choosen_camera == "static":
         thresh = cv.adaptiveThreshold(
             gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 17, 4
@@ -89,9 +86,10 @@ def findRectanglePatterns(gray, choosen_camera):
         )
     kernel = np.ones((3, 3), np.uint8)
     thresh = cv.morphologyEx(thresh, cv.MORPH_CLOSE, kernel)
-    # if choosen_camera == "moving":
-    #     cv.imshow("threshold", thresh)
-    #     cv.waitKey(1)
+    
+    if debug_mode >= 2 and choosen_camera == "moving":
+        cv.imshow("threshold", thresh)
+        cv.waitKey(1)
 
     # Find all the possible contours in thresholded image
     contours, _ = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)

@@ -1,4 +1,5 @@
 import os
+import cv2 as cv
 
 
 def safeIntInput(message, min_value, max_value):
@@ -44,6 +45,14 @@ def inputCoin():
     )
 
 
+def inputDebug():
+    return safeIntInput(
+        "Select debug mode (0. No debug, 1. Minimal debug, 2. Full debug): ",
+        0,
+        2,
+    )
+
+
 def inputAlignedVideos(path1, path2):
     return askIfFilesExist(
         [path1, path2], "Aligned videos found! Do you wish to re-generate them? (y/n): "
@@ -68,3 +77,41 @@ def inputInterpolatedMode():
         1,
         2,
     )
+
+
+def debugCorners(frame, corners):
+    first_corner = corners[0][0]
+    second_corner = corners[1][0]
+    third_corner = corners[2][0]
+    fourth_corner = corners[3][0]
+
+    frame = cv.circle(
+        frame,
+        (int(first_corner[0]), int(first_corner[1])),
+        radius=3,
+        color=(0, 0, 255),
+        thickness=-1,
+    )
+    frame = cv.circle(
+        frame,
+        (int(second_corner[0]), int(second_corner[1])),
+        radius=3,
+        color=(0, 255, 0),
+        thickness=-1,
+    )
+    frame = cv.circle(
+        frame,
+        (int(third_corner[0]), int(third_corner[1])),
+        radius=3,
+        color=(255, 0, 0),
+        thickness=-1,
+    )
+    frame = cv.circle(
+        frame,
+        (int(fourth_corner[0]), int(fourth_corner[1])),
+        radius=3,
+        color=(150, 150, 150),
+        thickness=-1,
+    )
+    cv.drawContours(frame, [corners], -1, (0, 0, 255))
+    return frame

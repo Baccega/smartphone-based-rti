@@ -3,8 +3,10 @@ import numpy as np
 from features_detector import findRectanglePatternHomography
 from interpolation import interpolate_data
 from myIO import (
+    debugCorners,
     inputAlignedVideos,
     inputCoin,
+    inputDebug,
     inputExtractedData,
     inputInterpolatedData,
     inputInterpolatedMode,
@@ -32,7 +34,7 @@ def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
 
 
 # Extract light direction and pixel intensities data from videos
-def extractDataFromVideos(static_video_path, moving_video_path):
+def extractDataFromVideos(static_video_path, moving_video_path, debug_mode):
     cv.namedWindow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"])
     cv.namedWindow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"])
 
@@ -75,12 +77,12 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                 static_homography,
                 static_corners,
                 static_warped_frame,
-            ) = findRectanglePatternHomography(static_gray_frame, "static")
+            ) = findRectanglePatternHomography(static_gray_frame, "static", debug_mode)
             (
                 moving_homography,
                 moving_corners,
                 moving_warped_frame,
-            ) = findRectanglePatternHomography(moving_gray_frame, "moving")
+            ) = findRectanglePatternHomography(moving_gray_frame, "moving", debug_mode)
 
             if static_corners is not None and moving_corners is not None:
                 # Get light direction from frames and corners
@@ -91,14 +93,15 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                     moving_corners,
                 )
 
-                # Create debug light direciton window
-                lightDirectionFrame = createLightDirectionFrame(
-                    (
-                        fromLightDirToIndex(light_direction[0]),
-                        fromLightDirToIndex(light_direction[1]),
+                if debug_mode >= 1:
+                    # Create debug light direciton window
+                    lightDirectionFrame = createLightDirectionFrame(
+                        (
+                            fromLightDirToIndex(light_direction[0]),
+                            fromLightDirToIndex(light_direction[1]),
+                        )
                     )
-                )
-                cv.imshow("Light direction", lightDirectionFrame)
+                    cv.imshow("Light direction", lightDirectionFrame)
 
                 # Get pixel intensities from static frame
                 pixel_intensities = findPixelIntensities(static_frame)
@@ -120,18 +123,28 @@ def extractDataFromVideos(static_video_path, moving_video_path):
                             else:
                                 data[x][y] = data_point
 
-                # static_frame = cv.drawContours(
-                #     static_frame, [static_corners], -1, (0, 0, 255), 3
-                # )
-                # cv.imshow("warped_moving", moving_warped_frame)
+                if debug_mode >= 1:
+                    # Show marker's contours
+                    static_frame = cv.drawContours(
+                        static_frame, [static_corners], -1, (0, 0, 255), 3
+                    )
+                if debug_mode >= 2:
+                    # Show moving warped frame
+                    cv.imshow(
+                        constants["WARPED_FRAME_WINDOW_TITLE"], moving_warped_frame
+                    )
+                    # Show frames corners
+                    static_frame = debugCorners(static_frame, static_corners)
+                    moving_frame = debugCorners(moving_frame, moving_corners)
 
-            # Video output during analysis
-            cv.imshow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"], static_frame)
-            cv.imshow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"], moving_frame)
+            if debug_mode >= 1:
+                # Video output during analysis
+                cv.imshow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"], static_frame)
+                cv.imshow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"], moving_frame)
 
-            # Quit by pressing 'q'
-            if cv.waitKey(1) & 0xFF == ord("q"):
-                flag = False
+                # Quit by pressing 'q'
+                if cv.waitKey(1) & 0xFF == ord("q"):
+                    flag = False
 
             # Frame skip
             current_frame_count += constants["ANALYSIS_FRAME_SKIP"]
@@ -161,6 +174,7 @@ def main(
     extracted_data_file_path,
     interpolated_data_file_path,
     interpolation_mode,
+    debug_mode,
 ):
     extracted_data = None
     interpolated_data = None
@@ -175,7 +189,9 @@ def main(
     # Ask to generate aligned videos (if they already exists)
     if inputExtractedData(extracted_data_file_path):
         # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
-        extracted_data = extractDataFromVideos(static_video_path, moving_video_path)
+        extracted_data = extractDataFromVideos(
+            static_video_path, moving_video_path, debug_mode
+        )
         writeDataFile(extracted_data_file_path, extracted_data)
 
     if extracted_data is not None:
@@ -190,6 +206,7 @@ def main(
 
 
 if __name__ == "__main__":
+    debug_mode = inputDebug()
     coin = inputCoin()
     interpolation_mode = inputInterpolatedMode()
     (
@@ -222,6 +239,7 @@ if __name__ == "__main__":
         extracted_data_file_path,
         interpolated_data_file_path,
         interpolation_mode,
+        debug_mode,
     )
 
     print("All Done!")
