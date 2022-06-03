@@ -27,26 +27,28 @@ def calibrate(calibration_video, save_file_path):
     while success:
         frame_count += 1
         success, frame = calibration_video.read()
-        gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-        # Find the chess board corners
-        ret, corners = cv.findChessboardCorners(
-            gray, constants["CHESSBOARD_SIZE"], None
-        )
-        # If found, add object points, image points (after refining them)
-        if ret == True:
-            objpoints.append(objp)
-            corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
-            imgpoints.append(corners)
-            # Draw and display the corners
-            cv.drawChessboardCorners(frame, constants["CHESSBOARD_SIZE"], corners2, ret)
-            cv.imshow("img", frame)
-            cv.waitKey(1)
-        if constants["CALIBRATION_FRAME_SKIP_INTERVAL"] * frame_count >= video_length:
-            break
-        calibration_video.set(
-            cv.CAP_PROP_POS_FRAMES,
-            constants["CALIBRATION_FRAME_SKIP_INTERVAL"] * frame_count,
-        )
+
+        if success:
+            gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+            # Find the chess board corners
+            ret, corners = cv.findChessboardCorners(
+                gray, constants["CHESSBOARD_SIZE"], None
+            )
+            # If found, add object points, image points (after refining them)
+            if ret == True:
+                objpoints.append(objp)
+                corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
+                imgpoints.append(corners)
+                # Draw and display the corners
+                cv.drawChessboardCorners(frame, constants["CHESSBOARD_SIZE"], corners2, ret)
+                cv.imshow("img", frame)
+                cv.waitKey(1)
+            if constants["CALIBRATION_FRAME_SKIP_INTERVAL"] * frame_count >= video_length:
+                break
+            calibration_video.set(
+                cv.CAP_PROP_POS_FRAMES,
+                constants["CALIBRATION_FRAME_SKIP_INTERVAL"] * frame_count,
+            )
 
     cv.destroyAllWindows()
     calibration_video.release()
