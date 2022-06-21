@@ -9,7 +9,7 @@
 
 ![sample_input](./docs/sample_input.gif)
 
-> Footage by professor Filippo Bergamasco (Ca Foscari University of Venice)
+> Footage by professor Filippo Bergamasco (Ca' Foscari University of Venice)
 
 ### 🕹 Output (interactive):
 
