@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/Baccega/smartphone-based-rti)
 [![Python version](https://img.shields.io/badge/Python-v3.10.4-blue.svg)](https://www.python.org/)
 
-**Reflectance Transformation Imaging** (RTI) using footage of two smartphones without requiring an expensive light dome, created in **Python** utilizing **OpenCV** .
+**Reflectance Transformation Imaging** (RTI) using footage from two smartphones without requiring an expensive light dome, created in **Python** utilizing **OpenCV** .
 
 ### 🎥 Input:
 
