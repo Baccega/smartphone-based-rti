@@ -10,10 +10,10 @@ def interpolate_data(data, mode):
 
     interpolated_data = np.zeros(
         (
+            constants["LIGHT_DIRECTION_WINDOW_SIZE"],
+            constants["LIGHT_DIRECTION_WINDOW_SIZE"],
             constants["SQAURE_GRID_DIMENSION"],
             constants["SQAURE_GRID_DIMENSION"],
-            200,
-            200,
         )
     )
 
@@ -34,8 +34,8 @@ def interpolate_data(data, mode):
                 )
 
                 # For every possible light direction
-                for x1 in range(200):
-                    for y1 in range(200):
+                for x1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                    for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
                         interpolated_data[x1][y1][x][y] = rbf_interpolation(x1, y1)
             else:
                 # Compute light projection matrix
@@ -61,8 +61,8 @@ def interpolate_data(data, mode):
                 a_matrix = np.dot(v.T, w)
 
                 # For every possible light direction
-                for lv in range(200):
-                    for lu in range(200):
+                for lv in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                    for lu in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
                         l0 = a_matrix[0] * (lu ** 2)
                         l1 = a_matrix[1] * (lv ** 2)
                         l2 = a_matrix[2] * (lu * lv)

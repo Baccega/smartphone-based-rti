@@ -18,7 +18,8 @@ constants = {
     "CHESSBOARD_SIZE": (6, 9),
     "CALIBRATION_FRAME_SKIP_INTERVAL": 40,  # We just need some, not all
     # --- ANALYSIS CONSTANTS
-    "SQAURE_GRID_DIMENSION": 200,  # It will be a 400x400 square grid inside the marker
+    "SQAURE_GRID_DIMENSION": 200,  # It will be a 200x200 square grid inside the marker
+    "LIGHT_DIRECTION_WINDOW_SIZE": 100,  # There will be 100x100 possible light directions
     "ALIGNED_VIDEO_FPS": 30,
     "ANALYSIS_FRAME_SKIP": 5,  # It will skip this frames each iteration during analysis
     # ---  DEBUG CONSTANTS
@@ -26,7 +27,6 @@ constants = {
     "MOVING_CAMERA_FEED_WINDOW_TITLE": "Moving camera feed",
     "WARPED_FRAME_WINDOW_TITLE": "Warped moving frame",
     "LIGHT_DIRECTION_WINDOW_TITLE": "Light direction",
-    "LIGHT_DIRECTION_WINDOW_SIZE": 200,
     # ---  INTERACTIVE RELIGHTING CONSTANTS
     "INTERPOLATED_WINDOW_TITLE": "Interpolated Data",
     "INPUT_LIGHT_DIRECTION_WINDOW_TITLE": "Light direction input",

@@ -58,8 +58,8 @@ def main(interpolated_data_file_path):
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
-            for x in range(200):
-                for y in range(200):
+            for x in range(constants["SQAURE_GRID_DIMENSION"]):
+                for y in range(constants["SQAURE_GRID_DIMENSION"]):
                     frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
             prevDirX = dirX
