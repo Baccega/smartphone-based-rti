@@ -182,7 +182,8 @@ def fromLightDirToIndex(lightDir):
     """
     Transform light direction [-1.0, ..., +1.0] to positive indexes (0, ..., 200)
     """
-    return int(np.around(lightDir, decimals=2) * 100) + 100
+    half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
+    return int(np.around(lightDir, decimals=2) * half_size) + half_size
 
 
 def writeDataFile(extracted_data_file_path, extracted_data):

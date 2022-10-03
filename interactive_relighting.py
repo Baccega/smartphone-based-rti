@@ -11,8 +11,8 @@ from utils import (
     loadDataFile,
 )
 
-dirX = 69
-dirY = 172
+dirX = 0    
+dirY = 0
 prevDirX = None
 prevDirY = None
 isDragging = False
@@ -60,6 +60,7 @@ def main(interpolated_data_file_path):
         if prevDirX != dirX or prevDirY != dirY:
             for x in range(constants["SQAURE_GRID_DIMENSION"]):
                 for y in range(constants["SQAURE_GRID_DIMENSION"]):
+                    print(x,y,dirX,dirY)
                     frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
             prevDirX = dirX
