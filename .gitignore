@@ -5,3 +5,5 @@ assets/
 data/
 
 __pycache__
+
+.vscode
