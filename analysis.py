@@ -87,9 +87,6 @@ def extractDataFromVideos(static_video_path, moving_video_path, debug_mode):
             if static_corners is not None and moving_corners is not None:
                 # Get light direction from frames and corners
                 light_direction = findLightDirection(
-                    static_frame,
-                    moving_frame,
-                    static_corners,
                     moving_corners,
                 )
 

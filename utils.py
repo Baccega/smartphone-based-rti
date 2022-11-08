@@ -80,43 +80,28 @@ def findPixelIntensities(static_frame):
     return roi[:, :, 2]
 
 
-def findLightDirection(static_frame, moving_frame, static_corners, moving_corners):
+# Compute the rotation and traslation matrix
+def computeRt(objectPoints, imagePoints):
+    M, D = getCameraIntrinsics(constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"])
+
+    objectPoints = np.hstack((objectPoints, np.zeros((objectPoints.shape[0], 1))))
+    imagePoints = imagePoints.astype(np.float32)
+    success, Rvec, tvec = cv.solvePnP(objectPoints, imagePoints, M, D)
+    rodRotMat = cv.Rodrigues(Rvec)[0]
+    return rodRotMat, tvec.T[0]
+
+
+def findLightDirection(moving_corners):
     """
     Get light direction from static_frame and moving frame
     """
-    moving_frame = cv.cvtColor(moving_frame, cv.COLOR_BGR2GRAY)
-    image_size = moving_frame.shape[::-1]
+    center = [constants["SQAURE_GRID_DIMENSION"], constants["SQAURE_GRID_DIMENSION"], 0]
+    refSquare = np.array([[0, 400], [400, 400], [400, 0], [0, 0]])
 
-    M, D = getCameraIntrinsics(constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"])
-    z_axis = 1
-    flags = cv.CALIB_USE_INTRINSIC_GUESS
+    rotation, translation = computeRt(refSquare, moving_corners)
+    o = -rotation.T @ translation
 
-    points_3d = np.float32(
-        [
-            (static_corners[point][0][0], static_corners[point][0][1], z_axis)
-            for point in range(0, len(static_corners))
-        ]
-    )
-    points_2d = np.float32(
-        [
-            (moving_corners[point][0][0], moving_corners[point][0][1])
-            for point in range(0, len(moving_corners))
-        ]
-    )
-
-    # perform a camera calibration to get R and T
-    (_, _, _, r_vectors, t_vectors) = cv.calibrateCamera(
-        [points_3d], [points_2d], image_size, cameraMatrix=M, distCoeffs=D, flags=flags
-    )
-    R = cv.Rodrigues(r_vectors[0])[0]
-    T = t_vectors[0]
-
-    pose = -np.matrix(R).T * np.matrix(T)
-    pose = np.array(pose).flatten()
-
-    h2, w2 = int(static_frame.shape[0] / 2), int(static_frame.shape[1] / 2)
-    p = (h2, w2, 0)
-    l = (pose - p) / np.linalg.norm(pose - p)
+    l = (o - center) / np.linalg.norm(o - center)
 
     # -1 ≤ l[0] ≤ +1
     # -1 ≤ l[1] ≤ +1
