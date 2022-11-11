@@ -214,6 +214,7 @@ if __name__ == "__main__":
         moving_video_path,
         extracted_data_file_path,
         interpolated_data_file_path,
+        _,
     ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
 
     if (not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"])) or (

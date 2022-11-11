@@ -1,4 +1,5 @@
 import os
+import torch
 import cv2 as cv
 import numpy as np
 import math
@@ -46,20 +47,46 @@ def loadIntrinsics(path=constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"]):
     return K, dist
 
 
-def getChoosenCoinVideosPaths(coin, interpolation_mode):
+def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
     """
     Get constants based on the coin and interpolation mode
     """
-    mode_str = "RBF" if interpolation_mode == 1 else "PTM"
-    return (
-        constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
-        constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
-        constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
-        constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
-        constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
-        constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
-        constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
-    )
+    if interpolation_mode == 0:
+        return (
+            constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
+            constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
+            constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
+            constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
+            constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
+            constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
+            "NO_INTERPOLATION",
+            constants["COIN_{}_PCA_MODEL".format(coin)],
+        )
+    else:
+        mode_str = "RBF" if interpolation_mode == 1 else "PTM"
+        return (
+            constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
+            constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
+            constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
+            constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
+            constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
+            constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
+            constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
+            constants["COIN_{}_PCA_MODEL".format(coin)],
+        )
+
+
+def generateGaussianMatrix(mean, standard_deviation, size):
+    out = []
+    for i in range(size):
+        out += [torch.normal(mean, standard_deviation.sqrt())]
+    return torch.stack(out, dim=0)
+
+
+def getProjectedLightsInFourierSpace(light_direction_x, light_direction_y, matrix):
+    s = np.dot(np.array(light_direction_x, light_direction_y), matrix)
+
+    return (torch.tensor(np.cos(s)), torch.tensor(np.sin(s)))
 
 
 def findPixelIntensities(static_frame):

@@ -4,3 +4,6 @@ numpy
 ffmpeg-python
 tqdm
 matplotlib
+pytorch
+torchvision
+torchaudio
