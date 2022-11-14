@@ -77,14 +77,17 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
 
 
 def generateGaussianMatrix(mean, standard_deviation, size):
-    out = []
+    first = []
+    second = []
     for i in range(size):
-        out += [torch.normal(mean, standard_deviation.sqrt())]
-    return torch.stack(out, dim=0)
+        first += [torch.normal(mean, standard_deviation)]
+    for i in range(size):
+        second += [torch.normal(mean, standard_deviation)]
+    return torch.stack([torch.tensor(first), torch.tensor(second)], dim=0)
 
 
 def getProjectedLightsInFourierSpace(light_direction_x, light_direction_y, matrix):
-    s = np.dot(np.array(light_direction_x, light_direction_y), matrix)
+    s = np.dot(np.array([light_direction_x, light_direction_y]), matrix)
 
     return (torch.tensor(np.cos(s)), torch.tensor(np.sin(s)))
 
