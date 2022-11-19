@@ -1,9 +1,11 @@
+import math
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 import os
+from sklearn.decomposition import PCA
 from tqdm import tqdm
 from torch.utils.data import DataLoader, Dataset, random_split
 from constants import constants
@@ -28,36 +30,110 @@ N_EPOCHS = 40
 
 # Local constants
 
-B = 8
+PCA_ORTHOGONAL_BASES = 8
 H = 10
 sigma = 0.3
 
-MODEL_INPUT_SIZE = B + (2 * H)
+MODEL_INPUT_SIZE = PCA_ORTHOGONAL_BASES + (2 * H)
 
 
 class PixelDataset(Dataset):
-    def __init__(self, extracted_data_file_path, B):
-        self.B = B
+    def __init__(self, extracted_data_file_path):
         extracted_data = loadDataFile(extracted_data_file_path)
 
+        n_extracted_datapoints = len(list(extracted_data[0][0].keys()))
         total = (
             constants["SQAURE_GRID_DIMENSION"]
             * constants["SQAURE_GRID_DIMENSION"]
-            * len(list(extracted_data[0][0].keys()))
+            * n_extracted_datapoints
         )
-        self.data = np.empty([total, 3])
+        # Length = size of K + 2 light directions
+        self.data = np.empty([total, 2 + PCA_ORTHOGONAL_BASES + 1])
+        full_pca_data = np.empty(
+            [
+                constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"],
+                n_extracted_datapoints,
+            ]
+        )
 
-        for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
-            for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                keys = list(extracted_data[x][y].keys())
-                light_directions_x = [i.split("|")[0] for i in keys]
-                light_directions_y = [i.split("|")[1] for i in keys]
-                pixel_intensities = list(extracted_data[x][y].values())
-                for i in range(len(pixel_intensities)):
-                    j = x * y * i
-                    self.data[j][0] = light_directions_x[i]
-                    self.data[j][1] = light_directions_y[i]
-                    self.data[j][2] = pixel_intensities[i]
+        print("Loading PCA Data")
+        for i in tqdm(
+            range(
+                constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]
+            )
+        ):
+            x = i % constants["SQAURE_GRID_DIMENSION"]
+            y = math.floor(i / constants["SQAURE_GRID_DIMENSION"])
+            full_pca_data[i] = list(extracted_data[x][y].values())
+
+        print("Running PCA")
+        pca = PCA(n_components=PCA_ORTHOGONAL_BASES)
+        pca_data = pca.fit_transform(full_pca_data)
+
+        # print(pca_data.shape)
+        # print(pca_data[0])
+        pca_data = torch.reshape(
+            torch.tensor(pca_data),
+            (
+                constants["SQAURE_GRID_DIMENSION"],
+                constants["SQAURE_GRID_DIMENSION"],
+                PCA_ORTHOGONAL_BASES,
+            ),
+        )
+
+        # print(pca_data.shape)
+        # print(pca_data[0][0])
+
+        for i in tqdm(
+            range(
+                constants["SQAURE_GRID_DIMENSION"]
+                * constants["SQAURE_GRID_DIMENSION"]
+                * n_extracted_datapoints
+            )
+        ):
+            x = i % constants["SQAURE_GRID_DIMENSION"]
+            y = (
+                math.floor(i / constants["SQAURE_GRID_DIMENSION"])
+                % constants["SQAURE_GRID_DIMENSION"]
+            )
+            z = math.floor(
+                i
+                / (
+                    constants["SQAURE_GRID_DIMENSION"]
+                    * constants["SQAURE_GRID_DIMENSION"]
+                )
+            )
+            # print(x, y, z)
+            keys = list(extracted_data[x][y].keys())
+            light_directions_x = [i.split("|")[0] for i in keys]
+            light_directions_y = [i.split("|")[1] for i in keys]
+            pixel_intensities = list(extracted_data[x][y].values())
+            self.data[i] = torch.cat(
+                (
+                    pca_data[x][y],
+                    torch.tensor(
+                        [
+                            float(light_directions_x[z]),
+                            float(light_directions_y[z]),
+                        ]
+                    ),
+                    torch.tensor([pixel_intensities[z]]),
+                ),
+                dim=-1,
+            )
+        # print(self.data[0])
+
+        # for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
+        #     for y in range(constants["SQAURE_GRID_DIMENSION"]):
+        #         keys = list(extracted_data[x][y].keys())
+        #         light_directions_x = [i.split("|")[0] for i in keys]
+        #         light_directions_y = [i.split("|")[1] for i in keys]
+        #         pixel_intensities = list(extracted_data[x][y].values())
+        #         for i in range(len(pixel_intensities)):
+        #             j = x * y * i
+        #             self.data[j][0] = light_directions_x[i]
+        #             self.data[j][1] = light_directions_y[i]
+        #             self.data[j][2] = pixel_intensities[i]
 
     def __len__(self):
         # total = (
@@ -68,78 +144,50 @@ class PixelDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        light_direction_x, light_direction_y = (self.data[idx][0], self.data[idx][1])
-        cos_s, sin_s = getProjectedLightsInFourierSpace(light_direction_x, light_direction_y, self.B)
-
-        # print("COS: ", np.cos(s))
-        # print("SIN: ", np.sin(s))
-
-        # input = pca + cos(s) + sin(s) 
-
-        input = torch.cat((cos_s, sin_s), 0)
-        label = torch.tensor(self.data[idx][2])
+        input = self.data[idx][:-1]
+        label = self.data[idx][-1]
         return input, label
 
 
 class NeuralModel(nn.Module):
-    def __init__(
-        self,
-    ):
+    def __init__(self, gaussian_matrix):
         super(NeuralModel, self).__init__()
-        self.fc1 = nn.Linear(MODEL_INPUT_SIZE, 16)
-        self.fc2 = nn.Linear(16, 16)
-        self.fc3 = nn.Linear(16, 16)
-        self.fc4 = nn.Linear(16, 16)
-        self.fc5 = nn.Linear(16, 1)
+
+        self.register_buffer(
+            "gaussian_matrix",
+            torch.tensor(gaussian_matrix.astype(np.double)),
+            persistent=True,
+        )
+
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(MODEL_INPUT_SIZE, 16),
+            nn.ELU(),
+            nn.Linear(16, 16),
+            nn.ELU(),
+            nn.Linear(16, 16),
+            nn.ELU(),
+            nn.Linear(16, 16),
+            nn.ELU(),
+            nn.Linear(16, 1),
+        )
 
     def forward(self, x):
-        x = F.elu(self.fc1(x))
-        x = F.elu(self.fc2(x))
-        x = F.elu(self.fc3(x))
-        x = F.elu(self.fc4(x))
-        x = F.elu(self.fc5(x))
-        return x
+        x_light = torch.tensor(6.283185 * (x[:, -2:] @ self.gaussian_matrix))
+        x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
+        x = torch.cat([x[:, :-2], x_light], dim=-1).float()
+        out = self.linear_relu_stack(x)
+        return out
 
 
-def train(model_path, extracted_data_file_path, B):
+def train(model_path, extracted_data_file_path, gaussian_matrix):
     print("PCA model: " + model_path)
     print("Training data: " + extracted_data_file_path)
 
-    model = NeuralModel()
+    model = NeuralModel(gaussian_matrix=gaussian_matrix)
 
-    dataset = PixelDataset(extracted_data_file_path, B)
+    dataset = PixelDataset(extracted_data_file_path)
 
-    # Random split (90% - 10%)
-    train_set_size = int(len(dataset) * 0.9)
-    test_set_size = len(dataset) - train_set_size
-    training_dataset, test_dataset = random_split(
-        dataset, [train_set_size, test_set_size]
-    )
-
-    train_dataloader = DataLoader(training_dataset, batch_size=64, shuffle=True)
-    test_dataloader = DataLoader(test_dataset, batch_size=64, shuffle=True)
-
-    def check_accuracy(data_loader, model):
-        n_corrects = 0
-        n_samples = 0
-        model.eval()
-
-        with torch.no_grad():
-            for x, y in data_loader:
-                # Sending data to device
-                x = x.to(device)
-                y = y.to(device)
-
-                # Forward propagation
-                y_hat = model(x)
-
-                # Calculate accuracy
-                _, predictions = y_hat.max(1)
-                n_corrects += (predictions == y).sum()
-                n_samples += predictions.size(0)
-
-            perc = (n_corrects.item() / n_samples) * 100
-            return (n_corrects.item(), n_samples, perc)
+    dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     # Mean Absolute Error
     criterion = nn.L1Loss()
@@ -148,14 +196,10 @@ def train(model_path, extracted_data_file_path, B):
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
 
-    # training_results_data = pd.DataFrame(
-    #     {"Epoch": [], "Predictions": [], "Samples": [], "Accuracy": [], "Loss": []}
-    # )
-
     for epoch in range(N_EPOCHS):  # loop over the dataset multiple times
         running_loss = 0.0
         model.train()
-        with tqdm(train_dataloader, unit="batch") as tepoch:
+        with tqdm(dataloader, unit="batch") as tepoch:
             for i, data in enumerate(tepoch):
                 # get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data
@@ -175,16 +219,7 @@ def train(model_path, extracted_data_file_path, B):
                 running_loss += loss.item()
             scheduler.step()
             current_lr = optimizer.state_dict()["param_groups"][0]["lr"]
-            n_corrects, n_samples, accuracy = check_accuracy(test_dataloader, model)
-            # training_results_data.loc[len(training_results_data.index)] = [
-            #     int(epoch + 1),
-            #     int(n_corrects),
-            #     int(n_samples),
-            #     accuracy,
-            #     running_loss,
-            # ]
             print(f"Epoch {epoch + 1}, loss: {running_loss}, lr: {current_lr}")
-            print(f"Accuracy: {n_corrects}/{n_samples} = {accuracy:.2f}%")
 
     print("Finished Training")
 
@@ -213,10 +248,18 @@ def main():
             )
         )
 
-    B = generateGaussianMatrix(0, torch.tensor(sigma), H)
-    # B = generateGaussianMatrix(0, torch.tensor(sigma), H * 2)
+    # gaussian_matrix = np.random.randn(2, 10) * sigma
+    gaussian_matrix = generateGaussianMatrix(0, torch.tensor(sigma), H)
+    # print(gaussian_matrix.shape)
+    # print(gaussian_matrix)
 
-    train(model_path, extracted_data_file_path, B)
+    # s = np.dot(np.array([0.5, 0.5]), matrix)
+
+    # print(torch.tensor(np.cos(s)), torch.tensor(np.sin(s)))
+    # matrix = generateGaussianMatrix(0, torch.tensor(sigma), H * 2)
+
+    train(model_path, extracted_data_file_path, gaussian_matrix)
+
 
 if __name__ == "__main__":
     main()

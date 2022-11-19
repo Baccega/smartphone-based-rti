@@ -83,7 +83,7 @@ def generateGaussianMatrix(mean, standard_deviation, size):
         first += [torch.normal(mean, standard_deviation)]
     for i in range(size):
         second += [torch.normal(mean, standard_deviation)]
-    return torch.stack([torch.tensor(first), torch.tensor(second)], dim=0)
+    return torch.stack([torch.tensor(first), torch.tensor(second)], dim=0).numpy()
 
 
 def getProjectedLightsInFourierSpace(light_direction_x, light_direction_y, matrix):
