@@ -87,6 +87,7 @@ if __name__ == "__main__":
         extracted_data_file_path,
         interpolated_data_file_path,
         _,
+        _,
     ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
 
     if not os.path.exists(interpolated_data_file_path):

@@ -51,30 +51,22 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
     """
     Get constants based on the coin and interpolation mode
     """
-    if interpolation_mode == 0:
-        return (
-            constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
-            constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
-            constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
-            constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
-            constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
-            constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
-            "NO_INTERPOLATION",
-            constants["COIN_{}_PCA_MODEL".format(coin)],
-        )
-    else:
-        mode_str = "RBF" if interpolation_mode == 1 else "PTM"
-        return (
-            constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
-            constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
-            constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
-            constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
-            constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
-            constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
-            constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
-            constants["COIN_{}_PCA_MODEL".format(coin)],
-        )
-
+    mode_str = "RBF"
+    if interpolation_mode == 2:
+        mode_str = "PTM"
+    elif interpolation_mode == 3:
+        mode_str = "PCA_MODEL"
+    return (
+        constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
+        constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
+        constants["FILE_{}_MOVING_CAMERA_DELAY".format(coin)],
+        constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
+        constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
+        constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
+        constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
+        constants["COIN_{}_PCA_MODEL".format(coin)],
+        constants["COIN_{}_PCA_DATA_FILE_PATH".format(coin)],
+    )
 
 def generateGaussianMatrix(mean, standard_deviation, size):
     first = []
@@ -201,20 +193,20 @@ def fromLightDirToIndex(lightDir):
     return int(np.around(lightDir, decimals=2) * half_size) + half_size
 
 
-def writeDataFile(extracted_data_file_path, extracted_data):
+def writeDataFile(data_file_path, data):
     """
     Write data file to os
     """
-    print("Saving extracted data into '{}'...".format(extracted_data_file_path))
-    np.savez_compressed(extracted_data_file_path, extracted_data)
+    print("Saving data into '{}'...".format(data_file_path))
+    np.savez_compressed(data_file_path, data)
     print("Saved!")
 
 
-def loadDataFile(extracted_data_file_path):
+def loadDataFile(data_file_path):
     """
     Load data file from os
     """
-    print("Loading extracted data file '{}'...".format(extracted_data_file_path))
-    loaded_data = np.load(extracted_data_file_path, allow_pickle=True)["arr_0"]
+    print("Loading extracted data file '{}'...".format(data_file_path))
+    loaded_data = np.load(data_file_path, allow_pickle=True)["arr_0"]
     print("Loaded!")
     return loaded_data

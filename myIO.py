@@ -73,9 +73,9 @@ def inputInterpolatedData(path1):
 
 def inputInterpolatedMode():
     return safeIntInput(
-        "Select interpolation method (1. Linear RBF, 2. Polinomial Texture Maps): ",
+        "Select interpolation method (1. Linear RBF, 2. Polinomial Texture Maps, 3. PCA neural model ): ",
         1,
-        2,
+        3,
     )
 
 

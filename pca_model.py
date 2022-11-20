@@ -15,6 +15,7 @@ from utils import (
     getProjectedLightsInFourierSpace,
     getChoosenCoinVideosPaths,
     loadDataFile,
+    writeDataFile,
 )
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -38,7 +39,7 @@ MODEL_INPUT_SIZE = PCA_ORTHOGONAL_BASES + (2 * H)
 
 
 class PixelDataset(Dataset):
-    def __init__(self, extracted_data_file_path):
+    def __init__(self, extracted_data_file_path, pca_data_file_path):
         extracted_data = loadDataFile(extracted_data_file_path)
 
         n_extracted_datapoints = len(list(extracted_data[0][0].keys()))
@@ -70,8 +71,6 @@ class PixelDataset(Dataset):
         pca = PCA(n_components=PCA_ORTHOGONAL_BASES)
         pca_data = pca.fit_transform(full_pca_data)
 
-        # print(pca_data.shape)
-        # print(pca_data[0])
         pca_data = torch.reshape(
             torch.tensor(pca_data),
             (
@@ -81,8 +80,9 @@ class PixelDataset(Dataset):
             ),
         )
 
-        # print(pca_data.shape)
-        # print(pca_data[0][0])
+        writeDataFile(pca_data_file_path, pca_data)
+
+        print("Preparing dataset data")
 
         for i in tqdm(
             range(
@@ -121,26 +121,8 @@ class PixelDataset(Dataset):
                 ),
                 dim=-1,
             )
-        # print(self.data[0])
-
-        # for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
-        #     for y in range(constants["SQAURE_GRID_DIMENSION"]):
-        #         keys = list(extracted_data[x][y].keys())
-        #         light_directions_x = [i.split("|")[0] for i in keys]
-        #         light_directions_y = [i.split("|")[1] for i in keys]
-        #         pixel_intensities = list(extracted_data[x][y].values())
-        #         for i in range(len(pixel_intensities)):
-        #             j = x * y * i
-        #             self.data[j][0] = light_directions_x[i]
-        #             self.data[j][1] = light_directions_y[i]
-        #             self.data[j][2] = pixel_intensities[i]
 
     def __len__(self):
-        # total = (
-        #     constants["SQAURE_GRID_DIMENSION"]
-        #     * constants["SQAURE_GRID_DIMENSION"]
-        #     * len(list(self.data[0][0].keys()))
-        # )
         return len(self.data)
 
     def __getitem__(self, idx):
@@ -179,14 +161,13 @@ class NeuralModel(nn.Module):
         return out
 
 
-def train(model_path, extracted_data_file_path, gaussian_matrix):
+def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path):
     print("PCA model: " + model_path)
     print("Training data: " + extracted_data_file_path)
 
     model = NeuralModel(gaussian_matrix=gaussian_matrix)
 
-    dataset = PixelDataset(extracted_data_file_path)
-
+    dataset = PixelDataset(extracted_data_file_path, pca_data_file_path)
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     # Mean Absolute Error
@@ -239,6 +220,7 @@ def main():
         extracted_data_file_path,
         _,
         model_path,
+        pca_data_file_path,
     ) = getChoosenCoinVideosPaths(coin)
 
     if not os.path.exists(extracted_data_file_path):
@@ -250,15 +232,8 @@ def main():
 
     # gaussian_matrix = np.random.randn(2, 10) * sigma
     gaussian_matrix = generateGaussianMatrix(0, torch.tensor(sigma), H)
-    # print(gaussian_matrix.shape)
-    # print(gaussian_matrix)
 
-    # s = np.dot(np.array([0.5, 0.5]), matrix)
-
-    # print(torch.tensor(np.cos(s)), torch.tensor(np.sin(s)))
-    # matrix = generateGaussianMatrix(0, torch.tensor(sigma), H * 2)
-
-    train(model_path, extracted_data_file_path, gaussian_matrix)
+    train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path)
 
 
 if __name__ == "__main__":

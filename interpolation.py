@@ -3,9 +3,10 @@ import numpy as np
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from constants import constants
+from utils import loadDataFile
 
 
-def interpolate_data(data, mode):
+def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
     print("\t— Interpolating data")
 
     interpolated_data = np.zeros(
@@ -16,6 +17,10 @@ def interpolate_data(data, mode):
             constants["SQAURE_GRID_DIMENSION"],
         )
     )
+
+    if mode == 3:
+        pca_data = loadDataFile(pca_data_file_path)
+        print("PCA_DATA_LOADED")
 
     # For every pixel coordinate
     for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
@@ -37,7 +42,7 @@ def interpolate_data(data, mode):
                 for x1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
                     for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
                         interpolated_data[x1][y1][x][y] = rbf_interpolation(x1, y1)
-            else:
+            elif mode == 2:
                 # Compute light projection matrix
                 light_projection_matrix = []
                 luminance_vector = []
@@ -70,5 +75,10 @@ def interpolate_data(data, mode):
                         l4 = a_matrix[4] * lv
                         L = l0 + l1 + l2 + l3 + l4 + a_matrix[5]
                         interpolated_data[lu][lv][x][y] = L
+            elif mode == 3:
+                print("Neural model: " + neural_model_path)
+                
+                
+
 
     return interpolated_data
