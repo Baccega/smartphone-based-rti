@@ -33,6 +33,7 @@ constants = {
     # ---  DATA FILE NAMES CONSTANTS
     "CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH": "data/static_intrinsics.xml",
     "CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH": "data/moving_intrinsics.xml",
+    "GAUSSIAN_MATRIX_FILE_PATH": "data/gaussian_matrix.npz",
     "COIN_1_ALIGNED_VIDEO_STATIC_PATH": "data/1_static_aligned_video.mov",
     "COIN_1_ALIGNED_VIDEO_MOVING_PATH": "data/1_moving_aligned_video.mp4",
     "COIN_1_PCA_MODEL": "data/1_pca_model.pt",

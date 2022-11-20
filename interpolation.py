@@ -1,10 +1,15 @@
 from scipy.interpolate import Rbf
 import numpy as np
+import torch
+import torch.nn as nn
+from pca_model import NeuralModel
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from constants import constants
 from utils import loadDataFile
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+torch.manual_seed(42)
 
 def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
     print("\t— Interpolating data")
@@ -21,16 +26,17 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
     if mode == 3:
         pca_data = loadDataFile(pca_data_file_path)
         print("PCA_DATA_LOADED")
+        gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
+        print("GAUSSIAN_MATRIX_LOADED")
 
     # For every pixel coordinate
     for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
         for y in range(constants["SQAURE_GRID_DIMENSION"]):
-            keys = list(data[x][y].keys())
-            light_directions_x = [i.split("|")[0] for i in keys]
-            light_directions_y = [i.split("|")[1] for i in keys]
-            pixel_intensities = list(data[x][y].values())
-
             if mode == 1:
+                keys = list(data[x][y].keys())
+                light_directions_x = [i.split("|")[0] for i in keys]
+                light_directions_y = [i.split("|")[1] for i in keys]
+                pixel_intensities = list(data[x][y].values())
                 rbf_interpolation = Rbf(
                     light_directions_x,
                     light_directions_y,
@@ -43,6 +49,10 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
                     for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
                         interpolated_data[x1][y1][x][y] = rbf_interpolation(x1, y1)
             elif mode == 2:
+                keys = list(data[x][y].keys())
+                light_directions_x = [i.split("|")[0] for i in keys]
+                light_directions_y = [i.split("|")[1] for i in keys]
+                pixel_intensities = list(data[x][y].values())
                 # Compute light projection matrix
                 light_projection_matrix = []
                 luminance_vector = []
@@ -77,6 +87,18 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
                         interpolated_data[lu][lv][x][y] = L
             elif mode == 3:
                 print("Neural model: " + neural_model_path)
+
+                model = NeuralModel(gaussian_matrix)
+                model.load_state_dict(torch.load(neural_model_path))
+                model.eval()
+
+                for x1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                    for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                        input = torch.cat((torch.tensor(pca_data[x][y]), torch.tensor([x1, y1])), dim=-1)
+                        input = input.to(device)
+                        interpolated_data[x1][y1][x][y] = model(input)
+
+
                 
                 
 

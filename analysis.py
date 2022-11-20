@@ -228,6 +228,8 @@ if __name__ == "__main__":
     print(neural_model_path, pca_data_file_path)
     if (not os.path.exists(neural_model_path)) or (
         not os.path.exists(pca_data_file_path)
+    ) or (
+        not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"])
     ):
         raise (Exception("You need to train the model before using it!"))
 

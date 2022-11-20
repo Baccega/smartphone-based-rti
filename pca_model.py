@@ -154,7 +154,7 @@ class NeuralModel(nn.Module):
         )
 
     def forward(self, x):
-        x_light = torch.tensor(6.283185 * (x[:, -2:] @ self.gaussian_matrix))
+        x_light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix)).clone().detach()
         x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
         x = torch.cat([x[:, :-2], x_light], dim=-1).float()
         out = self.linear_relu_stack(x)
@@ -177,6 +177,8 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
 
+    print("Starting training:")
+
     for epoch in range(N_EPOCHS):  # loop over the dataset multiple times
         running_loss = 0.0
         model.train()
@@ -192,7 +194,7 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
 
                 # forward + backward + optimize
                 outputs = model(inputs)
-                loss = criterion(outputs, labels)
+                loss = criterion(outputs.squeeze(), labels)
                 loss.backward()
                 optimizer.step()
 
@@ -205,6 +207,8 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
     print("Finished Training")
 
     torch.save(model.state_dict(), model_path)
+
+    print("Saved model to {}".format(model_path))
 
 
 def main():
@@ -220,7 +224,7 @@ def main():
         extracted_data_file_path,
         _,
         model_path,
-        pca_data_file_path,
+        pca_data_file_path
     ) = getChoosenCoinVideosPaths(coin)
 
     if not os.path.exists(extracted_data_file_path):
@@ -232,6 +236,8 @@ def main():
 
     # gaussian_matrix = np.random.randn(2, 10) * sigma
     gaussian_matrix = generateGaussianMatrix(0, torch.tensor(sigma), H)
+    writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"], gaussian_matrix)
+
 
     train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path)
 
