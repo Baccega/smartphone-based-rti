@@ -1,7 +1,6 @@
 import math
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 import os
@@ -12,7 +11,6 @@ from constants import constants
 from myIO import inputCoin
 from utils import (
     generateGaussianMatrix,
-    getProjectedLightsInFourierSpace,
     getChoosenCoinVideosPaths,
     loadDataFile,
     writeDataFile,
@@ -38,7 +36,7 @@ sigma = 0.3
 MODEL_INPUT_SIZE = PCA_ORTHOGONAL_BASES + (2 * H)
 
 
-class PixelDataset(Dataset):
+class ExtractedPixelsDataset(Dataset):
     def __init__(self, extracted_data_file_path, pca_data_file_path):
         extracted_data = loadDataFile(extracted_data_file_path)
 
@@ -154,9 +152,14 @@ class NeuralModel(nn.Module):
         )
 
     def forward(self, x):
-        x_light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix)).clone().detach()
-        x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
-        x = torch.cat([x[:, :-2], x_light], dim=-1).float()
+        if(x.shape[0] == 10):
+            x_light = (6.283185 * (x[-2:] @ self.gaussian_matrix)).clone().detach()
+            x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
+            x = torch.cat([x[:-2], x_light], dim=-1).float()
+        else:
+            x_light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix)).clone().detach()
+            x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
+            x = torch.cat([x[:, :-2], x_light], dim=-1).float()
         out = self.linear_relu_stack(x)
         return out
 
@@ -167,7 +170,7 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
 
     model = NeuralModel(gaussian_matrix=gaussian_matrix)
 
-    dataset = PixelDataset(extracted_data_file_path, pca_data_file_path)
+    dataset = ExtractedPixelsDataset(extracted_data_file_path, pca_data_file_path)
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
 
     # Mean Absolute Error
