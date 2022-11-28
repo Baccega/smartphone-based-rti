@@ -24,7 +24,6 @@ def mouse_click(event, x, y, flags, param):
     def click():
         global dirX, dirY
         boundedX, boundedY = boundXY(x, y)
-        print("New light direction: (x: {} ; y: {})".format(boundedX, boundedY))
         dirX = boundedX
         dirY = boundedY
 
@@ -60,7 +59,6 @@ def main(interpolated_data_file_path):
         if prevDirX != dirX or prevDirY != dirY:
             for x in range(constants["SQAURE_GRID_DIMENSION"]):
                 for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                    print(x,y,dirX,dirY)
                     frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
             prevDirX = dirX

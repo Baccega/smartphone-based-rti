@@ -152,14 +152,9 @@ class NeuralModel(nn.Module):
         )
 
     def forward(self, x):
-        if(x.shape[0] == 10):
-            x_light = (6.283185 * (x[-2:] @ self.gaussian_matrix)).clone().detach()
-            x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
-            x = torch.cat([x[:-2], x_light], dim=-1).float()
-        else:
-            x_light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix)).clone().detach()
-            x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
-            x = torch.cat([x[:, :-2], x_light], dim=-1).float()
+        x_light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix)).clone().detach()
+        x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
+        x = torch.cat([x[:, :-2], x_light], dim=-1).float()
         out = self.linear_relu_stack(x)
         return out
 

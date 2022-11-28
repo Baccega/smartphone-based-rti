@@ -95,35 +95,20 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
                             L = l0 + l1 + l2 + l3 + l4 + a_matrix[5]
                             interpolated_data[lu][lv][x][y] = L
                 elif mode == 3:
-                    # dataset = InterpolatedPixelsDataset(pca_data)
-                    # dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
-                    # with tqdm(dataloader, unit="batch") as tepoch:
-                    #     for i, data in enumerate(tepoch):
-                    #         x = i % constants["SQAURE_GRID_DIMENSION"]
-                    #         y = math.floor(i / constants["SQAURE_GRID_DIMENSION"]) % constants["SQAURE_GRID_DIMENSION"]
-                            
-                    #         x1 = math.floor(
-                    #             i
-                    #             / (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]) 
-                    #         ) % constants["LIGHT_DIRECTION_WINDOW_SIZE"]
-                    #         y1 = math.floor(
-                    #             i
-                    #             / (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"] * constants["LIGHT_DIRECTION_WINDOW_SIZE"])
-                    #         )
-                    #         inputs, _ = data
-                    #         inputs = inputs.to(device)
-                    #         outputs = model(inputs)
-                    #         for j in range(64):
-                    #             interpolated_data[x1][y1][x][y] = outputs[(i * 64) + j]
                     for x1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                        inputs = torch.empty(
+                            (constants["LIGHT_DIRECTION_WINDOW_SIZE"], 10),
+                            dtype=torch.float64,
+                        )
                         for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
-                            input = torch.cat(
+                            inputs[y1] = torch.cat(
                                 (torch.tensor(pca_data[x][y]), torch.tensor([x1, y1])),
                                 dim=-1,
                             )
-                            # input.reshape((64, PCA_ORTHOGONAL_BASES + 2))
-                            input = input.to(device)
-                            output = model(input)[0].item()
-                            interpolated_data[x1][y1][x][y] = output
+
+                        inputs = inputs.to(device)
+                        outputs = model(inputs)
+                        for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                            interpolated_data[x1][y1][x][y] = outputs[y1].item()
 
     return interpolated_data

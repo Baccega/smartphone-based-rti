@@ -78,11 +78,6 @@ def generateGaussianMatrix(mean, standard_deviation, size):
     return torch.stack([torch.tensor(first), torch.tensor(second)], dim=0).numpy()
 
 
-def getProjectedLightsInFourierSpace(light_direction_x, light_direction_y, matrix):
-    s = np.dot(np.array([light_direction_x, light_direction_y]), matrix)
-
-    return (torch.tensor(np.cos(s)), torch.tensor(np.sin(s)))
-
 
 def findPixelIntensities(static_frame):
     """
