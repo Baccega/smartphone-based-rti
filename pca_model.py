@@ -15,6 +15,7 @@ from utils import (
     loadDataFile,
     writeDataFile,
 )
+import cv2 as cv
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(42)
@@ -82,6 +83,9 @@ class ExtractedPixelsDataset(Dataset):
 
         print("Preparing dataset data")
 
+        keys = list(extracted_data[0][0].keys())
+        light_directions_x = [i.split("|")[0] for i in keys]
+        light_directions_y = [i.split("|")[1] for i in keys]
         for i in tqdm(
             range(
                 constants["SQAURE_GRID_DIMENSION"]
@@ -99,12 +103,9 @@ class ExtractedPixelsDataset(Dataset):
                 / (
                     constants["SQAURE_GRID_DIMENSION"]
                     * constants["SQAURE_GRID_DIMENSION"]
-                )
+                ) % n_extracted_datapoints
             )
-            # print(x, y, z)
-            keys = list(extracted_data[x][y].keys())
-            light_directions_x = [i.split("|")[0] for i in keys]
-            light_directions_y = [i.split("|")[1] for i in keys]
+            
             pixel_intensities = list(extracted_data[x][y].values())
             self.data[i] = torch.cat(
                 (
