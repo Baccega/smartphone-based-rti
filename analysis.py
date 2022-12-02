@@ -173,7 +173,7 @@ def main(
     interpolation_mode,
     debug_mode,
     neural_model_path,
-    pca_data_file_path
+    pca_data_file_path,
 ):
     extracted_data = None
     interpolated_data = None
@@ -200,7 +200,12 @@ def main(
 
     # Interpolate data from extracted
     if inputInterpolatedData(interpolated_data_file_path):
-        interpolated_data = interpolate_data(loaded_extracted_data, interpolation_mode, neural_model_path, pca_data_file_path)
+        interpolated_data = interpolate_data(
+            loaded_extracted_data,
+            interpolation_mode,
+            neural_model_path,
+            pca_data_file_path,
+        )
         writeDataFile(interpolated_data_file_path, interpolated_data)
 
 
@@ -219,17 +224,15 @@ if __name__ == "__main__":
         neural_model_path,
         pca_data_file_path,
     ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
-
     if (not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"])) or (
         not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"])
     ):
         raise (Exception("You need to run the calibration before the analysis!"))
-    
-    print(neural_model_path, pca_data_file_path)
-    if (not os.path.exists(neural_model_path)) or (
-        not os.path.exists(pca_data_file_path)
-    ) or (
-        not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"])
+
+    if (interpolation_mode == 3) and (
+        (not os.path.exists(neural_model_path))
+        or (not os.path.exists(pca_data_file_path))
+        or (not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"]))
     ):
         raise (Exception("You need to train the model before using it!"))
 
@@ -250,7 +253,7 @@ if __name__ == "__main__":
         interpolation_mode,
         debug_mode,
         neural_model_path,
-        pca_data_file_path
+        pca_data_file_path,
     )
 
     print("All Done!")
