@@ -14,6 +14,7 @@ from utils import (
     getChoosenCoinVideosPaths,
     loadDataFile,
     writeDataFile,
+    fromIndexToLightDir
 )
 import cv2 as cv
 
@@ -86,41 +87,61 @@ class ExtractedPixelsDataset(Dataset):
         keys = list(extracted_data[0][0].keys())
         light_directions_x = [i.split("|")[0] for i in keys]
         light_directions_y = [i.split("|")[1] for i in keys]
-        for i in tqdm(
-            range(
-                constants["SQAURE_GRID_DIMENSION"]
-                * constants["SQAURE_GRID_DIMENSION"]
-                * n_extracted_datapoints
-            )
-        ):
-            x = i % constants["SQAURE_GRID_DIMENSION"]
-            y = (
-                math.floor(i / constants["SQAURE_GRID_DIMENSION"])
-                % constants["SQAURE_GRID_DIMENSION"]
-            )
-            z = math.floor(
-                i
-                / (
-                    constants["SQAURE_GRID_DIMENSION"]
-                    * constants["SQAURE_GRID_DIMENSION"]
-                ) % n_extracted_datapoints
-            )
-            
-            pixel_intensities = list(extracted_data[x][y].values())
-            self.data[i] = torch.cat(
-                (
-                    pca_data[x][y],
-                    torch.tensor(
-                        [
-                            float(light_directions_x[z]),
-                            float(light_directions_y[z]),
-                        ]
-                    ),
-                    torch.tensor([pixel_intensities[z]]),
-                ),
-                dim=-1,
-            )
+        for x in range(constants["SQAURE_GRID_DIMENSION"]):
+            for y in range(constants["SQAURE_GRID_DIMENSION"]):
+                pixel_intensities = list(extracted_data[x][y].values())
+                for z in range(n_extracted_datapoints):
+                    i = (x * constants["SQAURE_GRID_DIMENSION"] * n_extracted_datapoints) + (y * n_extracted_datapoints) + z 
+                    self.data[i] = torch.cat(
+                        (
+                            pca_data[x][y],
+                            torch.tensor(
+                                [
+                                    float(fromIndexToLightDir(light_directions_x[z])),
+                                    float(fromIndexToLightDir(light_directions_y[z])),
+                                ]
+                            ),
+                            torch.tensor([pixel_intensities[z]]),
+                        ),
+                        dim=-1,
+                    )
 
+
+        # for i in tqdm(
+        #     range(
+        #         constants["SQAURE_GRID_DIMENSION"]
+        #         * constants["SQAURE_GRID_DIMENSION"]
+        #         * n_extracted_datapoints
+        #     )
+        # ):
+        #     x = i % constants["SQAURE_GRID_DIMENSION"]
+        #     y = (
+        #         math.floor(i / constants["SQAURE_GRID_DIMENSION"])
+        #         % constants["SQAURE_GRID_DIMENSION"]
+        #     )
+        #     z = math.floor(
+        #         i
+        #         / (
+        #             constants["SQAURE_GRID_DIMENSION"]
+        #             * constants["SQAURE_GRID_DIMENSION"]
+        #         ) % n_extracted_datapoints
+        #     )
+            
+        #     pixel_intensities = list(extracted_data[x][y].values())
+        #     self.data[i] = torch.cat(
+        #         (
+        #             pca_data[x][y],
+        #             torch.tensor(
+        #                 [
+        #                     float(fromIndexToLightDir(light_directions_x[z])),
+        #                     float(fromIndexToLightDir(light_directions_y[z])),
+        #                 ]
+        #             ),
+        #             torch.tensor([pixel_intensities[z]]),
+        #         ),
+        #         dim=-1,
+        #     )
+            
     def __len__(self):
         return len(self.data)
 

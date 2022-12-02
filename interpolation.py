@@ -6,7 +6,7 @@ from pca_model import NeuralModel
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from constants import constants
-from utils import loadDataFile
+from utils import loadDataFile, fromIndexToLightDir
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(42)
@@ -100,9 +100,19 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
                             (constants["LIGHT_DIRECTION_WINDOW_SIZE"], 10),
                             dtype=torch.float64,
                         )
+                        normalizedDirX = fromIndexToLightDir(x1)
                         for y1 in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                            normalizedDirY = fromIndexToLightDir(y1)
                             inputs[y1] = torch.cat(
-                                (torch.tensor(pca_data[x][y]), torch.tensor([x1, y1])),
+                                (
+                                    torch.tensor(pca_data[x][y]),
+                                    torch.tensor(
+                                        [
+                                            normalizedDirX,
+                                            normalizedDirY,
+                                        ]
+                                    ),
+                                ),
                                 dim=-1,
                             )
 

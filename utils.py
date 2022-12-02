@@ -187,6 +187,13 @@ def fromLightDirToIndex(lightDir):
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
     return int(np.around(lightDir, decimals=2) * half_size) + half_size
 
+def fromIndexToLightDir(index):
+    """
+    Transform light direction [-1.0, ..., +1.0] to positive indexes (0, ..., 200)
+    """
+    half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
+    return np.around((int(index) - half_size) / half_size, decimals=2)
+
 
 def writeDataFile(data_file_path, data):
     """
