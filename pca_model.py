@@ -255,8 +255,11 @@ def main():
         )
 
     # gaussian_matrix = np.random.randn(2, 10) * sigma
-    gaussian_matrix = generateGaussianMatrix(0, torch.tensor(sigma), H)
-    writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"], gaussian_matrix)
+    if not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"]):
+        gaussian_matrix = generateGaussianMatrix(0, torch.tensor(sigma), H)
+        writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"], gaussian_matrix)
+    else:
+        gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
 
 
     train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path)
