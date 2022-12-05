@@ -248,7 +248,8 @@ def main():
         extracted_data_file_path,
         _,
         model_path,
-        pca_data_file_path
+        pca_data_file_path,
+        _,
     ) = getChoosenCoinVideosPaths(coin)
 
     if not os.path.exists(extracted_data_file_path):

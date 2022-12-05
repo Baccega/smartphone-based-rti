@@ -66,4 +66,8 @@ constants = {
     "COIN_2_INTERPOLATED_DATA_PCA_MODEL_FILE_PATH": "data/2_pca_model_interpolated_data.npz",
     "COIN_3_INTERPOLATED_DATA_PCA_MODEL_FILE_PATH": "data/3_pca_model_interpolated_data.npz",
     "COIN_4_INTERPOLATED_DATA_PCA_MODEL_FILE_PATH": "data/4_pca_model_interpolated_data.npz",
+    "COIN_1_DATAPOINTS_FILE_PATH": "data/1_datapoints.npz",
+    "COIN_2_DATAPOINTS_FILE_PATH": "data/2_datapoints.npz",
+    "COIN_3_DATAPOINTS_FILE_PATH": "data/3_datapoints.npz",
+    "COIN_4_DATAPOINTS_FILE_PATH": "data/4_datapoints.npz",
 }

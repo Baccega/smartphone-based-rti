@@ -66,6 +66,7 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
         constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
         constants["COIN_{}_PCA_MODEL".format(coin)],
         constants["COIN_{}_PCA_DATA_FILE_PATH".format(coin)],
+        constants["COIN_{}_DATAPOINTS_FILE_PATH".format(coin)],
     )
 
 def generateGaussianMatrix(mean, standard_deviation, size):

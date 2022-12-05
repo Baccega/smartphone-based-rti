@@ -32,6 +32,15 @@ def generateAlignedVideo(not_aligned_video_path, video_path, delay=0):
         "fps", fps=constants["ALIGNED_VIDEO_FPS"]
     ).output(video_path).run()
 
+def getDatapoints(extracted_data):
+    datapoints = []
+    keys = list(extracted_data[0][0].keys())
+    light_directions_x = [i.split("|")[0] for i in keys]
+    light_directions_y = [i.split("|")[1] for i in keys]
+    for i in range(len(light_directions_x)):
+        datapoints.append((int(light_directions_x[i]), int(light_directions_y[i])))
+    return datapoints
+
 
 # Extract light direction and pixel intensities data from videos
 def extractDataFromVideos(static_video_path, moving_video_path, debug_mode):
@@ -174,6 +183,7 @@ def main(
     debug_mode,
     neural_model_path,
     pca_data_file_path,
+    datapoints_file_path
 ):
     extracted_data = None
     interpolated_data = None
@@ -192,6 +202,11 @@ def main(
             static_video_path, moving_video_path, debug_mode
         )
         writeDataFile(extracted_data_file_path, extracted_data)
+        # Save lightdirection datapoints (debug)
+        datapoints = getDatapoints(extracted_data)
+        writeDataFile(datapoints_file_path, datapoints)
+        print("Found {} light directions in total".format(len(datapoints)))
+
 
     if extracted_data is not None:
         loaded_extracted_data = extracted_data
@@ -223,6 +238,7 @@ if __name__ == "__main__":
         interpolated_data_file_path,
         neural_model_path,
         pca_data_file_path,
+        datapoints_file_path,
     ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
     if (not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_STATIC_PATH"])) or (
         not os.path.exists(constants["CALIBRATION_INTRINSICS_CAMERA_MOVING_PATH"])
@@ -254,6 +270,7 @@ if __name__ == "__main__":
         debug_mode,
         neural_model_path,
         pca_data_file_path,
+        datapoints_file_path
     )
 
     print("All Done!")
