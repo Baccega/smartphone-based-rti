@@ -19,7 +19,8 @@ constants = {
     "CALIBRATION_FRAME_SKIP_INTERVAL": 40,  # We just need some, not all
     # --- ANALYSIS CONSTANTS
     "SQAURE_GRID_DIMENSION": 200,  # It will be a 200x200 square grid inside the marker
-    "LIGHT_DIRECTION_WINDOW_SIZE": 100,  # There will be 100x100 possible light directions
+    "LIGHT_DIRECTION_WINDOW_SIZE": 100, # There will be 100x100 possible light directions
+    "LIGHT_DIRECTION_WINDOW_SCALE": 2,  # The light window will be 2 times the size
     "ALIGNED_VIDEO_FPS": 30,
     "ANALYSIS_FRAME_SKIP": 5,  # It will skip this frames each iteration during analysis
     # ---  DEBUG CONSTANTS

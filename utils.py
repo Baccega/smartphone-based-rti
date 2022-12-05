@@ -5,6 +5,8 @@ import numpy as np
 import math
 from constants import constants
 
+SCALE = constants["LIGHT_DIRECTION_WINDOW_SCALE"]
+
 
 def outerContour(contour, gray, margin=10):
     """
@@ -139,25 +141,28 @@ def getCameraIntrinsics(calibration_file_path):
     return intrinsics_matrix, distortion_matrix
 
 
-def createLightDirectionFrame(light_direction):
+def createLightDirectionFrame(light_direction, datapoints=[]):
     """
     Create a frame to show light direction to user
     """
     blank_image = np.zeros(
         shape=[
-            constants["LIGHT_DIRECTION_WINDOW_SIZE"],
-            constants["LIGHT_DIRECTION_WINDOW_SIZE"],
+            constants["LIGHT_DIRECTION_WINDOW_SIZE"] * SCALE,
+            constants["LIGHT_DIRECTION_WINDOW_SIZE"] * SCALE,
             3,
         ],
         dtype=np.uint8,
     )
 
-    half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
+    half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] * SCALE / 2)
 
     cv.line(
         blank_image,
         (half_size, half_size),
-        (light_direction[0], light_direction[1]),
+        (
+            light_direction[0] * SCALE,
+            light_direction[1] * SCALE,
+        ),
         (255, 255, 255),
     )
     cv.circle(
@@ -174,6 +179,8 @@ def boundXY(x, y):
     Force X and Y to be within the light directions bounds
     """
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
+    x = math.floor(x / SCALE)
+    y = math.floor(y / SCALE)
     if (x - half_size) * (x - half_size) + (y - half_size) * (y - half_size) <= (
         half_size * half_size
     ):
