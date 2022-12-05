@@ -2,6 +2,7 @@ import os
 import cv2 as cv
 import numpy as np
 import torch
+import math
 from constants import constants
 from pca_model import NeuralModel
 
@@ -103,29 +104,39 @@ def mainRealTime(neural_model_path, pca_data_file_path):
     model.load_state_dict(torch.load(neural_model_path))
     model.eval()
 
+    inputs = torch.empty(
+        (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"], 10),
+        dtype=torch.float64,
+    )
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
             normalizedDirX = fromIndexToLightDir(dirX)
             normalizedDirY = fromIndexToLightDir(dirY)
-            for x in range(constants["SQAURE_GRID_DIMENSION"]):
-                for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                    input = torch.cat(
-                        (
-                            torch.tensor(pca_data[x][y]),
-                            torch.tensor(
-                                [
-                                    normalizedDirX,
-                                    normalizedDirY,
-                                ]
-                            ),
+            
+            for i in range(constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]):
+                x = i % constants["SQAURE_GRID_DIMENSION"]
+                y = math.floor(i / constants["SQAURE_GRID_DIMENSION"]) % constants["SQAURE_GRID_DIMENSION"]
+                inputs[i] = torch.cat(
+                    (
+                        torch.tensor(pca_data[x][y]),
+                        torch.tensor(
+                            [
+                                normalizedDirX,
+                                normalizedDirY,
+                            ]
                         ),
-                        dim=-1,
-                    )
-                    input = input.to(device)
-                    output = model(input)
-                    frame[x][y] = max(0, min(255, output.item()))
-            lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
+                    ),
+                    dim=-1,
+                )
+
+            inputs = inputs.to(device)
+            outputs = model(inputs)
+            for i in range(constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]):
+                x = i % constants["SQAURE_GRID_DIMENSION"]
+                y = math.floor(i / constants["SQAURE_GRID_DIMENSION"]) % constants["SQAURE_GRID_DIMENSION"]
+                frame[x][y] = outputs[i].item()
+            lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints)
             prevDirX = dirX
             prevDirY = dirY
 
@@ -176,7 +187,9 @@ if __name__ == "__main__":
         )
     )
 
-    mainPreComputed(interpolated_data_file_path)
-    mainRealTime(neural_model_path, pca_data_file_path)
+    if interpolation_mode == 4:
+        mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path)
+    else:
+        mainPreComputed(interpolated_data_file_path)
 
     print("All Done!")
