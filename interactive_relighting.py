@@ -104,38 +104,46 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path):
     model.load_state_dict(torch.load(neural_model_path))
     model.eval()
 
+    # Initialize inputs
     inputs = torch.empty(
         (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"], 10),
         dtype=torch.float64,
     )
+    normalizedDirX = fromIndexToLightDir(dirX)
+    normalizedDirY = fromIndexToLightDir(dirY)
+    for x in range(constants["SQAURE_GRID_DIMENSION"]):
+        for y in range(constants["SQAURE_GRID_DIMENSION"]):
+            i = y + (x * constants["SQAURE_GRID_DIMENSION"])
+            inputs[i] = torch.cat(
+                (
+                    torch.tensor(pca_data[x][y]),
+                    torch.tensor(
+                        [
+                            normalizedDirX,
+                            normalizedDirY,
+                        ]
+                    ),
+                ),
+                dim=-1,
+            )
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
             normalizedDirX = fromIndexToLightDir(dirX)
             normalizedDirY = fromIndexToLightDir(dirY)
-            
-            for i in range(constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]):
-                x = i % constants["SQAURE_GRID_DIMENSION"]
-                y = math.floor(i / constants["SQAURE_GRID_DIMENSION"]) % constants["SQAURE_GRID_DIMENSION"]
-                inputs[i] = torch.cat(
-                    (
-                        torch.tensor(pca_data[x][y]),
-                        torch.tensor(
-                            [
-                                normalizedDirX,
-                                normalizedDirY,
-                            ]
-                        ),
-                    ),
-                    dim=-1,
-                )
+
+            for x in range(constants["SQAURE_GRID_DIMENSION"]):
+                for y in range(constants["SQAURE_GRID_DIMENSION"]):
+                    i = y + (x * constants["SQAURE_GRID_DIMENSION"])
+                    inputs[i][8] = normalizedDirX
+                    inputs[i][9] = normalizedDirY
 
             inputs = inputs.to(device)
             outputs = model(inputs)
-            for i in range(constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]):
-                x = i % constants["SQAURE_GRID_DIMENSION"]
-                y = math.floor(i / constants["SQAURE_GRID_DIMENSION"]) % constants["SQAURE_GRID_DIMENSION"]
-                frame[x][y] = outputs[i].item()
+            for x in range(constants["SQAURE_GRID_DIMENSION"]):
+                for y in range(constants["SQAURE_GRID_DIMENSION"]):
+                    i = y + (x * constants["SQAURE_GRID_DIMENSION"])
+                    frame[x][y] = outputs[i].item()
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints)
             prevDirX = dirX
             prevDirY = dirY
