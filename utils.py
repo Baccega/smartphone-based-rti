@@ -54,7 +54,7 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
     mode_str = "RBF"
     if interpolation_mode == 2:
         mode_str = "PTM"
-    elif interpolation_mode == 3:
+    elif interpolation_mode == 3 or interpolation_mode == 4:
         mode_str = "PCA_MODEL"
     return (
         constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
