@@ -43,6 +43,9 @@ class ExtractedPixelsDataset(Dataset):
         extracted_data = loadDataFile(extracted_data_file_path)
 
         n_extracted_datapoints = len(list(extracted_data[0][0].keys()))
+
+        print("Number of extracted light directions: {}".format(n_extracted_datapoints))
+
         total = (
             constants["SQAURE_GRID_DIMENSION"]
             * constants["SQAURE_GRID_DIMENSION"]
@@ -87,7 +90,7 @@ class ExtractedPixelsDataset(Dataset):
         keys = list(extracted_data[0][0].keys())
         light_directions_x = [i.split("|")[0] for i in keys]
         light_directions_y = [i.split("|")[1] for i in keys]
-        for x in range(constants["SQAURE_GRID_DIMENSION"]):
+        for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
             for y in range(constants["SQAURE_GRID_DIMENSION"]):
                 pixel_intensities = list(extracted_data[x][y].values())
                 for z in range(n_extracted_datapoints):
@@ -188,7 +191,7 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
     model = NeuralModel(gaussian_matrix=gaussian_matrix)
 
     dataset = ExtractedPixelsDataset(extracted_data_file_path, pca_data_file_path)
-    dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
     # Mean Absolute Error
     criterion = nn.L1Loss()
@@ -215,14 +218,15 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
                 # forward + backward + optimize
                 outputs = model(inputs)
                 loss = criterion(outputs.squeeze(), labels)
+                
+                running_loss += loss.item() 
+
                 loss.backward()
                 optimizer.step()
 
-                # print statistics
-                running_loss += loss.item()
-            scheduler.step()
-            current_lr = optimizer.state_dict()["param_groups"][0]["lr"]
-            print(f"Epoch {epoch + 1}, loss: {running_loss}, lr: {current_lr}")
+        scheduler.step()
+        current_lr = optimizer.state_dict()["param_groups"][0]["lr"]
+        print(f"Epoch {epoch + 1}, loss: {running_loss / BATCH_SIZE}, lr: {current_lr}")
 
     print("Finished Training")
 
