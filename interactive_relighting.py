@@ -80,7 +80,7 @@ def mainPreComputed(interpolated_data_file_path):
     cv.destroyAllWindows()
 
 
-def mainRealTime(neural_model_path, pca_data_file_path):
+def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path):
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
@@ -91,15 +91,15 @@ def mainRealTime(neural_model_path, pca_data_file_path):
         dtype=np.uint8,
     )
 
+    datapoints = loadDataFile(datapoints_file_path)
+
     cv.namedWindow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"])
-    lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
+    lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints)
     cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
 
-    pca_data = loadDataFile(pca_data_file_path)
-    print("PCA_DATA_LOADED")
-    gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
-    print("GAUSSIAN_MATRIX_LOADED")
     print("Neural model: " + neural_model_path)
+    pca_data = loadDataFile(pca_data_file_path)
+    gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
     model = NeuralModel(gaussian_matrix)
     model.load_state_dict(torch.load(neural_model_path))
     model.eval()
@@ -162,6 +162,7 @@ if __name__ == "__main__":
         interpolated_data_file_path,
         neural_model_path,
         pca_data_file_path,
+        datapoints_file_path,
     ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
 
     if interpolation_mode == 4 and (

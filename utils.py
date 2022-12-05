@@ -171,6 +171,17 @@ def createLightDirectionFrame(light_direction, datapoints=[]):
         half_size,
         (255, 255, 255),
     )
+
+    if len(datapoints) > 0:
+        for i in range(len(datapoints)):
+            blank_image = cv.circle(
+                blank_image,
+                (datapoints[i][0] * SCALE, datapoints[i][1] * SCALE),
+                radius=0,
+                color=(0, 0, 255),
+                thickness=-1,
+            )
+
     return blank_image
 
 
