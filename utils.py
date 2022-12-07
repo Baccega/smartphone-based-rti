@@ -124,7 +124,7 @@ def findLightDirection(moving_corners):
     l = (o - center) / np.linalg.norm(o - center)
 
     l[0] = l[0] * -1
-    l[1] = l[1] * -1
+    # l[1] = l[1] * -1
 
     # -1 ≤ l[0] ≤ +1
     # -1 ≤ l[1] ≤ +1
