@@ -220,13 +220,13 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
                 loss = criterion(outputs.squeeze(), labels)
                 
                 running_loss += loss.item() 
-
                 loss.backward()
                 optimizer.step()
 
         scheduler.step()
         current_lr = optimizer.state_dict()["param_groups"][0]["lr"]
-        print(f"Epoch {epoch + 1}, loss: {running_loss / BATCH_SIZE}, lr: {current_lr}")
+        loss = running_loss / (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"])
+        print(f"Epoch {epoch + 1}, loss: {loss}, lr: {current_lr}")
 
     print("Finished Training")
 

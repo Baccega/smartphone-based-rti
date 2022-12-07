@@ -214,7 +214,7 @@ def main(
         loaded_extracted_data = loadDataFile(extracted_data_file_path)
 
     # Interpolate data from extracted
-    if inputInterpolatedData(interpolated_data_file_path):
+    if interpolation_mode != 4 and inputInterpolatedData(interpolated_data_file_path):
         interpolated_data = interpolate_data(
             loaded_extracted_data,
             interpolation_mode,
