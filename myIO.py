@@ -70,6 +70,11 @@ def inputInterpolatedData(path1):
         [path1], "Intepolated data found! Do you wish to re-interpolate it? (y/n): "
     )
 
+def inputModelTraining(path1):
+    return askIfFilesExist(
+        [path1], "Neural model found! Do you wish to re-train it? (y/n): "
+    )
+
 
 def inputInterpolatedMode():
     return safeIntInput(

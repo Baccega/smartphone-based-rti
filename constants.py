@@ -23,6 +23,14 @@ constants = {
     "LIGHT_DIRECTION_WINDOW_SCALE": 2,  # The light window will be 2 times the size
     "ALIGNED_VIDEO_FPS": 30,
     "ANALYSIS_FRAME_SKIP": 5,  # It will skip this frames each iteration during analysis
+    # ---  PCA MODEL HYPERPARAMETERS
+    "PCA_BATCH_SIZE": 64,
+    "PCA_LEARNING_RATE": 0.0001,
+    "PCA_N_EPOCHS": 40,
+    "PCA_ORTHOGONAL_BASES": 8,
+    "PCA_H": 10,
+    "PCA_SIGMA": 0.3,
+    "PCA_MODEL_INPUT_SIZE": 8 + (2 * 10),   # PCA_ORTHOGONAL_BASES + (2 * H)
     # ---  DEBUG CONSTANTS
     "STATIC_CAMERA_FEED_WINDOW_TITLE": "Static camera feed",
     "MOVING_CAMERA_FEED_WINDOW_TITLE": "Moving camera feed",

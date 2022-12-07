@@ -22,22 +22,6 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(42)
 
 
-# Hyperparameters
-
-N_CLASSES = 102
-BATCH_SIZE = 64
-LEARNING_RATE = 0.0001
-N_EPOCHS = 40
-
-# Local constants
-
-PCA_ORTHOGONAL_BASES = 8
-H = 10
-sigma = 0.3
-
-MODEL_INPUT_SIZE = PCA_ORTHOGONAL_BASES + (2 * H)
-
-
 class ExtractedPixelsDataset(Dataset):
     def __init__(self, extracted_data_file_path, pca_data_file_path):
         extracted_data = loadDataFile(extracted_data_file_path)
@@ -52,7 +36,7 @@ class ExtractedPixelsDataset(Dataset):
             * n_extracted_datapoints
         )
         # Length = size of K + 2 light directions
-        self.data = np.empty([total, 2 + PCA_ORTHOGONAL_BASES + 1])
+        self.data = np.empty([total, 2 + constants["PCA_ORTHOGONAL_BASES"] + 1])
         full_pca_data = np.empty(
             [
                 constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"],
@@ -71,7 +55,7 @@ class ExtractedPixelsDataset(Dataset):
             full_pca_data[i] = list(extracted_data[x][y].values())
 
         print("Running PCA")
-        pca = PCA(n_components=PCA_ORTHOGONAL_BASES)
+        pca = PCA(n_components=constants["PCA_ORTHOGONAL_BASES"])
         pca_data = pca.fit_transform(full_pca_data)
 
         pca_data = torch.reshape(
@@ -79,7 +63,7 @@ class ExtractedPixelsDataset(Dataset):
             (
                 constants["SQAURE_GRID_DIMENSION"],
                 constants["SQAURE_GRID_DIMENSION"],
-                PCA_ORTHOGONAL_BASES,
+                constants["PCA_ORTHOGONAL_BASES"],
             ),
         )
 
@@ -165,7 +149,7 @@ class NeuralModel(nn.Module):
         )
 
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(MODEL_INPUT_SIZE, 16),
+            nn.Linear(constants["PCA_MODEL_INPUT_SIZE"], 16),
             nn.ELU(),
             nn.Linear(16, 16),
             nn.ELU(),
@@ -191,18 +175,18 @@ def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_d
     model = NeuralModel(gaussian_matrix=gaussian_matrix)
 
     dataset = ExtractedPixelsDataset(extracted_data_file_path, pca_data_file_path)
-    dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size=constants["PCA_BATCH_SIZE"], shuffle=True)
 
     # Mean Absolute Error
     criterion = nn.L1Loss()
 
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.Adam(model.parameters(), lr=constants["PCA_LEARNING_RATE"])
 
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
 
     print("Starting training:")
 
-    for epoch in range(N_EPOCHS):  # loop over the dataset multiple times
+    for epoch in range(constants["PCA_N_EPOCHS"]):  # loop over the dataset multiple times
         running_loss = 0.0
         model.train()
         with tqdm(dataloader, unit="batch") as tepoch:
@@ -261,7 +245,7 @@ def main():
 
     # gaussian_matrix = np.random.randn(2, 10) * sigma
     if not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"]):
-        gaussian_matrix = generateGaussianMatrix(0, torch.tensor(sigma), H)
+        gaussian_matrix = generateGaussianMatrix(0, torch.tensor(constants["PCA_SIGMA"]), constants["PCA_H"])
         writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"], gaussian_matrix)
     else:
         gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
