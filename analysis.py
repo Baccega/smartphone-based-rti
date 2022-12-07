@@ -86,7 +86,7 @@ def main(
         else:
             gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
 
-        train_pca_model(neural_model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path)
+        train_pca_model(neural_model_path, loaded_extracted_data, gaussian_matrix, pca_data_file_path, extracted_data_file_path)
 
     # Interpolate data from extracted
     if interpolation_mode != 4 and inputInterpolatedData(interpolated_data_file_path):

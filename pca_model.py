@@ -23,8 +23,9 @@ torch.manual_seed(42)
 
 
 class ExtractedPixelsDataset(Dataset):
-    def __init__(self, extracted_data_file_path, pca_data_file_path):
-        extracted_data = loadDataFile(extracted_data_file_path)
+    def __init__(self, extracted_data_file_path, pca_data_file_path, extracted_data=None):
+        if extracted_data is None:
+            extracted_data = loadDataFile(extracted_data_file_path)
 
         n_extracted_datapoints = len(list(extracted_data[0][0].keys()))
 
@@ -93,42 +94,6 @@ class ExtractedPixelsDataset(Dataset):
                         dim=-1,
                     )
 
-
-        # for i in tqdm(
-        #     range(
-        #         constants["SQAURE_GRID_DIMENSION"]
-        #         * constants["SQAURE_GRID_DIMENSION"]
-        #         * n_extracted_datapoints
-        #     )
-        # ):
-        #     x = i % constants["SQAURE_GRID_DIMENSION"]
-        #     y = (
-        #         math.floor(i / constants["SQAURE_GRID_DIMENSION"])
-        #         % constants["SQAURE_GRID_DIMENSION"]
-        #     )
-        #     z = math.floor(
-        #         i
-        #         / (
-        #             constants["SQAURE_GRID_DIMENSION"]
-        #             * constants["SQAURE_GRID_DIMENSION"]
-        #         ) % n_extracted_datapoints
-        #     )
-            
-        #     pixel_intensities = list(extracted_data[x][y].values())
-        #     self.data[i] = torch.cat(
-        #         (
-        #             pca_data[x][y],
-        #             torch.tensor(
-        #                 [
-        #                     float(fromIndexToLightDir(light_directions_x[z])),
-        #                     float(fromIndexToLightDir(light_directions_y[z])),
-        #                 ]
-        #             ),
-        #             torch.tensor([pixel_intensities[z]]),
-        #         ),
-        #         dim=-1,
-        #     )
-            
     def __len__(self):
         return len(self.data)
 
@@ -168,13 +133,13 @@ class NeuralModel(nn.Module):
         return out
 
 
-def train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path):
+def train_pca_model(model_path, extracted_data, gaussian_matrix, pca_data_file_path, extracted_data_file_path):
     print("PCA model: " + model_path)
     print("Training data: " + extracted_data_file_path)
 
     model = NeuralModel(gaussian_matrix=gaussian_matrix)
 
-    dataset = ExtractedPixelsDataset(extracted_data_file_path, pca_data_file_path)
+    dataset = ExtractedPixelsDataset(extracted_data_file_path, pca_data_file_path, extracted_data=extracted_data)
     dataloader = DataLoader(dataset, batch_size=constants["PCA_BATCH_SIZE"], shuffle=True)
 
     # Mean Absolute Error
@@ -251,7 +216,7 @@ def main():
         gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
 
 
-    train_pca_model(model_path, extracted_data_file_path, gaussian_matrix, pca_data_file_path)
+    train_pca_model(model_path, None, gaussian_matrix, pca_data_file_path, extracted_data_file_path)
 
 
 if __name__ == "__main__":
