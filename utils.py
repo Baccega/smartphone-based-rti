@@ -85,7 +85,7 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
     singleMulti = "Single" if synth[0] == "SINGLE" else "Multi"
     domeTest = "Dome" if synth[3] == "DOME" else "Test"
 
-    folder = "{}/Object{}/material{}/{}".format(
+    folder = "assets/synthRTI/{}/Object{}/material{}/{}".format(
         singleMulti, synth[1], synth[2], domeTest
     )
 
