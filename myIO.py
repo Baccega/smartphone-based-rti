@@ -44,11 +44,27 @@ def inputCoin():
         4,
     )
 
+def inputSynth():
+    # "single-object2-material3-dome"
+    return ("SINGLE", 2, 3, "DOME")
+    # return safeIntInput(
+    #     "Select coin (1. Danish 5 krone, 2. British 50 pence, 3. Swiss 1/2 franc, 4. Czechs 20 korun): ",
+    #     1,
+    #     4,
+    # )
+
 
 def inputDebug():
     return safeIntInput(
         "Select debug mode (0. No debug, 1. Minimal debug, 2. Full debug): ",
         0,
+        2,
+    )
+
+def inputDataset():
+    return safeIntInput(
+        "Select dataset (1. CoinDataset, 2. SynthDataset): ",
+        1,
         2,
     )
 

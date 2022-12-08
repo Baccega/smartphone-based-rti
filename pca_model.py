@@ -133,7 +133,7 @@ class NeuralModel(nn.Module):
         return out
 
 
-def train_pca_model(model_path, extracted_data, gaussian_matrix, pca_data_file_path, extracted_data_file_path):
+def train_pca_model(model_path, extracted_data, gaussian_matrix, pca_data_file_path, extracted_data_file_path = "Just Extracted"):
     print("PCA model: " + model_path)
     print("Training data: " + extracted_data_file_path)
 

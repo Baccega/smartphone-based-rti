@@ -71,6 +71,55 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
         constants["COIN_{}_DATAPOINTS_FILE_PATH".format(coin)],
     )
 
+
+def getChoosenSynthPaths(synth, interpolation_mode=0):
+    """
+    Get constants based on the synth object and interpolation mode
+    """
+    mode_str = "RBF"
+    if interpolation_mode == 2:
+        mode_str = "PTM"
+    elif interpolation_mode == 3 or interpolation_mode == 4:
+        mode_str = "PCA_MODEL"
+
+    singleMulti = "Single" if synth[0] == "SINGLE" else "Multi"
+    domeTest = "Dome" if synth[3] == "DOME" else "Test"
+
+    folder = "{}/Object{}/material{}/{}".format(
+        singleMulti, synth[1], synth[2], domeTest
+    )
+
+    return (
+        folder,
+        "{}/{}".format(folder, constants["SYNTH_LIGHT_DIRECTIONS_FILENAME"]),
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_EXTRACTED_DATA_FILE_PATH".format(
+                synth[0], synth[1], synth[2], synth[3]
+            )
+        ],
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(
+                synth[0], synth[1], synth[2], synth[3], mode_str
+            )
+        ],
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_PCA_MODEL".format(
+                synth[0], synth[1], synth[2], synth[3]
+            )
+        ],
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_PCA_DATA_FILE_PATH".format(
+                synth[0], synth[1], synth[2], synth[3]
+            )
+        ],
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_DATAPOINTS_FILE_PATH".format(
+                synth[0], synth[1], synth[2], synth[3]
+            )
+        ],
+    )
+
+
 def generateGaussianMatrix(mean, standard_deviation, size):
     first = []
     second = []
@@ -79,7 +128,6 @@ def generateGaussianMatrix(mean, standard_deviation, size):
     for i in range(size):
         second += [torch.normal(mean, standard_deviation)]
     return torch.stack([torch.tensor(first), torch.tensor(second)], dim=0).numpy()
-
 
 
 def findPixelIntensities(static_frame):
@@ -208,6 +256,7 @@ def fromLightDirToIndex(lightDir):
     """
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
     return int(np.around(lightDir, decimals=2) * half_size) + half_size
+
 
 def fromIndexToLightDir(index):
     """
