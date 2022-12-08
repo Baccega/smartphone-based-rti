@@ -20,7 +20,7 @@ This project is the assignment for the course **Geometric and 3D Computer Vision
 
 See **[FinalProject.pdf](FinalProject.pdf)** for more details on the assignment and to download the required assets.
 
-## 🔧 Usage
+## 📦 Downloading assets (CoinDataset)
 
 Before running the scripts you need to download the required assets, the assets should include:
 
@@ -28,14 +28,30 @@ Before running the scripts you need to download the required assets, the assets 
 - The footage from the static camera
 - The footage from the moving camera
 
-You need extract them inside a new folder called `assets` in the root of the project.
+You need extract them inside a new folder called `assets/coins` in the root of the project.
 Your folder structure should look like this:
 
 ![folder_structure](./docs/folder_structure.png)
 
-> If you want you can change the location of the input files by changing the corresponding row on the file `constants.py` under the heading: `ASSETS FILE NAMES AND DELAY BETWEEN FOOTAGE`.
+> If you want you can change the location of the input files by changing the corresponding row on the file `constants.py` under the heading: `COINS ASSETS FILE NAMES AND DELAY BETWEEN FOOTAGE`.
 
-After that you can just run this commands and follow the TUI:
+## 📦 Downloading assets (SynthRTIDataset)
+
+The scripts also supports the ![SynthRTIDataset](https://github.com/Univr-RTI/SynthRTI) from the paper "Neural Reflectance Transformation Imaging".
+To use it, in each folder the assets should include:
+
+- The images in jpg format
+- A file named: "dirs.lp"
+- An image called "normals.png" (Not required)
+
+You need extract them inside a new folder called `assets/synthRTI` in the root of the project.
+Your folder structure should look like this:
+
+![folder_structure](./docs/folder_structure_2.png)
+
+## 🔧 Usage
+
+After downloading the assets you can just run this commands and follow the TUI:
 
 ```bash
 python3 camera_calibrator.py        # Get camera intrinsics
