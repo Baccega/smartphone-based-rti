@@ -65,10 +65,12 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
         constants["COIN_{}_ALIGNED_VIDEO_STATIC_PATH".format(coin)],
         constants["COIN_{}_ALIGNED_VIDEO_MOVING_PATH".format(coin)],
         constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
+        constants["COIN_{}_TEST_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
         constants["COIN_{}_PCA_MODEL".format(coin)],
         constants["COIN_{}_PCA_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_DATAPOINTS_FILE_PATH".format(coin)],
+        constants["COIN_{}_TEST_DATAPOINTS_FILE_PATH".format(coin)],
     )
 
 
@@ -83,38 +85,52 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
         mode_str = "PCA_MODEL"
 
     singleMulti = "Single" if synth[0] == "SINGLE" else "Multi"
-    domeTest = "Dome" if synth[3] == "DOME" else "Test"
 
-    folder = "assets/synthRTI/{}/Object{}/material{}/{}".format(
-        singleMulti, synth[1], synth[2], domeTest
+    data_folder = "assets/synthRTI/{}/Object{}/material{}/Dome".format(
+        singleMulti, synth[1], synth[2]
+    )
+    test_folder = "assets/synthRTI/{}/Object{}/material{}/Test".format(
+        singleMulti, synth[1], synth[2]
     )
 
     return (
-        folder,
-        "{}/{}".format(folder, constants["SYNTH_LIGHT_DIRECTIONS_FILENAME"]),
+        data_folder,
+        "{}/{}".format(data_folder, constants["SYNTH_LIGHT_DIRECTIONS_FILENAME"]),
+        test_folder,
+        "{}/{}".format(test_folder, constants["SYNTH_LIGHT_DIRECTIONS_FILENAME"]),
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_EXTRACTED_DATA_FILE_PATH".format(
-                synth[0], synth[1], synth[2], synth[3]
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_EXTRACTED_DATA_FILE_PATH".format(
+                synth[0], synth[1], synth[2]
             )
         ],
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(
-                synth[0], synth[1], synth[2], synth[3], mode_str
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_TEST_DATA_FILE_PATH".format(
+                synth[0], synth[1], synth[2]
             )
         ],
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_PCA_MODEL".format(
-                synth[0], synth[1], synth[2], synth[3]
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(
+                synth[0], synth[1], synth[2], mode_str
             )
         ],
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_PCA_DATA_FILE_PATH".format(
-                synth[0], synth[1], synth[2], synth[3]
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_PCA_MODEL".format(
+                synth[0], synth[1], synth[2]
             )
         ],
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_DATAPOINTS_FILE_PATH".format(
-                synth[0], synth[1], synth[2], synth[3]
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_PCA_DATA_FILE_PATH".format(
+                synth[0], synth[1], synth[2]
+            )
+        ],
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_DATAPOINTS_FILE_PATH".format(
+                synth[0], synth[1], synth[2]
+            )
+        ],
+        constants[
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_TEST_DATAPOINTS_FILE_PATH".format(
+                synth[0], synth[1], synth[2]
             )
         ],
     )

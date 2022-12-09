@@ -14,7 +14,7 @@ from utils import (
 from constants import constants
 
 # Extract light direction and pixel intensities data from videos
-def extractDataFromVideos(static_video_path, moving_video_path, debug_mode):
+def extractCoinDataFromVideos(static_video_path, moving_video_path, debug_mode):
     cv.namedWindow(constants["STATIC_CAMERA_FEED_WINDOW_TITLE"])
     cv.namedWindow(constants["MOVING_CAMERA_FEED_WINDOW_TITLE"])
 
@@ -139,20 +139,18 @@ def extractDataFromVideos(static_video_path, moving_video_path, debug_mode):
     moving_video.release()
     cv.destroyAllWindows()
 
-    return np.asarray(data)
+    # TODO Test
+    return np.asarray(data), np.asarray(data)
 
 
-def extractDataFromImages(folder_path, light_directions_file_path, debug_mode):
-    light_directions_file = open(light_directions_file_path, "r")
-
+def extractSynthDataFromFolder(folder_path, light_directions_file_path):
     data = [
         [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
         for i in range(constants["SQAURE_GRID_DIMENSION"])
     ]
 
+    light_directions_file = open(light_directions_file_path, "r")
     count = 0
-
-    print("Extracting data from images...")
 
     for unstripped_line in light_directions_file.readlines():
         line = unstripped_line.strip()
@@ -190,3 +188,14 @@ def extractDataFromImages(folder_path, light_directions_file_path, debug_mode):
         count += 1
 
     return np.asarray(data)
+
+
+def extractSynthDataFromAssets(data_folder_path, data_light_directions_file_path, test_folder_path, test_light_directions_file_path):
+    print("Extracting data from images...")
+    data = extractSynthDataFromFolder(data_folder_path, data_light_directions_file_path)
+
+    print("Extracting test data from images...")
+    test_data = extractSynthDataFromFolder(test_folder_path, test_light_directions_file_path)
+
+    return data, test_data
+    
