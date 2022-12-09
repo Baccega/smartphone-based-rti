@@ -6,11 +6,12 @@ import math
 from constants import constants
 from pca_model import NeuralModel
 
-from myIO import inputCoin, inputInterpolatedMode
+from myIO import inputCoin, inputInterpolatedMode, inputDataset, inputSynth
 from utils import (
     boundXY,
     createLightDirectionFrame,
     getChoosenCoinVideosPaths,
+    getChoosenSynthPaths,
     loadDataFile,
     fromIndexToLightDir,
 )
@@ -158,20 +159,36 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path):
 
 
 if __name__ == "__main__":
-    coin = inputCoin()
+
+    dataset = inputDataset()
     interpolation_mode = inputInterpolatedMode()
-    (
-        not_aligned_static_video_path,
-        not_aligned_moving_video_path,
-        moving_camera_delay,
-        static_video_path,
-        moving_video_path,
-        extracted_data_file_path,
-        interpolated_data_file_path,
-        neural_model_path,
-        pca_data_file_path,
-        datapoints_file_path,
-    ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
+
+    if dataset == 1:
+        coin = inputCoin()
+        (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            interpolated_data_file_path,
+            neural_model_path,
+            pca_data_file_path,
+            datapoints_file_path,
+        ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
+    else:
+        synth = inputSynth()
+
+        (
+            _,
+            _,
+            _,
+            interpolated_data_file_path,
+            neural_model_path,
+            pca_data_file_path,
+            datapoints_file_path,
+        ) = getChoosenSynthPaths(synth, interpolation_mode)
 
     if interpolation_mode == 4 and (
         (not os.path.exists(neural_model_path))

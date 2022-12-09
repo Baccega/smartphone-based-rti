@@ -140,3 +140,53 @@ def extractDataFromVideos(static_video_path, moving_video_path, debug_mode):
     cv.destroyAllWindows()
 
     return np.asarray(data)
+
+
+def extractDataFromImages(folder_path, light_directions_file_path, debug_mode):
+    light_directions_file = open(light_directions_file_path, "r")
+
+    data = [
+        [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
+        for i in range(constants["SQAURE_GRID_DIMENSION"])
+    ]
+
+    count = 0
+
+    print("Extracting data from images...")
+    
+    for unstripped_line in light_directions_file.readlines():
+        line = unstripped_line.strip()
+
+        # Skip first line of file
+        if count != 0:
+            splitted_line = line.split(" ")
+            image_path = "{}/{}".format(folder_path, splitted_line[0])
+            light_dir_x = fromLightDirToIndex(float(splitted_line[1]))
+            light_dir_y = fromLightDirToIndex(float(splitted_line[2]))
+            # light_dir_z = fromLightDirToIndex(splitted_line[3])
+
+            full_res_image = cv.imread(image_path, cv.IMREAD_GRAYSCALE)
+
+            image = cv.resize(
+                full_res_image,
+                (constants["SQAURE_GRID_DIMENSION"], constants["SQAURE_GRID_DIMENSION"]),
+            )
+
+            for x in range(len(image)):
+                for y in range(len(image)):
+                    data_point = {
+                        "{}|{}".format(
+                            light_dir_x,
+                            light_dir_y,
+                        ): image[x][y]
+                    }
+                    # If data[x][y] exists: update
+                    if type(data[x][y]) is dict:
+                        data[x][y].update(data_point)
+                    # Else: create it
+                    else:
+                        data[x][y] = data_point            
+
+        count += 1
+
+    return np.asarray(data)

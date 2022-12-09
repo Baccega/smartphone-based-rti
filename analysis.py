@@ -18,7 +18,7 @@ from utils import (
     generateGaussianMatrix,
 )
 from pca_model import train_pca_model
-from extract_data import extractDataFromVideos
+from extract_data import extractDataFromVideos, extractDataFromImages
 import os
 import torch
 from constants import constants
@@ -112,7 +112,7 @@ def synthMain(debug_mode, interpolation_mode):
 
     (
         folder_path,
-        light_directions_filename,
+        light_directions_file_path,
         extracted_data_file_path,
         interpolated_data_file_path,
         neural_model_path,
@@ -120,37 +120,24 @@ def synthMain(debug_mode, interpolation_mode):
         datapoints_file_path,
     ) = getChoosenSynthPaths(synth, interpolation_mode)
 
+    if (not os.path.exists(folder_path)) or (
+        not os.path.exists(light_directions_file_path)
+    ):
+        raise (Exception("Synth assets not founded!"))
 
-    # print(folder_path)
-    # print(light_directions_filename)
-    # print(extracted_data_file_path)
-    # print(interpolated_data_file_path)
-    # print(neural_model_path)
-    # print(neural_model_path)
-    # print(pca_data_file_path)
-    # print(datapoints_file_path)
-
-
-    print(
-        "*** Analysis *** \n\tSynthData folder: '{}'".format(
-            folder_path
-        )
-    )
+    print("*** Analysis *** \n\tSynthData folder: '{}'".format(folder_path))
 
     extracted_data = None
 
-    
-    # # Ask to generate aligned videos (if they already exists)
-    # if inputExtractedData(extracted_data_file_path):
-    #     # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
-    #     extracted_data = extractDataFromVideos(
-    #         static_video_path, moving_video_path, debug_mode
-    #     )
-    #     writeDataFile(extracted_data_file_path, extracted_data)
-    #     # Save lightdirection datapoints (debug)
-    #     datapoints = getDatapoints(extracted_data)
-    #     writeDataFile(datapoints_file_path, datapoints)
-    #     print("Found {} light directions in total".format(len(datapoints)))
+    # Ask to extract data (if it already exists)
+    if inputExtractedData(extracted_data_file_path):
+        # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
+        extracted_data = extractDataFromImages(folder_path, light_directions_file_path, debug_mode)
+        writeDataFile(extracted_data_file_path, extracted_data)
+        # Save lightdirection datapoints (debug)
+        datapoints = getDatapoints(extracted_data)
+        writeDataFile(datapoints_file_path, datapoints)
+        print("Found {} light directions in total".format(len(datapoints)))
 
     if extracted_data is not None:
         loaded_extracted_data = extracted_data
