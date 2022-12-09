@@ -153,7 +153,7 @@ def extractDataFromImages(folder_path, light_directions_file_path, debug_mode):
     count = 0
 
     print("Extracting data from images...")
-    
+
     for unstripped_line in light_directions_file.readlines():
         line = unstripped_line.strip()
 
@@ -162,7 +162,7 @@ def extractDataFromImages(folder_path, light_directions_file_path, debug_mode):
             splitted_line = line.split(" ")
             image_path = "{}/{}".format(folder_path, splitted_line[0])
             light_dir_x = fromLightDirToIndex(float(splitted_line[1]))
-            light_dir_y = fromLightDirToIndex(float(splitted_line[2]))
+            light_dir_y = fromLightDirToIndex(float(splitted_line[2]) * -1)
             # light_dir_z = fromLightDirToIndex(splitted_line[3])
 
             full_res_image = cv.imread(image_path, cv.IMREAD_GRAYSCALE)
