@@ -40,8 +40,9 @@ def saveDatapointsToFile(path, data):
     light_directions_y = [i.split("|")[1] for i in keys]
     for i in range(len(light_directions_x)):
         datapoints.append((int(light_directions_x[i]), int(light_directions_y[i])))
+
     # Save to file
-    writeDataFile(path, data)
+    writeDataFile(path, datapoints)
 
 
 def coinSubMain(interpolation_mode):
@@ -96,7 +97,6 @@ def coinSubMain(interpolation_mode):
         )
         writeDataFile(extracted_data_file_path, extracted_data)
         writeDataFile(test_data_file_path, test_data)
-
     else:
         extracted_data = loadDataFile(extracted_data_file_path)
         test_data = loadDataFile(test_data_file_path)
@@ -150,7 +150,6 @@ def synthSubMain(interpolation_mode):
         )
         writeDataFile(extracted_data_file_path, extracted_data)
         writeDataFile(test_data_file_path, test_data)
-
     else:
         extracted_data = loadDataFile(extracted_data_file_path)
         test_data = loadDataFile(test_data_file_path)

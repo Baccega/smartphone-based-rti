@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import random
 from features_detector import findRectanglePatternHomography
 from myIO import (
     debugCorners,
@@ -9,9 +10,45 @@ from utils import (
     findLightDirection,
     findPixelIntensities,
     fromLightDirToIndex,
+    loadDataFile,
     loadIntrinsics,
 )
 from constants import constants
+
+
+def selectTestLights(n, data):
+    test_data = [
+        [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
+        for i in range(constants["SQAURE_GRID_DIMENSION"])
+    ]
+
+    # For each point to extract
+    for i in range(n):
+        lights = list(data[0][0].keys())
+        n_lights = len(lights)
+        choosen = random.randint(0, n_lights - 1)
+        choosen_light_str = lights[choosen]
+        choosen_light_x = choosen_light_str.split("|")[0]
+        choosen_light_y = choosen_light_str.split("|")[1]
+
+        for x in range(constants["SQAURE_GRID_DIMENSION"]):
+            for y in range(constants["SQAURE_GRID_DIMENSION"]):
+                data_point = {
+                    choosen_light_str: data[x][y][choosen_light_str]
+                }
+                # If data[x][y] exists: update
+                if type(test_data[x][y]) is dict:
+                    test_data[x][y].update(data_point)
+                # Else: create it
+                else:
+                    test_data[x][y] = data_point
+                
+                # Remove choosen data (TODO: surroundings)
+                del data[x][y][choosen_light_str]
+
+
+    return data, np.asarray(test_data)
+
 
 # Extract light direction and pixel intensities data from videos
 def extractCoinDataFromVideos(static_video_path, moving_video_path, debug_mode):
@@ -139,8 +176,12 @@ def extractCoinDataFromVideos(static_video_path, moving_video_path, debug_mode):
     moving_video.release()
     cv.destroyAllWindows()
 
-    # TODO Test
-    return np.asarray(data), np.asarray(data)
+    data = np.asarray(data)
+
+    # Select test data from extracted
+    data, test_data = selectTestLights(constants["COINS_TEST_N_LIGHTS"], data)
+
+    return data, test_data
 
 
 def extractSynthDataFromFolder(folder_path, light_directions_file_path):
@@ -167,35 +208,43 @@ def extractSynthDataFromFolder(folder_path, light_directions_file_path):
 
             image = cv.resize(
                 full_res_image,
-                (constants["SQAURE_GRID_DIMENSION"], constants["SQAURE_GRID_DIMENSION"]),
+                (
+                    constants["SQAURE_GRID_DIMENSION"],
+                    constants["SQAURE_GRID_DIMENSION"],
+                ),
             )
 
             for x in range(len(image)):
                 for y in range(len(image)):
                     data_point = {
-                        "{}|{}".format(
-                            light_dir_x,
-                            light_dir_y,
-                        ): image[x][y]
+                        "{}|{}".format(light_dir_x, light_dir_y,): image[
+                            x
+                        ][y]
                     }
                     # If data[x][y] exists: update
                     if type(data[x][y]) is dict:
                         data[x][y].update(data_point)
                     # Else: create it
                     else:
-                        data[x][y] = data_point            
+                        data[x][y] = data_point
 
         count += 1
 
     return np.asarray(data)
 
 
-def extractSynthDataFromAssets(data_folder_path, data_light_directions_file_path, test_folder_path, test_light_directions_file_path):
+def extractSynthDataFromAssets(
+    data_folder_path,
+    data_light_directions_file_path,
+    test_folder_path,
+    test_light_directions_file_path,
+):
     print("Extracting data from images...")
     data = extractSynthDataFromFolder(data_folder_path, data_light_directions_file_path)
 
     print("Extracting test data from images...")
-    test_data = extractSynthDataFromFolder(test_folder_path, test_light_directions_file_path)
+    test_data = extractSynthDataFromFolder(
+        test_folder_path, test_light_directions_file_path
+    )
 
     return data, test_data
-    

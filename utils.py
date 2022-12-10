@@ -206,7 +206,7 @@ def getCameraIntrinsics(calibration_file_path):
     return intrinsics_matrix, distortion_matrix
 
 
-def createLightDirectionFrame(light_direction, datapoints=[]):
+def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]):
     """
     Create a frame to show light direction to user
     """
@@ -242,6 +242,15 @@ def createLightDirectionFrame(light_direction, datapoints=[]):
             blank_image = cv.circle(
                 blank_image,
                 (datapoints[i][0] * SCALE, datapoints[i][1] * SCALE),
+                radius=0,
+                color=(0, 255, 0),
+                thickness=-1,
+            )
+    if len(test_datapoints) > 0:
+        for i in range(len(test_datapoints)):
+            blank_image = cv.circle(
+                blank_image,
+                (test_datapoints[i][0] * SCALE, test_datapoints[i][1] * SCALE),
                 radius=0,
                 color=(0, 0, 255),
                 thickness=-1,

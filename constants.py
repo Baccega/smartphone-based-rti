@@ -19,10 +19,11 @@ constants = {
     "CALIBRATION_FRAME_SKIP_INTERVAL": 40,  # We just need some, not all
     # --- ANALYSIS CONSTANTS
     "SQAURE_GRID_DIMENSION": 200,  # It will be a 200x200 square grid inside the marker
-    "LIGHT_DIRECTION_WINDOW_SIZE": 100, # There will be 100x100 possible light directions
+    "LIGHT_DIRECTION_WINDOW_SIZE": 100,  # There will be 100x100 possible light directions
     "LIGHT_DIRECTION_WINDOW_SCALE": 2,  # The light window will be 2 times the size
     "ALIGNED_VIDEO_FPS": 30,
     "ANALYSIS_FRAME_SKIP": 5,  # It will skip this frames each iteration during analysis
+    "COINS_TEST_N_LIGHTS": 5,
     # ---  PCA MODEL CONSTANTS
     "PCA_BATCH_SIZE": 64,
     "PCA_LEARNING_RATE": 0.0001,
@@ -30,7 +31,7 @@ constants = {
     "PCA_ORTHOGONAL_BASES": 8,
     "PCA_H": 10,
     "PCA_SIGMA": 0.3,
-    "PCA_MODEL_INPUT_SIZE": 8 + (2 * 10),   # PCA_ORTHOGONAL_BASES + (2 * H)
+    "PCA_MODEL_INPUT_SIZE": 8 + (2 * 10),  # PCA_ORTHOGONAL_BASES + (2 * H)
     "GAUSSIAN_MATRIX_FILE_PATH": "data/gaussian_matrix.npz",
     # ---  DEBUG CONSTANTS
     "STATIC_CAMERA_FEED_WINDOW_TITLE": "Static camera feed",

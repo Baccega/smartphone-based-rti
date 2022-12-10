@@ -45,7 +45,7 @@ def mouse_click(event, x, y, flags, param):
         isDragging = False
 
 
-def mainPreComputed(interpolated_data_file_path):
+def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_datapoints_file_path):
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
@@ -56,8 +56,11 @@ def mainPreComputed(interpolated_data_file_path):
         dtype=np.uint8,
     )
 
+    datapoints = loadDataFile(datapoints_file_path)
+    test_datapoints = loadDataFile(test_datapoints_file_path)
+
     cv.namedWindow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"])
-    lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
+    lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
     cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
 
     data = loadDataFile(interpolated_data_file_path)
@@ -68,7 +71,7 @@ def mainPreComputed(interpolated_data_file_path):
             for x in range(constants["SQAURE_GRID_DIMENSION"]):
                 for y in range(constants["SQAURE_GRID_DIMENSION"]):
                     frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
-            lightDirectionFrame = createLightDirectionFrame([dirX, dirY])
+            lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
             prevDirX = dirX
             prevDirY = dirY
 
@@ -81,7 +84,7 @@ def mainPreComputed(interpolated_data_file_path):
     cv.destroyAllWindows()
 
 
-def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path):
+def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, test_datapoints_file_path):
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
@@ -93,9 +96,10 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path):
     )
 
     datapoints = loadDataFile(datapoints_file_path)
+    test_datapoints = loadDataFile(test_datapoints_file_path)
 
     cv.namedWindow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"])
-    lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints)
+    lightDirectionFrame = createLightDirectionFrame([dirX, dirY], test_datapoints)
     cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
 
     print("Neural model: " + neural_model_path)
@@ -145,7 +149,7 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path):
                 for y in range(constants["SQAURE_GRID_DIMENSION"]):
                     i = y + (x * constants["SQAURE_GRID_DIMENSION"])
                     frame[x][y] = outputs[i].item()
-            lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints)
+            lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
             prevDirX = dirX
             prevDirY = dirY
 
@@ -172,10 +176,12 @@ if __name__ == "__main__":
             _,
             _,
             _,
+            _,
             interpolated_data_file_path,
             neural_model_path,
             pca_data_file_path,
             datapoints_file_path,
+            test_datapoints_file_path,
         ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
     else:
         synth = inputSynth()
@@ -184,10 +190,14 @@ if __name__ == "__main__":
             _,
             _,
             _,
+            _,
+            _,
+            _,
             interpolated_data_file_path,
             neural_model_path,
             pca_data_file_path,
             datapoints_file_path,
+            test_datapoints_file_path,
         ) = getChoosenSynthPaths(synth, interpolation_mode)
 
     if interpolation_mode == 4 and (
@@ -214,8 +224,8 @@ if __name__ == "__main__":
     )
 
     if interpolation_mode == 4:
-        mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path)
+        mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, test_datapoints_file_path)
     else:
-        mainPreComputed(interpolated_data_file_path)
+        mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_datapoints_file_path)
 
     print("All Done!")
