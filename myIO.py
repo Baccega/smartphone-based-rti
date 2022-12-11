@@ -37,6 +37,11 @@ def askIfFilesExist(files, message):
     return True
 
 
+def inputAnalysis():
+    return safeBoolInput(
+        "Do you want to compare the extracted data with test set? (y/n): "
+    )
+
 def inputCoin():
     return safeIntInput(
         "Select coin (1. Danish 5 krone, 2. British 50 pence, 3. Swiss 1/2 franc, 4. Czechs 20 korun): ",

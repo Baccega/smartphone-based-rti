@@ -1,6 +1,7 @@
 from interpolation import interpolate_data
 from myIO import (
     inputAlignedVideos,
+    inputAnalysis,
     inputCoin,
     inputDebug,
     inputDataset,
@@ -18,6 +19,7 @@ from utils import (
     generateGaussianMatrix,
 )
 from pca_model import train_pca_model
+from analyze_data import analyze_data
 from extract_data import extractCoinDataFromVideos, extractSynthDataFromAssets
 import os
 import torch
@@ -228,7 +230,8 @@ def main():
 
     print("All Done! Now you can use the interactive relighting.")
 
-    # Do you want to analyze the results with the test set?
+    if inputAnalysis():
+        analyze_data(extracted_data, test_data, interpolation_mode)
 
 
 if __name__ == "__main__":
