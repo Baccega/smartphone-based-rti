@@ -1,4 +1,5 @@
 import numpy as np
+import kornia
 import cv2 as cv
 from tqdm import tqdm
 from constants import constants
@@ -76,8 +77,12 @@ def getPTMInterpolationFunction(data):
 
 
 def SSIM(output, ground_truth):
-
-    return 1
+    tensor1 = kornia.utils.image_to_tensor(output).float()
+    tensor2 = kornia.utils.image_to_tensor(ground_truth).float()
+    # Add Batch dimension
+    tensor1 = tensor1.unsqueeze(0) 
+    tensor2 = tensor2.unsqueeze(0) 
+    return kornia.metrics.ssim(tensor1, tensor2, constants["SSIM_GAUSSIAN_KERNEL_SIZE"], 255.)
 
 
 def analyze_data(data, test_data, interpolation_mode=None):
@@ -132,13 +137,13 @@ def analyze_data(data, test_data, interpolation_mode=None):
                     outputs[idx], ground_truths[idx]
                 )
 
-            mean_comparison_value = total_comparison_value / len(test_data)
+            mean_comparison_value = total_comparison_value / len(test_light_directions)
 
             print(
                 "{} - {}: {} ({} values)".format(
                     interpolation_function_name,
                     comparison_function_name,
                     mean_comparison_value,
-                    len(test_data),
+                    len(test_light_directions),
                 )
             )

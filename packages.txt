@@ -8,3 +8,4 @@ pytorch
 torchvision
 torchaudio
 scikit-learn
+kornia

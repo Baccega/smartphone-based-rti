@@ -24,6 +24,7 @@ constants = {
     "ALIGNED_VIDEO_FPS": 30,
     "ANALYSIS_FRAME_SKIP": 5,  # It will skip this frames each iteration during analysis
     "COINS_TEST_N_LIGHTS": 5,
+    "SSIM_GAUSSIAN_KERNEL_SIZE": 5,
     # ---  PCA MODEL CONSTANTS
     "PCA_BATCH_SIZE": 64,
     "PCA_LEARNING_RATE": 0.0001,
