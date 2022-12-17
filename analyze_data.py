@@ -1,13 +1,17 @@
 import numpy as np
 import kornia
+import torch
 import cv2 as cv
+from pca_model import NeuralModel
 from tqdm import tqdm
 from constants import constants
 from scipy.interpolate import Rbf
-from utils import fromIndexToLightDir
+from utils import fromIndexToLightDir, loadDataFile
 
 N = constants["SQAURE_GRID_DIMENSION"]
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+torch.manual_seed(42)
 
 def getLinerRBFInterpolationFunction(data):
     def interpolate(x, y, light_directions):
@@ -75,6 +79,43 @@ def getPTMInterpolationFunction(data):
 
     return interpolate
 
+def getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path):
+    pca_data = loadDataFile(pca_data_file_path)
+    gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
+    model = NeuralModel(gaussian_matrix)
+    model.load_state_dict(torch.load(neural_model_path))
+    model.eval()
+    
+    def interpolate(x, y, light_directions):
+        inputs = torch.empty(
+            (len(light_directions), 10),
+            dtype=torch.float64,
+        )
+       
+        inputs = inputs.to(device)
+        for i in range(len(light_directions)):
+            light_direction_str = light_directions[i]
+            light_dir_x = fromIndexToLightDir(light_direction_str.split("|")[0])
+            light_dir_y = fromIndexToLightDir(light_direction_str.split("|")[1])
+
+            inputs[i] = torch.cat(
+                (
+                    torch.tensor(pca_data[x][y]),
+                    torch.tensor(
+                        [
+                            light_dir_x,
+                            light_dir_y,
+                        ]
+                    ),
+                ),
+                dim=-1,
+            )
+
+        outputs = model(inputs)
+        return outputs
+
+    return interpolate
+
 
 def SSIM(output, ground_truth):
     tensor1 = kornia.utils.image_to_tensor(output).float()
@@ -85,17 +126,22 @@ def SSIM(output, ground_truth):
     return kornia.metrics.ssim(tensor1, tensor2, constants["SSIM_GAUSSIAN_KERNEL_SIZE"], 255.)
 
 
-def analyze_data(data, test_data, interpolation_mode=None):
-
+def analyze_data(data, test_data, interpolation_mode, pca_data_file_path="", neural_model_path=""):
     print("Analyzing data...")
 
-    if interpolation_mode is None:
-        return
+    if interpolation_mode == 1:
+        get_interpolation_functions = [
+            ("LinearRBF", getLinerRBFInterpolationFunction(data))
+        ]
+    if interpolation_mode == 2:
+        get_interpolation_functions = [
+            ("PolynomialTextureMaps", getPTMInterpolationFunction(data))
+        ]
+    if interpolation_mode == 3 or interpolation_mode == 4:
+        get_interpolation_functions = [
+            ("PCAModel", getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path))
+        ]
 
-    get_interpolation_functions = [
-        ("LinearRBF", getLinerRBFInterpolationFunction(data)),
-        ("PolynomialTextureMaps", getPTMInterpolationFunction(data)),
-    ]
     comparison_functions = [("SSIM", SSIM)]
 
     test_light_directions = list(test_data[0][0].keys())

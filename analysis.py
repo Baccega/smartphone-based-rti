@@ -231,7 +231,7 @@ def main():
     print("All Done! Now you can use the interactive relighting.")
 
     if inputAnalysis():
-        analyze_data(extracted_data, test_data, interpolation_mode)
+        analyze_data(extracted_data, test_data, interpolation_mode, pca_data_file_path, neural_model_path)
 
 
 if __name__ == "__main__":
