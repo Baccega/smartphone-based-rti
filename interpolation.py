@@ -85,8 +85,8 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
                     a_matrix = np.dot(v.T, w)
 
                     # For every possible light direction
-                    for lv in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
-                        for lu in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                    for lu in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
+                        for lv in range(constants["LIGHT_DIRECTION_WINDOW_SIZE"]):
                             l0 = a_matrix[0] * (lu**2)
                             l1 = a_matrix[1] * (lv**2)
                             l2 = a_matrix[2] * (lu * lv)
