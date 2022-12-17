@@ -33,19 +33,16 @@ def selectTestLights(n, data):
 
         for x in range(constants["SQAURE_GRID_DIMENSION"]):
             for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                data_point = {
-                    choosen_light_str: data[x][y][choosen_light_str]
-                }
+                data_point = {choosen_light_str: data[x][y][choosen_light_str]}
                 # If data[x][y] exists: update
                 if type(test_data[x][y]) is dict:
                     test_data[x][y].update(data_point)
                 # Else: create it
                 else:
                     test_data[x][y] = data_point
-                
+
                 # Remove choosen data (TODO: surroundings)
                 del data[x][y][choosen_light_str]
-
 
     return data, np.asarray(test_data)
 
@@ -214,20 +211,20 @@ def extractSynthDataFromFolder(folder_path, light_directions_file_path):
                 ),
             )
 
-            for x in range(len(image)):
-                for y in range(len(image)):
-                    data_point = {
-                        "{}|{}".format(light_dir_x, light_dir_y,): image[
-                            x
-                        ][y]
-                    }
+            for x in range(constants["SQAURE_GRID_DIMENSION"]):
+                for y in range(constants["SQAURE_GRID_DIMENSION"]):
+                    key = "{}|{}".format(
+                        light_dir_x,
+                        light_dir_y,
+                    )
                     # If data[x][y] exists: update
                     if type(data[x][y]) is dict:
-                        data[x][y].update(data_point)
+                        data[x][y][key] = image[x][y]
                     # Else: create it
                     else:
-                        data[x][y] = data_point
-
+                        data[x][y] = {
+                            key: image[x][y]
+                        }
         count += 1
 
     return np.asarray(data)

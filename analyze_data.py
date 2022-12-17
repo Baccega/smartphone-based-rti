@@ -5,12 +5,15 @@ from constants import constants
 from scipy.interpolate import Rbf
 from utils import fromIndexToLightDir
 
+N = constants["SQAURE_GRID_DIMENSION"]
+
 
 def getLinerRBFInterpolationFunction(data):
     def interpolate(x, y, light_directions):
         keys = list(data[x][y].keys())
-        light_directions_x = [fromIndexToLightDir(i.split("|")[0]) for i in keys]
-        light_directions_y = [fromIndexToLightDir(i.split("|")[1]) for i in keys]
+        light_directions_x = [i.split("|")[0] for i in keys]
+        light_directions_y = [i.split("|")[1] for i in keys]
+
         pixel_intensities = list(data[x][y].values())
         rbf_interpolation = Rbf(
             light_directions_x,
@@ -54,55 +57,32 @@ def analyze_data(data, test_data, interpolation_mode=None):
             interpolation_function,
         ) = get_interpolation_functions[i]
 
-        outputs = np.zeros(
-            (
-                constants["SQAURE_GRID_DIMENSION"],
-                constants["SQAURE_GRID_DIMENSION"],
-                len(test_light_directions),
-            )
-        )
-        ground_truths = np.zeros(
-            (
-                constants["SQAURE_GRID_DIMENSION"],
-                constants["SQAURE_GRID_DIMENSION"],
-                len(test_light_directions),
-            )
-        )
-        for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
-            for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                outputs[x][y] = interpolation_function(x, y, test_light_directions)
+        print("{}:".format(interpolation_function_name))
+
+        outputs = np.zeros((len(test_light_directions), N, N), dtype=np.uint8)
+        ground_truths = np.zeros((len(test_light_directions), N, N), dtype=np.uint8)
+
+        for x in tqdm(range(N)):
+            for y in range(N):
+                values = interpolation_function(x, y, test_light_directions)
+
+                for i in range(len(test_light_directions)):
+                    outputs[i][x][y] = values[i]
 
                 count = 0
-                for value in test_data[x][y].values():
-                    ground_truths[x][y][count] = value
+                for test_light_direction_str in test_light_directions:
+                    ground_truths[count][x][y] = test_data[x][y][test_light_direction_str]
                     count += 1
-        outputs = outputs.reshape(
-            (
-                len(test_light_directions),
-                constants["SQAURE_GRID_DIMENSION"],
-                constants["SQAURE_GRID_DIMENSION"],
-            )
-        )
-        ground_truths = ground_truths.reshape(
-            (
-                len(test_light_directions),
-                constants["SQAURE_GRID_DIMENSION"],
-                constants["SQAURE_GRID_DIMENSION"],
-            )
-        )
+                count = 0
 
-        cv.imshow("test2", outputs[0])
-        cv.waitKey(0)
+        # cv.imshow("ground truths", ground_truths[0])
+        # cv.imshow("outputs", outputs[0])
+        # cv.waitKey(0)
 
         for j in range(len(comparison_functions)):
             total_comparison_value = 0.0
             comparison_function_name, comparison_function = comparison_functions[j]
 
-            print(
-                "{} - {}".format(interpolation_function_name, comparison_function_name)
-            )
-
-            
             for idx in range(len(test_light_directions)):
                 total_comparison_value += comparison_function(
                     outputs[idx], ground_truths[idx]
