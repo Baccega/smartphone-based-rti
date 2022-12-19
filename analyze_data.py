@@ -13,6 +13,7 @@ N = constants["SQAURE_GRID_DIMENSION"]
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(42)
 
+
 def getLinerRBFInterpolationFunction(data):
     def interpolate(x, y, light_directions):
         keys = list(data[x][y].keys())
@@ -35,6 +36,7 @@ def getLinerRBFInterpolationFunction(data):
         return values
 
     return interpolate
+
 
 def getPTMInterpolationFunction(data):
     def interpolate(x, y, light_directions):
@@ -79,19 +81,20 @@ def getPTMInterpolationFunction(data):
 
     return interpolate
 
+
 def getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path):
     pca_data = loadDataFile(pca_data_file_path)
     gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
     model = NeuralModel(gaussian_matrix)
     model.load_state_dict(torch.load(neural_model_path))
     model.eval()
-    
+
     def interpolate(x, y, light_directions):
         inputs = torch.empty(
             (len(light_directions), 10),
             dtype=torch.float64,
         )
-       
+
         inputs = inputs.to(device)
         for i in range(len(light_directions)):
             light_direction_str = light_directions[i]
@@ -121,75 +124,87 @@ def SSIM(output, ground_truth):
     tensor1 = kornia.utils.image_to_tensor(output).float()
     tensor2 = kornia.utils.image_to_tensor(ground_truth).float()
     # Add Batch dimension
-    tensor1 = tensor1.unsqueeze(0) 
-    tensor2 = tensor2.unsqueeze(0) 
-    return kornia.metrics.ssim(tensor1, tensor2, constants["SSIM_GAUSSIAN_KERNEL_SIZE"], 255.)
+    tensor1 = tensor1.unsqueeze(0)
+    tensor2 = tensor2.unsqueeze(0)
+    return kornia.metrics.ssim(
+        tensor1, tensor2, constants["SSIM_GAUSSIAN_KERNEL_SIZE"], 255.0
+    )
 
 
-def analyze_data(data, test_data, interpolation_mode, pca_data_file_path="", neural_model_path=""):
+def PSNR(output, ground_truth):
+    tensor1 = kornia.utils.image_to_tensor(output).float()
+    tensor2 = kornia.utils.image_to_tensor(ground_truth).float()
+    return kornia.metrics.psnr(tensor1, tensor2, 255.0)
+
+
+def analyze_data(
+    data, test_data, interpolation_mode, pca_data_file_path="", neural_model_path=""
+):
     print("Analyzing data...")
 
     if interpolation_mode == 1:
-        get_interpolation_functions = [
-            ("LinearRBF", getLinerRBFInterpolationFunction(data))
-        ]
+        get_interpolation_functions = (
+            "LinearRBF",
+            getLinerRBFInterpolationFunction(data),
+        )
     if interpolation_mode == 2:
-        get_interpolation_functions = [
-            ("PolynomialTextureMaps", getPTMInterpolationFunction(data))
-        ]
+        get_interpolation_functions = (
+            "PolynomialTextureMaps",
+            getPTMInterpolationFunction(data),
+        )
     if interpolation_mode == 3 or interpolation_mode == 4:
-        get_interpolation_functions = [
-            ("PCAModel", getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path))
-        ]
+        get_interpolation_functions = (
+            "PCAModel",
+            getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path),
+        )
 
-    comparison_functions = [("SSIM", SSIM)]
+    comparison_functions = [("SSIM", SSIM), ("PSNR", PSNR)]
 
     test_light_directions = list(test_data[0][0].keys())
 
-    for i in range(len(get_interpolation_functions)):
-        (
-            interpolation_function_name,
-            interpolation_function,
-        ) = get_interpolation_functions[i]
+    (
+        interpolation_function_name,
+        interpolation_function,
+    ) = get_interpolation_functions
 
-        print("{}:".format(interpolation_function_name))
+    print("{}:".format(interpolation_function_name))
 
-        outputs = np.zeros((len(test_light_directions), N, N), dtype=np.uint8)
-        ground_truths = np.zeros((len(test_light_directions), N, N), dtype=np.uint8)
+    outputs = np.zeros((len(test_light_directions), N, N), dtype=np.uint8)
+    ground_truths = np.zeros((len(test_light_directions), N, N), dtype=np.uint8)
 
-        for x in tqdm(range(N)):
-            for y in range(N):
-                values = interpolation_function(x, y, test_light_directions)
+    for x in tqdm(range(N)):
+        for y in range(N):
+            values = interpolation_function(x, y, test_light_directions)
 
-                for i in range(len(test_light_directions)):
-                    outputs[i][x][y] = values[i]
+            for i in range(len(test_light_directions)):
+                outputs[i][x][y] = values[i]
 
-                count = 0
-                for test_light_direction_str in test_light_directions:
-                    ground_truths[count][x][y] = test_data[x][y][test_light_direction_str]
-                    count += 1
-                count = 0
+            count = 0
+            for test_light_direction_str in test_light_directions:
+                ground_truths[count][x][y] = test_data[x][y][test_light_direction_str]
+                count += 1
+            count = 0
 
-        # cv.imshow("ground truths", ground_truths[0])
-        # cv.imshow("outputs", outputs[0])
-        # cv.waitKey(0)
+    # cv.imshow("ground truths", ground_truths[0])
+    # cv.imshow("outputs", outputs[0])
+    # cv.waitKey(0)
 
-        for j in range(len(comparison_functions)):
-            total_comparison_value = 0.0
-            comparison_function_name, comparison_function = comparison_functions[j]
+    for j in range(len(comparison_functions)):
+        total_comparison_value = 0.0
+        comparison_function_name, comparison_function = comparison_functions[j]
 
-            for idx in range(len(test_light_directions)):
-                total_comparison_value += comparison_function(
-                    outputs[idx], ground_truths[idx]
-                )
-
-            mean_comparison_value = total_comparison_value / len(test_light_directions)
-
-            print(
-                "{} - {}: {} ({} values)".format(
-                    interpolation_function_name,
-                    comparison_function_name,
-                    mean_comparison_value,
-                    len(test_light_directions),
-                )
+        for idx in range(len(test_light_directions)):
+            total_comparison_value += comparison_function(
+                outputs[idx], ground_truths[idx]
             )
+
+        mean_comparison_value = total_comparison_value / len(test_light_directions)
+
+        print(
+            "{} - {}: {} ({} values)".format(
+                interpolation_function_name,
+                comparison_function_name,
+                mean_comparison_value,
+                len(test_light_directions),
+            )
+        )
