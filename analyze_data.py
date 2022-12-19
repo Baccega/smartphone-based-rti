@@ -137,6 +137,13 @@ def PSNR(output, ground_truth):
     return kornia.metrics.psnr(tensor1, tensor2, 255.0)
 
 
+def L1(output, ground_truth):
+    tensor1 = kornia.utils.image_to_tensor(output).float()
+    tensor2 = kornia.utils.image_to_tensor(ground_truth).float()
+    loss = torch.nn.L1Loss()
+    return loss(tensor1, tensor2)
+
+
 def analyze_data(
     data, test_data, interpolation_mode, pca_data_file_path="", neural_model_path=""
 ):
@@ -158,7 +165,7 @@ def analyze_data(
             getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path),
         )
 
-    comparison_functions = [("SSIM", SSIM), ("PSNR", PSNR)]
+    comparison_functions = [("SSIM", SSIM), ("PSNR", PSNR), ("L1", L1)]
 
     test_light_directions = list(test_data[0][0].keys())
 
