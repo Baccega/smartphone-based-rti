@@ -126,9 +126,11 @@ def SSIM(output, ground_truth):
     # Add Batch dimension
     tensor1 = tensor1.unsqueeze(0)
     tensor2 = tensor2.unsqueeze(0)
-    return kornia.metrics.ssim(
+
+    values = kornia.metrics.ssim(
         tensor1, tensor2, constants["SSIM_GAUSSIAN_KERNEL_SIZE"], 255.0
     )
+    return values.sum() / (N * N) 
 
 
 def PSNR(output, ground_truth):
