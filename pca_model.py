@@ -27,7 +27,8 @@ class ExtractedPixelsDataset(Dataset):
         if extracted_data is None:
             extracted_data = loadDataFile(extracted_data_file_path)
 
-        n_extracted_datapoints = len(list(extracted_data[0][0].keys()))
+        extracted_datapoints = list(extracted_data[0][0].keys())
+        n_extracted_datapoints = len(extracted_datapoints)
 
         print("Number of extracted light directions: {}".format(n_extracted_datapoints))
 
@@ -51,8 +52,8 @@ class ExtractedPixelsDataset(Dataset):
                 constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]
             )
         ):
-            x = i % constants["SQAURE_GRID_DIMENSION"]
-            y = math.floor(i / constants["SQAURE_GRID_DIMENSION"])
+            x = math.floor(i / constants["SQAURE_GRID_DIMENSION"])
+            y = i % constants["SQAURE_GRID_DIMENSION"]
             full_pca_data[i] = list(extracted_data[x][y].values())
 
         print("Running PCA")
@@ -71,25 +72,23 @@ class ExtractedPixelsDataset(Dataset):
         writeDataFile(pca_data_file_path, pca_data)
 
         print("Preparing dataset data")
-
-        keys = list(extracted_data[0][0].keys())
-        light_directions_x = [i.split("|")[0] for i in keys]
-        light_directions_y = [i.split("|")[1] for i in keys]
         for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
             for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                pixel_intensities = list(extracted_data[x][y].values())
                 for z in range(n_extracted_datapoints):
+                    lightDirection = extracted_datapoints[z]
+                    light_direction_x = float(fromIndexToLightDir(lightDirection.split("|")[0]))
+                    light_direction_y = float(fromIndexToLightDir(lightDirection.split("|")[1]))
                     i = (x * constants["SQAURE_GRID_DIMENSION"] * n_extracted_datapoints) + (y * n_extracted_datapoints) + z 
                     self.data[i] = torch.cat(
                         (
                             pca_data[x][y],
                             torch.tensor(
                                 [
-                                    float(fromIndexToLightDir(light_directions_x[z])),
-                                    float(fromIndexToLightDir(light_directions_y[z])),
+                                    light_direction_x,
+                                    light_direction_y,
                                 ]
                             ),
-                            torch.tensor([pixel_intensities[z]]),
+                            torch.tensor([extracted_data[x][y][lightDirection]]),
                         ),
                         dim=-1,
                     )
