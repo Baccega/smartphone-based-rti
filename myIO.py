@@ -98,9 +98,9 @@ def inputModelTraining(path1):
 
 def inputInterpolatedMode():
     return safeIntInput(
-        "Select interpolation method (1. Linear RBF, 2. Polinomial Texture Maps, 3. PCA neural model (pre-computed), 4. PCA neural model (real-time) ): ",
+        "Select interpolation method (1. Linear RBF, 2. Polinomial Texture Maps, 3. PCA neural model (pre-computed), 4. PCA neural model (real-time), 5. Neural model (pre-computed), 6. Neural model (real-time) ): ",
         1,
-        4,
+        6,
     )
 
 

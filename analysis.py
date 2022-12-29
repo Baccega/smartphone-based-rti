@@ -19,6 +19,7 @@ from utils import (
     generateGaussianMatrix,
 )
 from pca_model import train_pca_model
+from neural_model import train_neural_model
 from analyze_data import analyze_data
 from extract_data import extractCoinDataFromVideos, extractSynthDataFromAssets
 import os
@@ -60,7 +61,7 @@ def coinSubMain(interpolation_mode):
         extracted_data_file_path,
         test_data_file_path,
         interpolated_data_file_path,
-        neural_model_path,
+        model_path,
         pca_data_file_path,
         datapoints_file_path,
         test_datapoints_file_path,
@@ -107,7 +108,7 @@ def coinSubMain(interpolation_mode):
         extracted_data,
         test_data,
         interpolated_data_file_path,
-        neural_model_path,
+        model_path,
         pca_data_file_path,
         datapoints_file_path,
         test_datapoints_file_path,
@@ -125,7 +126,7 @@ def synthSubMain(interpolation_mode):
         extracted_data_file_path,
         test_data_file_path,
         interpolated_data_file_path,
-        neural_model_path,
+        model_path,
         pca_data_file_path,
         datapoints_file_path,
         test_datapoints_file_path,
@@ -160,7 +161,7 @@ def synthSubMain(interpolation_mode):
         extracted_data,
         test_data,
         interpolated_data_file_path,
-        neural_model_path,
+        model_path,
         pca_data_file_path,
         datapoints_file_path,
         test_datapoints_file_path,
@@ -176,7 +177,7 @@ def main():
             extracted_data,
             test_data,
             interpolated_data_file_path,
-            neural_model_path,
+            model_path,
             pca_data_file_path,
             datapoints_file_path,
             test_datapoints_file_path,
@@ -186,7 +187,7 @@ def main():
             extracted_data,
             test_data,
             interpolated_data_file_path,
-            neural_model_path,
+            model_path,
             pca_data_file_path,
             datapoints_file_path,
             test_datapoints_file_path,
@@ -201,7 +202,7 @@ def main():
 
     # Train model if necessary
     if (interpolation_mode == 3 or interpolation_mode == 4) and inputModelTraining(
-        neural_model_path
+        model_path
     ):
         if not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"]):
             gaussian_matrix = generateGaussianMatrix(
@@ -212,10 +213,34 @@ def main():
             gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
 
         train_pca_model(
-            neural_model_path,
+            model_path,
             extracted_data,
             gaussian_matrix,
             pca_data_file_path,
+        )
+    if (interpolation_mode == 5 or interpolation_mode == 6) and inputModelTraining(
+        model_path
+    ):
+        if not os.path.exists(
+            constants["GAUSSIAN_MATRIX_FILE_PATH_XY"]
+        ) or not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"]):
+            gaussian_matrix_xy = generateGaussianMatrix(
+                0, torch.tensor(constants["NEURAL_SIGMA_XY"]), constants["NEURAL_H"]
+            )
+            gaussian_matrix_uv = generateGaussianMatrix(
+                0, torch.tensor(constants["NEURAL_SIGMA_UV"]), constants["NEURAL_H"]
+            )
+            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"], gaussian_matrix_xy)
+            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"], gaussian_matrix_uv)
+        else:
+            gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
+            gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
+
+        train_neural_model(
+            model_path,
+            extracted_data,
+            gaussian_matrix_xy,
+            gaussian_matrix_uv,
         )
 
     # Interpolate data from extracted if necessary
@@ -223,7 +248,7 @@ def main():
         interpolated_data = interpolate_data(
             extracted_data,
             interpolation_mode,
-            neural_model_path,
+            model_path,
             pca_data_file_path,
         )
         writeDataFile(interpolated_data_file_path, interpolated_data)
@@ -231,7 +256,13 @@ def main():
     print("All Done! Now you can use the interactive relighting.")
 
     if inputAnalysis():
-        analyze_data(extracted_data, test_data, interpolation_mode, pca_data_file_path, neural_model_path)
+        analyze_data(
+            extracted_data,
+            test_data,
+            interpolation_mode,
+            pca_data_file_path,
+            model_path,
+        )
 
 
 if __name__ == "__main__":

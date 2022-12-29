@@ -58,6 +58,8 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
         mode_str = "PTM"
     elif interpolation_mode == 3 or interpolation_mode == 4:
         mode_str = "PCA_MODEL"
+    elif interpolation_mode == 5 or interpolation_mode == 6:
+        mode_str = "NEURAL_MODEL"
     return (
         constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
         constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
@@ -67,7 +69,7 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
         constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_TEST_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
-        constants["COIN_{}_PCA_MODEL".format(coin)],
+        constants["COIN_{}_{}".format(coin, mode_str)],
         constants["COIN_{}_PCA_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_DATAPOINTS_FILE_PATH".format(coin)],
         constants["COIN_{}_TEST_DATAPOINTS_FILE_PATH".format(coin)],
@@ -83,6 +85,8 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
         mode_str = "PTM"
     elif interpolation_mode == 3 or interpolation_mode == 4:
         mode_str = "PCA_MODEL"
+    elif interpolation_mode == 5 or interpolation_mode == 6:
+        mode_str = "NEURAL_MODEL"
 
     singleMulti = "Single" if synth[0] == "SINGLE" else "Multi"
 
@@ -114,8 +118,8 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
             )
         ],
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_PCA_MODEL".format(
-                synth[0], synth[1], synth[2]
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}".format(
+                synth[0], synth[1], synth[2], mode_str
             )
         ],
         constants[
@@ -285,9 +289,16 @@ def fromLightDirToIndex(lightDir):
 
 def fromIndexToLightDir(index):
     """
-    Transform light direction [-1.0, ..., +1.0] to positive indexes (0, ..., 200)
+    Transform positive indexes (0, ..., 100) to light direction [-1.0, ..., +1.0]
     """
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
+    return np.around((int(index) - half_size) / half_size, decimals=2)
+
+def normalizeXY(index):
+    """
+    Transform positive indexes (0, ..., 200) to light direction [-1.0, ..., +1.0]
+    """
+    half_size = int(constants["SQAURE_GRID_DIMENSION"] / 2)
     return np.around((int(index) - half_size) / half_size, decimals=2)
 
 
