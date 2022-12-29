@@ -2,7 +2,7 @@ from scipy.interpolate import Rbf
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Dataset
-from pca_model import NeuralModel
+from pca_model import PCAModel
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from constants import constants
@@ -33,7 +33,7 @@ def interpolate_data(data, mode, neural_model_path, pca_data_file_path):
         gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
         print("GAUSSIAN_MATRIX_LOADED")
         print("Neural model: " + neural_model_path)
-        model = NeuralModel(gaussian_matrix)
+        model = PCAModel(gaussian_matrix)
         model.load_state_dict(torch.load(neural_model_path))
         model.eval()
 

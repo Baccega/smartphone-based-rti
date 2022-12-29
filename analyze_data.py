@@ -2,11 +2,12 @@ import numpy as np
 import kornia
 import torch
 import cv2 as cv
-from pca_model import NeuralModel
+from pca_model import PCAModel
+from neural_model import NeuralModel
 from tqdm import tqdm
 from constants import constants
 from scipy.interpolate import Rbf
-from utils import fromIndexToLightDir, loadDataFile
+from utils import fromIndexToLightDir, loadDataFile, normalizeXY
 
 N = constants["SQAURE_GRID_DIMENSION"]
 
@@ -82,11 +83,11 @@ def getPTMInterpolationFunction(data):
     return interpolate
 
 
-def getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path):
+def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
     pca_data = loadDataFile(pca_data_file_path)
     gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
-    model = NeuralModel(gaussian_matrix)
-    model.load_state_dict(torch.load(neural_model_path))
+    model = PCAModel(gaussian_matrix)
+    model.load_state_dict(torch.load(pca_model_path))
     model.eval()
 
     def interpolate(x, y, light_directions):
@@ -106,6 +107,47 @@ def getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path):
                     torch.tensor(pca_data[x][y]),
                     torch.tensor(
                         [
+                            light_dir_x,
+                            light_dir_y,
+                        ]
+                    ),
+                ),
+                dim=-1,
+            )
+
+        outputs = model(inputs)
+        return outputs
+
+    return interpolate
+
+def getNeuralModelInterpolationFunction(neural_model_path):
+    gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
+    gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
+    model = NeuralModel(gaussian_matrix_xy, gaussian_matrix_uv)
+    model.load_state_dict(torch.load(neural_model_path))
+    model.eval()
+
+    def interpolate(x, y, light_directions):
+        inputs = torch.empty(
+            (len(light_directions), 4),
+            dtype=torch.float64,
+        )
+
+        inputs = inputs.to(device)
+
+        normalized_x = normalizeXY(x)
+        normalized_y = normalizeXY(y)
+        for i in range(len(light_directions)):
+            light_direction_str = light_directions[i]
+            light_dir_x = fromIndexToLightDir(light_direction_str.split("|")[0])
+            light_dir_y = fromIndexToLightDir(light_direction_str.split("|")[1])
+
+            inputs[i] = torch.cat(
+                (
+                    torch.tensor(
+                        [
+                            normalized_x,
+                            normalized_y,
                             light_dir_x,
                             light_dir_y,
                         ]
@@ -147,7 +189,7 @@ def L1(output, ground_truth):
 
 
 def analyze_data(
-    data, test_data, interpolation_mode, pca_data_file_path="", neural_model_path=""
+    data, test_data, interpolation_mode, pca_data_file_path="", model_path=""
 ):
     print("Analyzing data...")
 
@@ -164,7 +206,12 @@ def analyze_data(
     if interpolation_mode == 3 or interpolation_mode == 4:
         get_interpolation_functions = (
             "PCAModel",
-            getPCAModelInterpolationFunction(pca_data_file_path, neural_model_path),
+            getPCAModelInterpolationFunction(pca_data_file_path, model_path),
+        )
+    if interpolation_mode == 5 or interpolation_mode == 6:
+        get_interpolation_functions = (
+            "NeuralModel",
+            getNeuralModelInterpolationFunction(model_path),
         )
 
     comparison_functions = [("SSIM", SSIM), ("PSNR", PSNR), ("L1", L1)]

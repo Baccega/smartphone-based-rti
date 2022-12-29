@@ -4,7 +4,8 @@ import numpy as np
 import torch
 import math
 from constants import constants
-from pca_model import NeuralModel
+from pca_model import PCAModel
+from neural_model import NeuralModel
 
 from myIO import inputCoin, inputInterpolatedMode, inputDataset, inputSynth
 from utils import (
