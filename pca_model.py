@@ -33,15 +33,15 @@ class ExtractedPixelsDataset(Dataset):
         print("Number of extracted light directions: {}".format(n_extracted_datapoints))
 
         total = (
-            constants["SQAURE_GRID_DIMENSION"]
-            * constants["SQAURE_GRID_DIMENSION"]
+            constants["SQUARE_GRID_DIMENSION"]
+            * constants["SQUARE_GRID_DIMENSION"]
             * n_extracted_datapoints
         )
         # Length = size of K + 2 light directions
         self.data = np.empty([total, 2 + constants["PCA_ORTHOGONAL_BASES"] + 1])
         full_pca_data = np.empty(
             [
-                constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"],
+                constants["SQUARE_GRID_DIMENSION"] * constants["SQUARE_GRID_DIMENSION"],
                 n_extracted_datapoints,
             ]
         )
@@ -49,11 +49,11 @@ class ExtractedPixelsDataset(Dataset):
         print("Loading PCA Data")
         for i in tqdm(
             range(
-                constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]
+                constants["SQUARE_GRID_DIMENSION"] * constants["SQUARE_GRID_DIMENSION"]
             )
         ):
-            x = math.floor(i / constants["SQAURE_GRID_DIMENSION"])
-            y = i % constants["SQAURE_GRID_DIMENSION"]
+            x = math.floor(i / constants["SQUARE_GRID_DIMENSION"])
+            y = i % constants["SQUARE_GRID_DIMENSION"]
             full_pca_data[i] = list(extracted_data[x][y].values())
 
         print("Running PCA")
@@ -63,8 +63,8 @@ class ExtractedPixelsDataset(Dataset):
         pca_data = torch.reshape(
             torch.tensor(pca_data),
             (
-                constants["SQAURE_GRID_DIMENSION"],
-                constants["SQAURE_GRID_DIMENSION"],
+                constants["SQUARE_GRID_DIMENSION"],
+                constants["SQUARE_GRID_DIMENSION"],
                 constants["PCA_ORTHOGONAL_BASES"],
             ),
         )
@@ -72,13 +72,13 @@ class ExtractedPixelsDataset(Dataset):
         writeDataFile(pca_data_file_path, pca_data)
 
         print("Preparing dataset data")
-        for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
-            for y in range(constants["SQAURE_GRID_DIMENSION"]):
+        for x in tqdm(range(constants["SQUARE_GRID_DIMENSION"])):
+            for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 for z in range(n_extracted_datapoints):
                     lightDirection = extracted_datapoints[z]
                     light_direction_x = float(fromIndexToLightDir(lightDirection.split("|")[0]))
                     light_direction_y = float(fromIndexToLightDir(lightDirection.split("|")[1]))
-                    i = (x * constants["SQAURE_GRID_DIMENSION"] * n_extracted_datapoints) + (y * n_extracted_datapoints) + z 
+                    i = (x * constants["SQUARE_GRID_DIMENSION"] * n_extracted_datapoints) + (y * n_extracted_datapoints) + z 
                     self.data[i] = torch.cat(
                         (
                             pca_data[x][y],
@@ -113,7 +113,7 @@ class PCAModel(nn.Module):
         )
 
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(constants["PCA_MODEL_INPUT_SIZE"], 16),
+            nn.Linear(constants["PCA_INPUT_SIZE"], 16),
             nn.ELU(),
             nn.Linear(16, 16),
             nn.ELU(),
@@ -173,7 +173,7 @@ def train_pca_model(model_path, extracted_data, gaussian_matrix, pca_data_file_p
 
         scheduler.step()
         current_lr = optimizer.state_dict()["param_groups"][0]["lr"]
-        loss = running_loss / (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"])
+        loss = running_loss / (constants["SQUARE_GRID_DIMENSION"] * constants["SQUARE_GRID_DIMENSION"])
         print(f"Epoch {epoch + 1}, loss: {loss}, lr: {current_lr}")
 
     print("Finished Training")

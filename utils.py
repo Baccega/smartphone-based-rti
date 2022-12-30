@@ -57,9 +57,9 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
     if interpolation_mode == 2:
         mode_str = "PTM"
     elif interpolation_mode == 3 or interpolation_mode == 4:
-        mode_str = "PCA_MODEL"
+        mode_str = "PCA"
     elif interpolation_mode == 5 or interpolation_mode == 6:
-        mode_str = "NEURAL_MODEL"
+        mode_str = "NEURAL"
     return (
         constants["COIN_{}_VIDEO_CAMERA_STATIC_PATH".format(coin)],
         constants["COIN_{}_VIDEO_CAMERA_MOVING_PATH".format(coin)],
@@ -69,7 +69,7 @@ def getChoosenCoinVideosPaths(coin, interpolation_mode=0):
         constants["COIN_{}_EXTRACTED_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_TEST_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_INTERPOLATED_DATA_{}_FILE_PATH".format(coin, mode_str)],
-        constants["COIN_{}_{}".format(coin, mode_str)],
+        constants["COIN_{}_{}_MODEL".format(coin, mode_str)],
         constants["COIN_{}_PCA_DATA_FILE_PATH".format(coin)],
         constants["COIN_{}_DATAPOINTS_FILE_PATH".format(coin)],
         constants["COIN_{}_TEST_DATAPOINTS_FILE_PATH".format(coin)],
@@ -84,9 +84,9 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
     if interpolation_mode == 2:
         mode_str = "PTM"
     elif interpolation_mode == 3 or interpolation_mode == 4:
-        mode_str = "PCA_MODEL"
+        mode_str = "PCA"
     elif interpolation_mode == 5 or interpolation_mode == 6:
-        mode_str = "NEURAL_MODEL"
+        mode_str = "NEURAL"
 
     singleMulti = "Single" if synth[0] == "SINGLE" else "Multi"
 
@@ -118,7 +118,7 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
             )
         ],
         constants[
-            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}".format(
+            "SYNTH_{}_OBJECT_{}_MATERIAL_{}_{}_MODEL".format(
                 synth[0], synth[1], synth[2], mode_str
             )
         ],
@@ -162,7 +162,7 @@ def findPixelIntensities(static_frame):
 
     roi = cv.resize(
         roi_full_size,
-        (constants["SQAURE_GRID_DIMENSION"], constants["SQAURE_GRID_DIMENSION"]),
+        (constants["SQUARE_GRID_DIMENSION"], constants["SQUARE_GRID_DIMENSION"]),
     )
 
     return roi[:, :, 2]
@@ -183,7 +183,7 @@ def findLightDirection(moving_corners):
     """
     Get light direction from static_frame and moving frame
     """
-    center = [constants["SQAURE_GRID_DIMENSION"], constants["SQAURE_GRID_DIMENSION"], 0]
+    center = [constants["SQUARE_GRID_DIMENSION"], constants["SQUARE_GRID_DIMENSION"], 0]
     refSquare = np.array([[0, 400], [400, 400], [400, 0], [0, 0]])
 
     rotation, translation = computeRt(refSquare, moving_corners)
@@ -298,7 +298,7 @@ def normalizeXY(index):
     """
     Transform positive indexes (0, ..., 200) to light direction [-1.0, ..., +1.0]
     """
-    half_size = int(constants["SQAURE_GRID_DIMENSION"] / 2)
+    half_size = int(constants["SQUARE_GRID_DIMENSION"] / 2)
     return np.around((int(index) - half_size) / half_size, decimals=2)
 
 

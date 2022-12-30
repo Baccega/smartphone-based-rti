@@ -50,8 +50,8 @@ def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_data
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
-            constants["SQAURE_GRID_DIMENSION"],
-            constants["SQAURE_GRID_DIMENSION"],
+            constants["SQUARE_GRID_DIMENSION"],
+            constants["SQUARE_GRID_DIMENSION"],
             3,
         ],
         dtype=np.uint8,
@@ -69,8 +69,8 @@ def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_data
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
-            for x in range(constants["SQAURE_GRID_DIMENSION"]):
-                for y in range(constants["SQAURE_GRID_DIMENSION"]):
+            for x in range(constants["SQUARE_GRID_DIMENSION"]):
+                for y in range(constants["SQUARE_GRID_DIMENSION"]):
                     frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
             prevDirX = dirX
@@ -89,8 +89,8 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, te
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
-            constants["SQAURE_GRID_DIMENSION"],
-            constants["SQAURE_GRID_DIMENSION"],
+            constants["SQUARE_GRID_DIMENSION"],
+            constants["SQUARE_GRID_DIMENSION"],
             3,
         ],
         dtype=np.uint8,
@@ -112,14 +112,14 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, te
 
     # Initialize inputs
     inputs = torch.empty(
-        (constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"], 10),
+        (constants["SQUARE_GRID_DIMENSION"] * constants["SQUARE_GRID_DIMENSION"], 10),
         dtype=torch.float64,
     )
     normalizedDirX = fromIndexToLightDir(dirX)
     normalizedDirY = fromIndexToLightDir(dirY)
-    for x in range(constants["SQAURE_GRID_DIMENSION"]):
-        for y in range(constants["SQAURE_GRID_DIMENSION"]):
-            i = y + (x * constants["SQAURE_GRID_DIMENSION"])
+    for x in range(constants["SQUARE_GRID_DIMENSION"]):
+        for y in range(constants["SQUARE_GRID_DIMENSION"]):
+            i = y + (x * constants["SQUARE_GRID_DIMENSION"])
             inputs[i] = torch.cat(
                 (
                     torch.tensor(pca_data[x][y]),
@@ -138,17 +138,17 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, te
             normalizedDirX = fromIndexToLightDir(dirX)
             normalizedDirY = fromIndexToLightDir(dirY)
 
-            for x in range(constants["SQAURE_GRID_DIMENSION"]):
-                for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                    i = y + (x * constants["SQAURE_GRID_DIMENSION"])
+            for x in range(constants["SQUARE_GRID_DIMENSION"]):
+                for y in range(constants["SQUARE_GRID_DIMENSION"]):
+                    i = y + (x * constants["SQUARE_GRID_DIMENSION"])
                     inputs[i][8] = normalizedDirX
                     inputs[i][9] = normalizedDirY
 
             inputs = inputs.to(device)
             outputs = model(inputs)
-            for x in range(constants["SQAURE_GRID_DIMENSION"]):
-                for y in range(constants["SQAURE_GRID_DIMENSION"]):
-                    i = y + (x * constants["SQAURE_GRID_DIMENSION"])
+            for x in range(constants["SQUARE_GRID_DIMENSION"]):
+                for y in range(constants["SQUARE_GRID_DIMENSION"]):
+                    i = y + (x * constants["SQUARE_GRID_DIMENSION"])
                     frame[x][y] = outputs[i].item()
             lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
             prevDirX = dirX

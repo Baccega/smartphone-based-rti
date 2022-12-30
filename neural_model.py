@@ -34,17 +34,17 @@ class ExtractedPixelsDataset(Dataset):
         print("Number of extracted light directions: {}".format(n_extracted_datapoints))
 
         total = (
-            constants["SQAURE_GRID_DIMENSION"]
-            * constants["SQAURE_GRID_DIMENSION"]
+            constants["SQUARE_GRID_DIMENSION"]
+            * constants["SQUARE_GRID_DIMENSION"]
             * n_extracted_datapoints
         )
         # Length = size of 2 positions + 2 light directions + label
         self.data = np.empty([total, 2 + 2 + 1])
 
         print("Preparing dataset data")
-        for x in tqdm(range(constants["SQAURE_GRID_DIMENSION"])):
+        for x in tqdm(range(constants["SQUARE_GRID_DIMENSION"])):
             normalized_x = normalizeXY(x)
-            for y in range(constants["SQAURE_GRID_DIMENSION"]):
+            for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 normalized_y = normalizeXY(y)
                 for z in range(n_extracted_datapoints):
                     lightDirection = extracted_datapoints[z]
@@ -57,7 +57,7 @@ class ExtractedPixelsDataset(Dataset):
                     i = (
                         (
                             x
-                            * constants["SQAURE_GRID_DIMENSION"]
+                            * constants["SQUARE_GRID_DIMENSION"]
                             * n_extracted_datapoints
                         )
                         + (y * n_extracted_datapoints)
@@ -103,7 +103,7 @@ class NeuralModel(nn.Module):
         )
 
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(constants["NEURAL_MODEL_INPUT_SIZE"], 16),
+            nn.Linear(constants["NEURAL_INPUT_SIZE"], 16),
             nn.ELU(),
             nn.Linear(16, 16),
             nn.ELU(),
@@ -181,7 +181,7 @@ def train_neural_model(
         scheduler.step()
         current_lr = optimizer.state_dict()["param_groups"][0]["lr"]
         loss = running_loss / (
-            constants["SQAURE_GRID_DIMENSION"] * constants["SQAURE_GRID_DIMENSION"]
+            constants["SQUARE_GRID_DIMENSION"] * constants["SQUARE_GRID_DIMENSION"]
         )
         print(f"Epoch {epoch + 1}, L1 loss: {loss}, lr: {current_lr}")
 

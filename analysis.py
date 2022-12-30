@@ -244,7 +244,7 @@ def main():
         )
 
     # Interpolate data from extracted if necessary
-    if interpolation_mode != 4 and inputInterpolatedData(interpolated_data_file_path):
+    if interpolation_mode != 4 and interpolation_mode != 6 and inputInterpolatedData(interpolated_data_file_path):
         interpolated_data = interpolate_data(
             extracted_data,
             interpolation_mode,

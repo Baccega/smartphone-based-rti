@@ -18,8 +18,8 @@ from constants import constants
 
 def selectTestLights(n, data):
     test_data = [
-        [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
-        for i in range(constants["SQAURE_GRID_DIMENSION"])
+        [[] * constants["SQUARE_GRID_DIMENSION"]] * constants["SQUARE_GRID_DIMENSION"]
+        for i in range(constants["SQUARE_GRID_DIMENSION"])
     ]
 
     # For each point to extract
@@ -31,8 +31,8 @@ def selectTestLights(n, data):
         choosen_light_x = choosen_light_str.split("|")[0]
         choosen_light_y = choosen_light_str.split("|")[1]
 
-        for x in range(constants["SQAURE_GRID_DIMENSION"]):
-            for y in range(constants["SQAURE_GRID_DIMENSION"]):
+        for x in range(constants["SQUARE_GRID_DIMENSION"]):
+            for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 data_point = {choosen_light_str: data[x][y][choosen_light_str]}
                 # If data[x][y] exists: update
                 if type(test_data[x][y]) is dict:
@@ -66,8 +66,8 @@ def extractCoinDataFromVideos(static_video_path, moving_video_path, debug_mode):
 
     # Prepare data structure
     data = [
-        [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
-        for i in range(constants["SQAURE_GRID_DIMENSION"])
+        [[] * constants["SQUARE_GRID_DIMENSION"]] * constants["SQUARE_GRID_DIMENSION"]
+        for i in range(constants["SQUARE_GRID_DIMENSION"])
     ]
 
     max_frames = min(
@@ -183,8 +183,8 @@ def extractCoinDataFromVideos(static_video_path, moving_video_path, debug_mode):
 
 def extractSynthDataFromFolder(folder_path, light_directions_file_path):
     data = [
-        [[] * constants["SQAURE_GRID_DIMENSION"]] * constants["SQAURE_GRID_DIMENSION"]
-        for i in range(constants["SQAURE_GRID_DIMENSION"])
+        [[] * constants["SQUARE_GRID_DIMENSION"]] * constants["SQUARE_GRID_DIMENSION"]
+        for i in range(constants["SQUARE_GRID_DIMENSION"])
     ]
 
     light_directions_file = open(light_directions_file_path, "r")
@@ -206,13 +206,13 @@ def extractSynthDataFromFolder(folder_path, light_directions_file_path):
             image = cv.resize(
                 full_res_image,
                 (
-                    constants["SQAURE_GRID_DIMENSION"],
-                    constants["SQAURE_GRID_DIMENSION"],
+                    constants["SQUARE_GRID_DIMENSION"],
+                    constants["SQUARE_GRID_DIMENSION"],
                 ),
             )
 
-            for x in range(constants["SQAURE_GRID_DIMENSION"]):
-                for y in range(constants["SQAURE_GRID_DIMENSION"]):
+            for x in range(constants["SQUARE_GRID_DIMENSION"]):
+                for y in range(constants["SQUARE_GRID_DIMENSION"]):
                     key = "{}|{}".format(
                         light_dir_x,
                         light_dir_y,
