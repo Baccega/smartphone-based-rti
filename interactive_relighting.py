@@ -16,6 +16,10 @@ from utils import (
     loadDataFile,
     fromIndexToLightDir,
 )
+from interpolation import (
+    getPCAModelInterpolationFunction,
+    getNeuralModelInterpolationFunction,
+)
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(42)
@@ -46,7 +50,9 @@ def mouse_click(event, x, y, flags, param):
         isDragging = False
 
 
-def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_datapoints_file_path):
+def mainPreComputed(
+    interpolated_data_file_path, datapoints_file_path, test_datapoints_file_path
+):
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
@@ -61,7 +67,9 @@ def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_data
     test_datapoints = loadDataFile(test_datapoints_file_path)
 
     cv.namedWindow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"])
-    lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
+    lightDirectionFrame = createLightDirectionFrame(
+        [dirX, dirY], datapoints, test_datapoints
+    )
     cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
 
     data = loadDataFile(interpolated_data_file_path)
@@ -72,7 +80,9 @@ def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_data
             for x in range(constants["SQUARE_GRID_DIMENSION"]):
                 for y in range(constants["SQUARE_GRID_DIMENSION"]):
                     frame[x][y] = max(0, min(255, data[dirX][dirY][x][y]))
-            lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
+            lightDirectionFrame = createLightDirectionFrame(
+                [dirX, dirY], datapoints, test_datapoints
+            )
             prevDirX = dirX
             prevDirY = dirY
 
@@ -85,7 +95,13 @@ def mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_data
     cv.destroyAllWindows()
 
 
-def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, test_datapoints_file_path):
+def mainRealTime(
+    interpolation_mode,
+    model_path,
+    pca_data_file_path,
+    datapoints_file_path,
+    test_datapoints_file_path,
+):
     global dirX, dirY, prevDirX, prevDirY
     frame = np.zeros(
         shape=[
@@ -103,54 +119,38 @@ def mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, te
     lightDirectionFrame = createLightDirectionFrame([dirX, dirY], test_datapoints)
     cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
 
-    print("Neural model: " + neural_model_path)
-    pca_data = loadDataFile(pca_data_file_path)
-    gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
-    model = NeuralModel(gaussian_matrix)
-    model.load_state_dict(torch.load(neural_model_path))
-    model.eval()
+    if interpolation_mode == 4:
+        get_interpolation_function = (
+            "PCAModel",
+            getPCAModelInterpolationFunction(pca_data_file_path, model_path)[1],
+        )
+    if interpolation_mode == 6:
+        get_interpolation_function = (
+            "NeuralModel",
+            getNeuralModelInterpolationFunction(model_path)[1],
+        )
 
-    # Initialize inputs
-    inputs = torch.empty(
-        (constants["SQUARE_GRID_DIMENSION"] * constants["SQUARE_GRID_DIMENSION"], 10),
-        dtype=torch.float64,
-    )
-    normalizedDirX = fromIndexToLightDir(dirX)
-    normalizedDirY = fromIndexToLightDir(dirY)
-    for x in range(constants["SQUARE_GRID_DIMENSION"]):
-        for y in range(constants["SQUARE_GRID_DIMENSION"]):
-            i = y + (x * constants["SQUARE_GRID_DIMENSION"])
-            inputs[i] = torch.cat(
-                (
-                    torch.tensor(pca_data[x][y]),
-                    torch.tensor(
-                        [
-                            normalizedDirX,
-                            normalizedDirY,
-                        ]
-                    ),
-                ),
-                dim=-1,
-            )
+    (
+        interpolation_function_name,
+        interpolation_function,
+    ) = get_interpolation_function
+
+    print("Neural model: " + model_path)
+    print("Interpolation function: " + interpolation_function_name)
+
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
-            normalizedDirX = fromIndexToLightDir(dirX)
-            normalizedDirY = fromIndexToLightDir(dirY)
+            outputs = interpolation_function(dirX, dirY)
 
             for x in range(constants["SQUARE_GRID_DIMENSION"]):
                 for y in range(constants["SQUARE_GRID_DIMENSION"]):
                     i = y + (x * constants["SQUARE_GRID_DIMENSION"])
-                    inputs[i][8] = normalizedDirX
-                    inputs[i][9] = normalizedDirY
+                    frame[x][y] = outputs[i]
 
-            inputs = inputs.to(device)
-            outputs = model(inputs)
-            for x in range(constants["SQUARE_GRID_DIMENSION"]):
-                for y in range(constants["SQUARE_GRID_DIMENSION"]):
-                    i = y + (x * constants["SQUARE_GRID_DIMENSION"])
-                    frame[x][y] = outputs[i].item()
-            lightDirectionFrame = createLightDirectionFrame([dirX, dirY], datapoints, test_datapoints)
+            lightDirectionFrame = createLightDirectionFrame(
+                [dirX, dirY], datapoints, test_datapoints
+            )
             prevDirX = dirX
             prevDirY = dirY
 
@@ -211,7 +211,21 @@ if __name__ == "__main__":
                 "You need to run the analysis before the interactive relighting on this coin!"
             )
         )
-    if interpolation_mode != 4 and (not os.path.exists(interpolated_data_file_path)):
+    if interpolation_mode == 6 and (
+        (not os.path.exists(neural_model_path))
+        or (not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"]))
+        or (not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"]))
+    ):
+        raise (
+            Exception(
+                "You need to run the analysis before the interactive relighting on this coin!"
+            )
+        )
+    if (
+        interpolation_mode != 4
+        and interpolation_mode != 6
+        and (not os.path.exists(interpolated_data_file_path))
+    ):
         raise (
             Exception(
                 "You need to run the analysis before the interactive relighting on this coin!"
@@ -224,9 +238,17 @@ if __name__ == "__main__":
         )
     )
 
-    if interpolation_mode == 4:
-        mainRealTime(neural_model_path, pca_data_file_path, datapoints_file_path, test_datapoints_file_path)
+    if interpolation_mode == 4 or interpolation_mode == 6:
+        mainRealTime(
+            interpolation_mode,
+            neural_model_path,
+            pca_data_file_path,
+            datapoints_file_path,
+            test_datapoints_file_path,
+        )
     else:
-        mainPreComputed(interpolated_data_file_path, datapoints_file_path, test_datapoints_file_path)
+        mainPreComputed(
+            interpolated_data_file_path, datapoints_file_path, test_datapoints_file_path
+        )
 
     print("All Done!")

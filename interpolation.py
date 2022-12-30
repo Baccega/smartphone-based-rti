@@ -126,7 +126,40 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
             outputs = model(inputs)
             return outputs
 
-    return interpolate
+    def interpolateImage(dirX, dirY):
+        with torch.no_grad():
+            inputs = torch.empty(
+                (
+                    constants["SQUARE_GRID_DIMENSION"]
+                    * constants["SQUARE_GRID_DIMENSION"],
+                    10,
+                ),
+                dtype=torch.float64,
+            )
+
+            inputs = inputs.to(device)
+            normalizedDirX = fromIndexToLightDir(dirX)
+            normalizedDirY = fromIndexToLightDir(dirY)
+
+            for x in range(N):
+                for y in range(N):
+                    inputs[(x * N) + y] = torch.cat(
+                        (
+                            torch.tensor(pca_data[x][y]),
+                            torch.tensor(
+                                [
+                                    normalizedDirX,
+                                    normalizedDirY,
+                                ]
+                            ),
+                        ),
+                        dim=-1,
+                    )
+
+            outputs = model(inputs)
+            return outputs
+
+    return interpolate, interpolateImage
 
 
 def getNeuralModelInterpolationFunction(model_path):
@@ -169,7 +202,44 @@ def getNeuralModelInterpolationFunction(model_path):
             outputs = model(inputs)
             return outputs
 
-    return interpolate
+    def interpolateImage(dirX, dirY):
+        with torch.no_grad():
+            inputs = torch.empty(
+                (
+                    constants["SQUARE_GRID_DIMENSION"]
+                    * constants["SQUARE_GRID_DIMENSION"],
+                    4,
+                ),
+                dtype=torch.float64,
+            )
+
+            inputs = inputs.to(device)
+
+            normalizedDirX = fromIndexToLightDir(dirX)
+            normalizedDirY = fromIndexToLightDir(dirY)
+
+            for x in range(N):
+                normalized_x = normalizeXY(x)
+                for y in range(N):
+                    normalized_y = normalizeXY(y)
+                    inputs[(x * N) + y] = torch.cat(
+                        (
+                            torch.tensor(
+                                [
+                                    normalized_x,
+                                    normalized_y,
+                                    normalizedDirX,
+                                    normalizedDirY,
+                                ]
+                            ),
+                        ),
+                        dim=-1,
+                    )
+
+            outputs = model(inputs)
+            return outputs
+
+    return interpolate, interpolateImage
 
 
 def interpolate_data(data, mode, model_path, pca_data_file_path):

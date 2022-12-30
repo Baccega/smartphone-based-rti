@@ -61,12 +61,12 @@ def analyze_data(
     if interpolation_mode == 3 or interpolation_mode == 4:
         get_interpolation_function = (
             "PCAModel",
-            getPCAModelInterpolationFunction(pca_data_file_path, model_path),
+            getPCAModelInterpolationFunction(pca_data_file_path, model_path)[0],
         )
     if interpolation_mode == 5 or interpolation_mode == 6:
         get_interpolation_function = (
             "NeuralModel",
-            getNeuralModelInterpolationFunction(model_path),
+            getNeuralModelInterpolationFunction(model_path)[0],
         )
 
     comparison_functions = [("SSIM", SSIM), ("PSNR", PSNR), ("L1", L1)]
