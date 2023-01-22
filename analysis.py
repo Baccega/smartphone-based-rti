@@ -41,8 +41,10 @@ def saveDatapointsToFile(path, data):
     keys = list(data[0][0].keys())
     light_directions_x = [i.split("|")[0] for i in keys]
     light_directions_y = [i.split("|")[1] for i in keys]
-    for i in range(len(light_directions_x)):
+    for i in range(1):
         datapoints.append((int(light_directions_x[i]), int(light_directions_y[i])))
+    # for i in range(len(light_directions_x)):
+    #     datapoints.append((int(light_directions_x[i]), int(light_directions_y[i])))
 
     # Save to file
     writeDataFile(path, datapoints)
@@ -233,8 +235,17 @@ def main():
             writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"], gaussian_matrix_xy)
             writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"], gaussian_matrix_uv)
         else:
-            gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
-            gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
+            print("FORCED RE-GENERATIONS, {}, {}".format(constants["NEURAL_SIGMA_XY"], constants["NEURAL_SIGMA_UV"]))
+            gaussian_matrix_xy = generateGaussianMatrix(
+                0, torch.tensor(constants["NEURAL_SIGMA_XY"]), constants["NEURAL_H"]
+            )
+            gaussian_matrix_uv = generateGaussianMatrix(
+                0, torch.tensor(constants["NEURAL_SIGMA_UV"]), constants["NEURAL_H"]
+            )
+            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"], gaussian_matrix_xy)
+            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"], gaussian_matrix_uv)
+            # gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
+            # gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
 
         train_neural_model(
             model_path,

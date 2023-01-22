@@ -37,10 +37,10 @@ constants = {
     # ---  NEURAL MODEL CONSTANTS
     "NEURAL_BATCH_SIZE": 64,
     "NEURAL_LEARNING_RATE": 0.0001,
-    "NEURAL_N_EPOCHS": 40,
+    "NEURAL_N_EPOCHS": 3,
     "NEURAL_H": 10,
     "NEURAL_SIGMA_XY": 0.3,
-    "NEURAL_SIGMA_UV": 0.3,
+    "NEURAL_SIGMA_UV": 100.0,
     "NEURAL_INPUT_SIZE": (4 * 10),  # (4 * H)
     "GAUSSIAN_MATRIX_FILE_PATH_XY": "data/gaussian_matrix_xy.npz",
     "GAUSSIAN_MATRIX_FILE_PATH_UV": "data/gaussian_matrix_uv.npz",

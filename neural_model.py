@@ -46,7 +46,7 @@ class ExtractedPixelsDataset(Dataset):
             normalized_x = normalizeXY(x)
             for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 normalized_y = normalizeXY(y)
-                for z in range(n_extracted_datapoints):
+                for z in range(1):
                     lightDirection = extracted_datapoints[z]
                     light_direction_x = float(
                         fromIndexToLightDir(lightDirection.split("|")[0])
@@ -77,6 +77,37 @@ class ExtractedPixelsDataset(Dataset):
                         ),
                         dim=-1,
                     )
+                # for z in range(n_extracted_datapoints):
+                #     lightDirection = extracted_datapoints[z]
+                #     light_direction_x = float(
+                #         fromIndexToLightDir(lightDirection.split("|")[0])
+                #     )
+                #     light_direction_y = float(
+                #         fromIndexToLightDir(lightDirection.split("|")[1])
+                #     )
+                #     i = (
+                #         (
+                #             x
+                #             * constants["SQUARE_GRID_DIMENSION"]
+                #             * n_extracted_datapoints
+                #         )
+                #         + (y * n_extracted_datapoints)
+                #         + z
+                #     )
+                #     self.data[i] = torch.cat(
+                #         (
+                #             torch.tensor(
+                #                 [
+                #                     normalized_x,
+                #                     normalized_y,
+                #                     light_direction_x,
+                #                     light_direction_y,
+                #                 ]
+                #             ),
+                #             torch.tensor([extracted_data[x][y][lightDirection]]),
+                #         ),
+                #         dim=-1,
+                #     )
 
     def __len__(self):
         return len(self.data)
@@ -115,10 +146,10 @@ class NeuralModel(nn.Module):
         )
 
     def forward(self, x):
-        position = (6.283185 * (x[:, :2] @ self.gaussian_matrix_xy)).clone().detach()
+        position = (6.283185 * (x[:, :2] @ self.gaussian_matrix_xy))
         position = torch.cat([torch.cos(position), torch.sin(position)], dim=-1)
 
-        light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix_uv)).clone().detach()
+        light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix_uv))
         light = torch.cat([torch.cos(light), torch.sin(light)], dim=-1)
         x = torch.cat([position, light], dim=-1).float()
         out = self.linear_relu_stack(x)
@@ -193,7 +224,7 @@ def train_neural_model(
 
 
 def main():
-    print("PCA model training")
+    print("Neural model training")
 
     coin = inputCoin()
     (

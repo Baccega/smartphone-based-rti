@@ -117,7 +117,9 @@ def mainRealTime(
 
     cv.namedWindow(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"])
     lightDirectionFrame = createLightDirectionFrame([dirX, dirY], test_datapoints)
-    cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
+    # cv.setMouseCallback(constants["INPUT_LIGHT_DIRECTION_WINDOW_TITLE"], mouse_click)
+
+    dirX, dirY = datapoints[0][0], datapoints[0][1]
 
     if interpolation_mode == 4:
         get_interpolation_function = (
