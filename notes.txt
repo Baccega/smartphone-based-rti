@@ -1,0 +1,247 @@
+
+Domanda 3: Come si calcola K?
+
+K = PCA delle intensità del pixel? quindi indipendente dalla light direction? si
+
+Domanda 2: gaussiana implementata correttamente? si
+
+Domanda 3: Devo fare una trasformazione o metto tutto nel getItem del dataset? mettere layer fittizio (foto)
+
+Domanda 4: MAE loss = L1Loss? si
+
+Domanda 5: split dataset serve? no
+
+
+pca(matrix N x ) sklearn decomposition PCA 
+
+
+
+PCA(8)
+
+
+reshape(h * w, 1000) -> fit_transform(width * height, n_extracted_features) -> reshape(h,w,8)
+
+non serve accuracy 
+
+
+
+togliere alcuni dati e poi usarli come test alla fine. 
+
+
+visualizzare immagini risultato della pca 
+
+
+
+layer custom  
+
+neuralRTI
+
+
+moltiplica * 2 PI    (con 0.3 di std)
+
+
+
+------------
+
+In che formato deve essere la direzione della luce? -1 ... +1 ?
+
+
+
+TODO:
+
+fix light direction **
+
+interpolazione in real time ** 
+
+cambiare la finestra di direzione della luce, aggiungendo i punti di training che uso e ingrandendola **
+
+
+loss < 255 
+
+-----------------
+
+provare ad usare il dataset sintetico 
+
+synthRTI 
+realRTI
+
+neuralRTI (Github)(articolo citato e consigliato )(autoencoder invece che PCA)
+
+
+provo a cercare altri dataset 
+
+
+
+scarica dataset
+faccio andare il mio codice con il nuovo dataset 
+
+dividi train e test
+posso scartare la z delle direzioni della luce 
+funzioni per calcolare l'errore del test (SSIM (structural similarity, la trovo implementata in teoria), PSNR (signal to noise ratio, la posso fare a mano), L1 ..., guardare paper)
+
+fn (modello, test, ground truth)-> {
+    output = modello(test)
+    return confronto(output, ground truth)
+}
+
+stai attento al valore dell'intensità dell'immagine (alcuni algoritmi assumono che i valori valnno fino ad 1 e non fino a 255)
+
+
+v3.0:
+
+proiettare anche le coordinate, oltre che per la luce (stessa formula con sin e cos)
+
+prova con poche immagini all'inizio
+provo a vedere come va con le immagini con cui faccio il training
+grayscale
+
+fare image regression aggiungendo la direzione della luce (guarda paper di google, che spiega come le proiezioni di forier migliorano i risultati)
+
+
+TODO v2.0:
+- Supportare nuovo dataset **
+- Dividere train e validation **
+    - Togliere intorno nel dataset delle monete
+- Aggiungere funzioni generiche per il calcolo dell'errore **
+
+
+-------
+
+v2.0: 
+
+Dovrebbe avere da 4 a 7 di loss **
+Probabilmente il dataset non è corretto ** 
+Mi invierà il dataset dei dati estratti dalle monete TODO
+
+SSIM: utilizzare il kernel di default (11 o 7)
+
+v3.0:
+
+Usare 2 matrici gaussina diverse per x,y e u,v (con sigma diversi) **
+Inizio usando lo stesso sigma. **
+Normalizzo x,y in modo che i valori vadano da -1 ad 1 e non da 0 a 200 **
+
+Si può provare ad aggiungere fc layer per migliorare i risultati
+Usare dati sintetici per questo modello 
+
+TODO: Fix interpolation mode 5
+
+
+v3.0 Results on Synth:
+
+LOSS: L1
+5 Linear, 4 Elu
+
+NEURAL_SIGMA_XY: 0.3 
+NEURAL_SIGMA_UV: 0.3
+NEURAL_H: 10
+NEURAL_BATCH_SIZE: 64,
+NEURAL_LEARNING_RATE: 0.0001,
+NEURAL_N_EPOCHS: 40,
+
+Max loss value: 20.36
+Min loss value: 15.11
+Final loss value: 15.11
+
+SSIM: 0.43 
+PSNR: 19.67
+L1: 21.29
+
+------------------------------
+...baseline
+NEURAL_SIGMA_XY: 0.4
+
+SSIM: 0.43
+PSNR: 19.61
+L1: 21.24
+
+------------------------------
+NEURAL_N_EPOCHS: 10
+
+
+
+
+Implicit neural representation 
+
+alzare sigma di tanto (uv troppo basso )
+provare sigma: 10 
+probabilmente quelle trainate bene, quenne nuove non tanto 
+
+non dare sequenza di pixel (u e v sempre casuali) (controllare dataloader, mescolare dataset ogni 10 iterazioni?)
+
+sensibile al numero di immagini in training 
+provare a trainare con pochissime immagini (5)(1, dovrebbe venire perfetto per indovinare sigma di uv)
+
+in futuro loss 
+
+
+troppo grana, troppo poco sfocata
+
+
+
+devo scriverlo come se il vostro paper non esistesse? (abbiamo creato dei video, abbiamo ...)
+perché tante cose sarebbero super simili 
+
+oppure posso dire che i video vengono da voi? 
+
+quanti dettagli riguardo l'implementazione? 
+
+lunghezza tesi? dipende
+
+studio aggiuntivo su un paper recente 
+
+parte introduttiva (prendo spunto dall'intro del paper), trovo in letteratura articoli 
+learning based e non learning based, dome di luci, quelli con la pallina??? 
+
+marker, camera, homography, calaibration, 
+haruko marker, ...
+
+5 pagine introduzione 
+
+Implicit neural representation si può espandere benissimo (scholar)
+
+CVPR ICCV ECCV GOCV  IJCV 
+impact factor su google scholar (8+ molto buono)
+
+tirocinio? carte da firmare?
+
+----------------------------------------------------------------
+
+NEURAL_SIGMA_XY: 1.0 
+NEURAL_SIGMA_UV: 10.0
+NEURAL_H: 10
+NEURAL_BATCH_SIZE: 64,
+NEURAL_LEARNING_RATE: 0.0001,
+NEURAL_N_EPOCHS: 10,
+
+Max loss value: 25.16
+Min loss value: 15.57
+Final loss value: 15.57
+
+SSIM: 0.34
+PSNR: 11.82
+L1: 66.98
+----------------------------------------------------------------
+...prec
+NEURAL_SIGMA_XY: 0.3
+NEURAL_SIGMA_UV: 5.0
+
+Max loss value: 24.81
+Min loss value: 15.90
+Final loss value: 15.90
+
+SSIM: 0.36
+PSNR: 12.83
+L1: 59.18
+----------------------------------------------------------------
+...prec
+NEURAL_SIGMA_UV: 15.0
+
+Max loss value: 24.81
+Min loss value: 15.90
+Final loss value: 15.90
+
+SSIM: 0.36
+PSNR: 12.83
+L1: 59.18
+
