@@ -203,7 +203,7 @@ Implicit neural representation si può espandere benissimo (scholar)
 CVPR ICCV ECCV GOCV  IJCV 
 impact factor su google scholar (8+ molto buono)
 
-tirocinio? carte da firmare?
+tirocinio? carte da firmare? Bisogna firmare una carta alla fine del tirocinio
 
 ----------------------------------------------------------------
 
@@ -245,3 +245,13 @@ SSIM: 0.36
 PSNR: 12.83
 L1: 59.18
 
+
+
+
+
+Title: On-the-go Reflectance Transformation Imaging with an implicit neural representation
+
+Abstract: 
+Reflectance Transformation Imaging (RTI) is a widely used method that enables the retrieval of reflectance data at a per-pixel level through the acquisition of an object under various lighting conditions. This data can subsequently be utilized to expose surface characteristics and alter the lighting of the object in an interactive manner. However, this technique often necessitates specialized equipment to recover the direction of light from multiple positions, making the procedure inconvenient when executed outside of a laboratory setting.
+To capture the RTI data we used video recordings from two ordinary smartphones, adopting a method proposed by Mara Pistellato and Filippo Bergamasco on "On-the-go Reflectance Transformation Imaging with Ordinary Smartphones".
+We propose to use implicit neural representation to represent inside the neural model the vast amount of data generated with the smartphones, so that we are later on able to use that model in the field and match the performance of other state-of-the-art approaches involving dedicated hardware setups.
