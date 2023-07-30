@@ -94,12 +94,12 @@ class NeuralModel(nn.Module):
 
         self.register_buffer(
             "gaussian_matrix_xy",
-            torch.tensor(gaussian_matrix_xy.astype(np.double)),
+            torch.tensor(gaussian_matrix_xy.astype(np.float32)).to(device),
             persistent=True,
         )
         self.register_buffer(
             "gaussian_matrix_uv",
-            torch.tensor(gaussian_matrix_uv.astype(np.double)),
+            torch.tensor(gaussian_matrix_uv.astype(np.float32)).to(device),
             persistent=True,
         )
 
@@ -113,7 +113,7 @@ class NeuralModel(nn.Module):
             nn.Linear(16, 16),
             nn.ELU(),
             nn.Linear(16, 1),
-        )
+        ).to(device)
 
     def forward(self, x):
         position = (6.283185 * (x[:, :2] @ self.gaussian_matrix_xy)).clone().detach()
@@ -165,8 +165,8 @@ def train_neural_model(
             for i, data in enumerate(tepoch):
                 # get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                inputs = inputs.float().to(device)
+                labels = labels.float().to(device)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()

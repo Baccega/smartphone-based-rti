@@ -101,7 +101,7 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
         with torch.no_grad():
             inputs = torch.empty(
                 (len(missing_light_directions), 10),
-                dtype=torch.float64,
+                dtype=torch.float32,
             )
 
             inputs = inputs.to(device)
@@ -134,7 +134,7 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
                     * constants["SQUARE_GRID_DIMENSION"],
                     10,
                 ),
-                dtype=torch.float64,
+                dtype=torch.float32,
             )
 
             inputs = inputs.to(device)
@@ -173,7 +173,7 @@ def getNeuralModelInterpolationFunction(model_path):
         with torch.no_grad():
             inputs = torch.empty(
                 (len(missing_light_directions), 4),
-                dtype=torch.float64,
+                dtype=torch.float32,
             )
 
             inputs = inputs.to(device)
@@ -210,7 +210,7 @@ def getNeuralModelInterpolationFunction(model_path):
                     * constants["SQUARE_GRID_DIMENSION"],
                     4,
                 ),
-                dtype=torch.float64,
+                dtype=torch.float32,
             )
 
             inputs = inputs.to(device)
@@ -368,7 +368,7 @@ def interpolate_data(data, mode, model_path, pca_data_file_path):
                     for x1 in range(M):
                         inputs = torch.empty(
                             (M, 10),
-                            dtype=torch.float64,
+                            dtype=torch.float32,
                         )
                         normalizedDirX = fromIndexToLightDir(x1)
                         for y1 in range(M):
