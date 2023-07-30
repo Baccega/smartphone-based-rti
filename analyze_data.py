@@ -10,10 +10,12 @@ from interpolation import (
     getPCAModelInterpolationFunction,
     getNeuralModelInterpolationFunction,
 )
+from utils import getPytorchDevice
 
 N = constants["SQUARE_GRID_DIMENSION"]
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = getPytorchDevice()
+
 torch.manual_seed(42)
 
 

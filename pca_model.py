@@ -14,11 +14,12 @@ from utils import (
     getChoosenCoinVideosPaths,
     loadDataFile,
     writeDataFile,
-    fromIndexToLightDir
+    fromIndexToLightDir,
+    getPytorchDevice
 )
 import cv2 as cv
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = getPytorchDevice()
 torch.manual_seed(42)
 
 

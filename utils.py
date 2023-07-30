@@ -319,3 +319,19 @@ def loadDataFile(data_file_path):
     loaded_data = np.load(data_file_path, allow_pickle=True)["arr_0"]
     print("Loaded!")
     return loaded_data
+
+def getPytorchDevice():
+    # Check if CUDA is available
+    if torch.cuda.is_available():
+        print("Using CUDA")
+        device = torch.device("cuda:0")
+    # Check if MPS is available
+    # elif torch.backends.mps.is_available():
+    #     print("Using MPS")
+    #     device = torch.device("mps:0")
+    # Fallback to CPU
+    else:
+        print("Using CPU")
+        device = torch.device("cpu")
+    return device
+        

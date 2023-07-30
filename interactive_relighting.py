@@ -14,14 +14,15 @@ from utils import (
     getChoosenCoinVideosPaths,
     getChoosenSynthPaths,
     loadDataFile,
-    fromIndexToLightDir,
+    getPytorchDevice,
 )
 from interpolation import (
     getPCAModelInterpolationFunction,
     getNeuralModelInterpolationFunction,
 )
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = getPytorchDevice()
+    
 torch.manual_seed(42)
 
 dirX = 0

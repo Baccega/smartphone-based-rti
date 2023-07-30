@@ -8,9 +8,9 @@ from neural_model import NeuralModel
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from constants import constants
-from utils import loadDataFile, fromIndexToLightDir, normalizeXY
+from utils import loadDataFile, fromIndexToLightDir, normalizeXY, getPytorchDevice
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device = getPytorchDevice()
 torch.manual_seed(42)
 
 N = constants["SQUARE_GRID_DIMENSION"]
