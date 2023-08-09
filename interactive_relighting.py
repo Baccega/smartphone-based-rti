@@ -15,6 +15,7 @@ from utils import (
     getChoosenSynthPaths,
     loadDataFile,
     getPytorchDevice,
+    fromLightDirToIndex,
 )
 from interpolation import (
     getPCAModelInterpolationFunction,
@@ -25,10 +26,11 @@ device = getPytorchDevice()
     
 torch.manual_seed(42)
 
-dirX = 0
-dirY = 0
-prevDirX = None
-prevDirY = None
+dirX = fromLightDirToIndex(0.7500)
+dirY = fromLightDirToIndex(-0.4330)
+
+prevDirX = 0
+prevDirY = 0
 isDragging = False
 
 

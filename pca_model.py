@@ -92,7 +92,7 @@ class ExtractedPixelsDataset(Dataset):
                             torch.tensor([extracted_data[x][y][lightDirection]]),
                         ),
                         dim=-1,
-                    )
+                    ).float()
 
     def __len__(self):
         return len(self.data)
@@ -109,7 +109,7 @@ class PCAModel(nn.Module):
 
         self.register_buffer(
             "gaussian_matrix",
-            torch.tensor(gaussian_matrix.astype(np.double)),
+            torch.tensor(gaussian_matrix.astype(np.float32)).to(device),
             persistent=True,
         )
 
@@ -128,7 +128,7 @@ class PCAModel(nn.Module):
     def forward(self, x):
         x_light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix)).clone().detach()
         x_light = torch.cat([torch.cos(x_light), torch.sin(x_light)], dim=-1)
-        x = torch.cat([x[:, :-2], x_light], dim=-1).float()
+        x = torch.cat([x[:, :-2], x_light], dim=-1)
         out = self.linear_relu_stack(x)
         return out
 

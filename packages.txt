@@ -9,3 +9,6 @@ torchvision
 torchaudio
 scikit-learn
 kornia
+gst-plugins-base
+gst-plugins-good
+gstreamer

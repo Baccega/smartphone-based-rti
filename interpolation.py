@@ -367,7 +367,7 @@ def interpolate_data(data, mode, model_path, pca_data_file_path):
                 elif mode == 3:
                     for x1 in range(M):
                         inputs = torch.empty(
-                            (M, 10),
+                            (M, constants["PCA_H"]),
                             dtype=torch.float32,
                         )
                         normalizedDirX = fromIndexToLightDir(x1)
