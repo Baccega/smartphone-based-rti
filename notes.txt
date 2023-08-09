@@ -163,9 +163,9 @@ NEURAL_N_EPOCHS: 10
 
 Implicit neural representation 
 
-alzare sigma di tanto (uv troppo basso )
+alzare sigma di tanto (uv troppo basso)
 provare sigma: 10 
-probabilmente quelle trainate bene, quenne nuove non tanto 
+probabilmente quelle trainate bene, quelle nuove non tanto 
 
 non dare sequenza di pixel (u e v sempre casuali) (controllare dataloader, mescolare dataset ogni 10 iterazioni?)
 
@@ -193,10 +193,10 @@ studio aggiuntivo su un paper recente
 parte introduttiva (prendo spunto dall'intro del paper), trovo in letteratura articoli 
 learning based e non learning based, dome di luci, quelli con la pallina??? 
 
-marker, camera, homography, calaibration, 
+marker, camera, homography, calibration, 
 haruko marker, ...
 
-5 pagine introduzione 
+~5 pagine introduzione 
 
 Implicit neural representation si può espandere benissimo (scholar)
 
@@ -245,13 +245,41 @@ SSIM: 0.36
 PSNR: 12.83
 L1: 59.18
 
+---------
+
+"NEURAL_BATCH_SIZE": 64,
+"NEURAL_LEARNING_RATE": 0.01,
+"NEURAL_N_EPOCHS": 40,
+"NEURAL_H": 10,
+"NEURAL_SIGMA_XY": 1.2,
+"NEURAL_SIGMA_UV": 12.0,
+"NEURAL_INPUT_SIZE": (4 * 10), 
+
+Max loss value: 15.26
+Min loss value: 13.16
+Final loss value: 13.16
+
+NeuralModel - SSIM: 0.35 (20 values)
+NeuralModel - PSNR: 14.49 (20 values)
+NeuralModel - L1: 44.60 (20 values)
+
+--- 
+
+Aumentare la dimensione del modello
+
+La loro idea per continuare:
+Loss divisa in 2 (Una perceptual loss e una l1 loss)
+Perceptual loss -> un altra rete trainata per riconoscere se una foto è "realistica" o no
+
+Gli mando una mail tra pochi giorni.
+Gli dirò che proverò ad andare a Gennaio, ma che se ci mettiamo troppo tempo, ripieghiamo sulla tesi che bisogna solo fare il confronto (non posso perdere questa scadenza).
+
+Rete che hanno usato:
+128, 64, 32, 16, 16, 16 (Relu)
 
 
-
-
-Title: On-the-go Reflectance Transformation Imaging with an implicit neural representation
-
-Abstract: 
-Reflectance Transformation Imaging (RTI) is a widely used method that enables the retrieval of reflectance data at a per-pixel level through the acquisition of an object under various lighting conditions. This data can subsequently be utilized to expose surface characteristics and alter the lighting of the object in an interactive manner. However, this technique often necessitates specialized equipment to recover the direction of light from multiple positions, making the procedure inconvenient when executed outside of a laboratory setting.
-To capture the RTI data we used video recordings from two ordinary smartphones, adopting a method proposed by Mara Pistellato and Filippo Bergamasco on "On-the-go Reflectance Transformation Imaging with Ordinary Smartphones".
-We propose to use implicit neural representation to represent inside the neural model the vast amount of data generated with the smartphones, so that we are later on able to use that model in the field and match the performance of other state-of-the-art approaches involving dedicated hardware setups.
+Tesi:
+Va estesa la parte iniziale, citando molti lavori (che cos`è rti, acquisizione )
+Cos'è l'implicit neural representation, volendo anche spiegare le neural networks.
+All'inizio si cita, la parte dopo 
+aggiungere parte confronti?
