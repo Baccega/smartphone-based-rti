@@ -104,14 +104,18 @@ class NeuralModel(nn.Module):
         )
 
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(constants["NEURAL_INPUT_SIZE"], 16),
-            nn.ELU(),
+            nn.Linear(constants["NEURAL_INPUT_SIZE"], 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, 16),
+            nn.ReLU(),
             nn.Linear(16, 16),
-            nn.ELU(),
-            nn.Linear(16, 16),
-            nn.ELU(),
-            nn.Linear(16, 16),
-            nn.ELU(),
+            nn.ReLU(),
             nn.Linear(16, 1),
         ).to(device)
 
@@ -194,7 +198,7 @@ def train_neural_model(
 
 
 def main():
-    print("PCA model training")
+    print("Neural model training")
 
     coin = inputCoin()
     (
