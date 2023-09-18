@@ -283,3 +283,37 @@ Va estesa la parte iniziale, citando molti lavori (che cos`è rti, acquisizione 
 Cos'è l'implicit neural representation, volendo anche spiegare le neural networks.
 All'inizio si cita, la parte dopo 
 aggiungere parte confronti?
+
+
+----
+
+Forse bisogna clippare i valori tra 0, 255 (o 0,1) per eliminare i buchi
+
+VggLoss -> Valore basso se simili, valore alto se diversi
+Si usa di solito per style transfer
+
+Paper: https://arxiv.org/abs/1603.08155
+
+Cercare su google uno snippet per fare la loss tra due immagini (non farla a mano)
+2 immagini -> numero
+
+Provare a generare un pò di immagini con la direzione della luce di training
+e poi generarle un pò più lontane (sempre peggio) direzione a e b
+(generare 10/20 immagini tra due direzioni della luce)
+
+calcolare perceptual loss rispetto alla direzione della luce più vicina 
+
+più artefatti -> loss alta 
+due immagini vere -> loss bassa 
+
+Usare il modello trainato con almeno le due immagini che uso 
+
+- Leggere articolo
+- Creare test per la perceptual loss:
+    - Trainare modello con immagini di due direzioni della luce
+    - Interpolare 10/20 immagini tra le due direzioni 
+    - Calcolare perceptual loss tra la prima immagine e ogni altra immagine
+- Verificare che la perceptual loss parta basse, si alzi finché ci allontaniamo dalla partenza, e poi ri diminuisce quando ci avviciniamo alla seconda
+
+
+
