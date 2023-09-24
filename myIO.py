@@ -50,7 +50,8 @@ def inputCoin():
     )
 
 def inputSynth():
-    return ("SINGLE", 2, 3)
+    # return ("SINGLE", 2, 3)
+    return ("MULTI", 2, 3)
     # return safeIntInput(
     #     "Select coin (1. Danish 5 krone, 2. British 50 pence, 3. Swiss 1/2 franc, 4. Czechs 20 korun): ",
     #     1,

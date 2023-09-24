@@ -2,10 +2,9 @@ import torch
 import torchvision
 
 from myIO import inputSynth
-from utils import getChoosenSynthPaths
+from utils import getChoosenSynthPaths,get_intermediate_light_directions
 
 N_IN_BETWEEN = 10
-
 
 class VGGPerceptualLoss(torch.nn.Module):
     def __init__(self, resize=True):
@@ -77,7 +76,14 @@ def main():
     ) = getChoosenSynthPaths(synth, 6)
     print("Model path: {}".format(neural_model_path))
 
-    # Get 2 light directions
+    x1, y1 = 0.7500, 0.4330
+    x2, y2 = -0.7500, -0.4330
+
+    points = get_intermediate_light_directions(x1, y1, x2, y2, N_IN_BETWEEN)
+
+    for i, point in enumerate(points, 1):
+        print(f"Point {i}: x = {point[0]:.4f}, y = {point[1]:.4f}")
+
     # Get 10/20 in between directions
     print(N_IN_BETWEEN)
 

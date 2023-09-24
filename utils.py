@@ -335,3 +335,19 @@ def getPytorchDevice():
         device = torch.device("cpu")
     return device
         
+
+def get_intermediate_light_directions(x1, y1, x2, y2, n):
+    # A list to store the interpolated points
+    points = []
+    
+    # Calculate the differences divided by the number of points + 1
+    dx = (x2 - x1) / (n + 1)
+    dy = (y2 - y1) / (n + 1)
+    
+    # Generate the points and add them to the list
+    for i in range(1, n + 1):
+        xi = x1 + i * dx
+        yi = y1 + i * dy
+        points.append((xi, yi))
+        
+    return points
