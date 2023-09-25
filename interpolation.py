@@ -202,7 +202,7 @@ def getNeuralModelInterpolationFunction(model_path):
             outputs = model(inputs)
             return outputs
 
-    def interpolateImage(dirX, dirY):
+    def interpolateImage(dirX, dirY, dir_normalized=False):
         with torch.no_grad():
             inputs = torch.empty(
                 (
@@ -215,8 +215,12 @@ def getNeuralModelInterpolationFunction(model_path):
 
             inputs = inputs.to(device)
 
-            normalizedDirX = fromIndexToLightDir(dirX)
-            normalizedDirY = fromIndexToLightDir(dirY)
+            if dir_normalized:
+                normalizedDirX = dirX
+                normalizedDirY = dirY
+            else:
+                normalizedDirX = fromIndexToLightDir(dirX)
+                normalizedDirY = fromIndexToLightDir(dirY)
 
             for x in range(N):
                 normalized_x = normalizeXY(x)
