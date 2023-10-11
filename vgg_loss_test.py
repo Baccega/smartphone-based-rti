@@ -10,17 +10,18 @@ import matplotlib.pyplot as plt
 from myIO import inputSynth
 from constants import constants
 from interpolation import getNeuralModelInterpolationFunction
-from utils import getChoosenSynthPaths,get_intermediate_light_directions
+from utils import getChoosenSynthPaths, get_intermediate_light_directions
 
 N_IN_BETWEEN = 10
+
 
 def main():
     print("Vgg loss test")
 
     # Define the VGG model
-    vgg_model = models.vgg16(weights='IMAGENET1K_V1').features
+    vgg_model = models.vgg16(weights="IMAGENET1K_V1").features
     vgg_model.eval()
-    
+
     # Load neural model trained on 2 images
     synth = inputSynth()
     (
@@ -39,8 +40,8 @@ def main():
     print("Model path: {}".format(neural_model_path))
 
     # TODO: Get these points dynamically
-    x1, y1 = 0.7500, 0.4330
-    x2, y2 = -0.7500, -0.4330
+    x1, y1 = 0.7500, -0.4330
+    x2, y2 = 0.8529, 0.4924
 
     points = get_intermediate_light_directions(x1, y1, x2, y2, N_IN_BETWEEN)
 
@@ -67,18 +68,30 @@ def main():
     for x in range(constants["SQUARE_GRID_DIMENSION"]):
         for y in range(constants["SQUARE_GRID_DIMENSION"]):
             index = y + (x * constants["SQUARE_GRID_DIMENSION"])
-            frame[x][y] = outputs[index]
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225]
-        )
-    ])
+            frame[x][y] = max(0, min(255, outputs[index]))
+    transform = transforms.Compose(
+        [
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.48235, 0.45882, 0.40784],
+                std=[0.00392156862745098, 0.00392156862745098, 0.00392156862745098],
+            ),
+        ]
+    )
     target_image = Image.fromarray(frame)
     target_image = transform(target_image)
     target_features = vgg_model(target_image.unsqueeze(0))
+
+    cv.imshow(f"Target image", frame)
+
+    outputs = interpolateImage(x2, y2, True)
+    for x in range(constants["SQUARE_GRID_DIMENSION"]):
+        for y in range(constants["SQUARE_GRID_DIMENSION"]):
+            index = y + (x * constants["SQUARE_GRID_DIMENSION"])
+            frame[x][y] = max(0, min(255, outputs[index]))
+
+    cv.imshow(f"Target image 2", frame)
 
     for i, point in enumerate(points, 1):
         frame = np.zeros(
@@ -91,10 +104,10 @@ def main():
         )
         outputs = interpolateImage(point[0], point[1], True)
         for x in range(constants["SQUARE_GRID_DIMENSION"]):
-                for y in range(constants["SQUARE_GRID_DIMENSION"]):
-                    index = y + (x * constants["SQUARE_GRID_DIMENSION"])
-                    frame[x][y] = outputs[index]
-        
+            for y in range(constants["SQUARE_GRID_DIMENSION"]):
+                index = y + (x * constants["SQUARE_GRID_DIMENSION"])
+                frame[x][y] = max(0, min(255, outputs[index]))
+
         # Show image
         cv.imshow(f"Image {i}; {point[0]}, {point[1]}", frame)
 
@@ -103,19 +116,20 @@ def main():
         generated_image = transform(generated_image)
         generated_features = vgg_model(generated_image.unsqueeze(0))
 
-         # Calculate the mean squared error between the features
+        # Calculate the mean squared error between the features
         loss = nn.functional.mse_loss(target_features, generated_features)
         losses.append(loss.item())
 
     # Plot vgg loss for each image
     plt.plot(losses)
-    plt.xlabel('Image')
-    plt.ylabel('Loss')
-    plt.title('VGG Perceptual Loss')
+    plt.xlabel("Image")
+    plt.ylabel("Loss")
+    plt.title("VGG Perceptual Loss")
     plt.show()
 
     print("Done")
     cv.waitKey(0)
+
 
 if __name__ == "__main__":
     main()
