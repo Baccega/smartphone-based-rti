@@ -197,8 +197,8 @@ def extractSynthDataFromFolder(folder_path, light_directions_file_path):
         if count != 0:
             splitted_line = line.split(" ")
             image_path = "{}/{}".format(folder_path, splitted_line[0])
-            light_dir_x = fromLightDirToIndex(float(splitted_line[1]))
-            light_dir_y = fromLightDirToIndex(float(splitted_line[2]) * -1)
+            light_dir_x = float(splitted_line[1])
+            light_dir_y = float(splitted_line[2]) * -1
             # light_dir_z = fromLightDirToIndex(splitted_line[3])
 
             full_res_image = cv.imread(image_path, cv.IMREAD_GRAYSCALE)

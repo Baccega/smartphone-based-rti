@@ -42,10 +42,21 @@ def saveDatapointsToFile(path, data):
     light_directions_x = [i.split("|")[0] for i in keys]
     light_directions_y = [i.split("|")[1] for i in keys]
     for i in range(len(light_directions_x)):
-        datapoints.append((int(light_directions_x[i]), int(light_directions_y[i])))
+        datapoints.append((light_directions_x[i], light_directions_y[i]))
 
     # Save to file
     writeDataFile(path, datapoints)
+# def saveDatapointsToFile(path, data):
+#     # Get Datapoints
+#     datapoints = []
+#     keys = list(data[0][0].keys())
+#     light_directions_x = [i.split("|")[0] for i in keys]
+#     light_directions_y = [i.split("|")[1] for i in keys]
+#     for i in range(len(light_directions_x)):
+#         datapoints.append((int(light_directions_x[i]), int(light_directions_y[i])))
+
+#     # Save to file
+#     writeDataFile(path, datapoints)
 
 
 def coinSubMain(interpolation_mode):

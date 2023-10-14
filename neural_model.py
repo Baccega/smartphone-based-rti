@@ -16,7 +16,7 @@ from utils import (
     writeDataFile,
     fromIndexToLightDir,
     normalizeXY,
-    getPytorchDevice
+    getPytorchDevice,
 )
 import cv2 as cv
 
@@ -49,12 +49,8 @@ class ExtractedPixelsDataset(Dataset):
                 normalized_y = normalizeXY(y)
                 for z in range(n_extracted_datapoints):
                     lightDirection = extracted_datapoints[z]
-                    light_direction_x = float(
-                        fromIndexToLightDir(lightDirection.split("|")[0])
-                    )
-                    light_direction_y = float(
-                        fromIndexToLightDir(lightDirection.split("|")[1])
-                    )
+                    light_direction_x = float(lightDirection.split("|")[0])
+                    light_direction_y = float(lightDirection.split("|")[1])
                     i = (
                         (
                             x
@@ -84,6 +80,8 @@ class ExtractedPixelsDataset(Dataset):
 
     def __getitem__(self, idx):
         input = self.data[idx][:-1]
+
+        # Aggiungere "perturbazione" gaussiano 0.005 alla luce
         label = self.data[idx][-1]
         return input, label
 
