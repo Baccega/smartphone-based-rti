@@ -348,6 +348,6 @@ def get_intermediate_light_directions(x1, y1, x2, y2, n):
     for i in range(1, n + 1):
         xi = x1 + i * dx
         yi = y1 + i * dy
-        points.append((round(xi, 2), round(yi, 2)))
+        points.append((xi, yi))
         
     return points
