@@ -315,5 +315,25 @@ Usare il modello trainato con almeno le due immagini che uso
     - Calcolare perceptual loss tra la prima immagine e ogni altra immagine
 - Verificare che la perceptual loss parta basse, si alzi finché ci allontaniamo dalla partenza, e poi ri diminuisce quando ci avviciniamo alla seconda
 
+---
 
+Togliere round da `get_intermediate_light_directions`
+`get_intermediate_light_directions` dovrebbe usare l'interpolazione linerare in teoria
+controllare segno delle immagini (immagine 10 è simile alla target)
 
+Controllare la loss della target image 2
+
+Dopo ogni epoca:
+    shuffle del dataset (self.data)
+Anzi: getItem con shuffle?
+Check: I primi elementi del dataset dovrebbero avere direzioni della luce diversi
+
+Fare il training con il dataset intero
+
+0.1 UV
+Anche l'alpha di XY (~4)
+
+Magari va ingrandita la rete 
+
+Provare a perturbare la luce 
+(fare il training con un luce = luce + gaussiana con sigma 0.005)
