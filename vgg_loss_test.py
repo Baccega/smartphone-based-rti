@@ -91,6 +91,12 @@ def main():
             index = y + (x * constants["SQUARE_GRID_DIMENSION"])
             frame[x][y] = max(0, min(255, outputs[index]))
 
+    # Add loss from target image 2
+    generated_image = Image.fromarray(frame)
+    generated_image = transform(generated_image)
+    generated_features = vgg_model(generated_image.unsqueeze(0))
+    last_loss = nn.functional.mse_loss(target_features, generated_features).item()
+
     cv.imshow(f"Target image 2", frame)
 
     for i, point in enumerate(points, 1):
@@ -120,11 +126,18 @@ def main():
         loss = nn.functional.mse_loss(target_features, generated_features)
         losses.append(loss.item())
 
+    losses.append(last_loss)
+
     # Plot vgg loss for each image
     plt.plot(losses)
     plt.xlabel("Image")
     plt.ylabel("Loss")
     plt.title("VGG Perceptual Loss")
+
+    x_labels = [str(i) for i in range(1, len(losses))]
+    x_labels.append("(2)")
+    plt.xticks(ticks=range(len(losses)), labels=x_labels)
+
     plt.show()
 
     print("Done")
