@@ -41,7 +41,7 @@ def mouse_click(event, x, y, flags, param):
         global dirX, dirY
         boundedX, boundedY = boundXY(x, y)
         dirX = boundedX
-        dirY = boundedY
+        dirY = boundedY * -1
 
     if not isDragging and event == cv.EVENT_LBUTTONDOWN:
         click()
