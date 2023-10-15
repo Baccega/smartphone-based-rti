@@ -81,7 +81,10 @@ class ExtractedPixelsDataset(Dataset):
     def __getitem__(self, idx):
         input = self.data[idx][:-1]
 
-        # Aggiungere "perturbazione" gaussiano 0.005 alla luce
+        # Add noise to light direction in input
+        noise = np.random.normal(loc=0, scale=0.005)
+        input[2:] += noise
+    
         label = self.data[idx][-1]
         return input, label
 
