@@ -126,7 +126,7 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
             outputs = model(inputs)
             return outputs
 
-    def interpolateImage(dirX, dirY):
+    def interpolateImage(dirX, dirY, dir_normalized=False):
         with torch.no_grad():
             inputs = torch.empty(
                 (
@@ -138,8 +138,12 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
             )
 
             inputs = inputs.to(device)
-            normalizedDirX = fromIndexToLightDir(dirX)
-            normalizedDirY = fromIndexToLightDir(dirY)
+            if dir_normalized:
+                normalizedDirX = dirX
+                normalizedDirY = dirY
+            else:
+                normalizedDirX = fromIndexToLightDir(dirX)
+                normalizedDirY = fromIndexToLightDir(dirY)
 
             for x in range(N):
                 for y in range(N):

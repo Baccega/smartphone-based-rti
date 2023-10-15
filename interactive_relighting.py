@@ -144,7 +144,7 @@ def mainRealTime(
     flag = True
     while flag:
         if prevDirX != dirX or prevDirY != dirY:
-            outputs = interpolation_function(dirX, dirY)
+            outputs = interpolation_function(dirX, dirY, True)
 
             for x in range(constants["SQUARE_GRID_DIMENSION"]):
                 for y in range(constants["SQUARE_GRID_DIMENSION"]):

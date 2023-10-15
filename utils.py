@@ -210,6 +210,15 @@ def getCameraIntrinsics(calibration_file_path):
     return intrinsics_matrix, distortion_matrix
 
 
+def denormalize(value):
+    """
+    De-normalize a value from the range [-1, +1] to [0, constants["LIGHT_DIRECTION_WINDOW_SIZE"]].
+    """
+    return math.floor(
+        ((float(value) + 1) / 2) * constants["LIGHT_DIRECTION_WINDOW_SIZE"] * SCALE
+    )
+
+
 def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]):
     """
     Create a frame to show light direction to user
@@ -224,14 +233,10 @@ def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]
     )
 
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] * SCALE / 2)
-
     cv.line(
         blank_image,
         (half_size, half_size),
-        (
-            light_direction[0] * SCALE,
-            light_direction[1] * SCALE,
-        ),
+        (denormalize(light_direction[0]), denormalize(light_direction[1] * -1)),
         (255, 255, 255),
     )
     cv.circle(
@@ -245,7 +250,7 @@ def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]
         for i in range(len(datapoints)):
             blank_image = cv.circle(
                 blank_image,
-                (datapoints[i][0] * SCALE, datapoints[i][1] * SCALE),
+                (denormalize(datapoints[i][0]), denormalize(datapoints[i][1])),
                 radius=0,
                 color=(0, 255, 0),
                 thickness=-1,
@@ -254,7 +259,10 @@ def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]
         for i in range(len(test_datapoints)):
             blank_image = cv.circle(
                 blank_image,
-                (test_datapoints[i][0] * SCALE, test_datapoints[i][1] * SCALE),
+                (
+                    denormalize(test_datapoints[i][0]),
+                    denormalize(test_datapoints[i][1]),
+                ),
                 radius=0,
                 color=(0, 0, 255),
                 thickness=-1,
@@ -273,7 +281,10 @@ def boundXY(x, y):
     if (x - half_size) * (x - half_size) + (y - half_size) * (y - half_size) <= (
         half_size * half_size
     ):
-        return (x, y)
+        return (
+            (x / constants["LIGHT_DIRECTION_WINDOW_SIZE"]) * 2 - 1,
+            (y / constants["LIGHT_DIRECTION_WINDOW_SIZE"]) * 2 - 1,
+        )
     else:
         print("OUTSIDE!")
         return (half_size, half_size)
@@ -293,6 +304,7 @@ def fromIndexToLightDir(index):
     """
     half_size = int(constants["LIGHT_DIRECTION_WINDOW_SIZE"] / 2)
     return np.around((int(index) - half_size) / half_size, decimals=2)
+
 
 def normalizeXY(index):
     """
@@ -320,6 +332,7 @@ def loadDataFile(data_file_path):
     print("Loaded!")
     return loaded_data
 
+
 def getPytorchDevice():
     # Check if CUDA is available
     if torch.cuda.is_available():
@@ -334,20 +347,20 @@ def getPytorchDevice():
         print("Using CPU")
         device = torch.device("cpu")
     return device
-        
+
 
 def get_intermediate_light_directions(x1, y1, x2, y2, n):
     # A list to store the interpolated points
     points = []
-    
+
     # Calculate the differences divided by the number of points + 1
     dx = (x2 - x1) / (n + 1)
     dy = (y2 - y1) / (n + 1)
-    
+
     # Generate the points and add them to the list
     for i in range(1, n + 1):
         xi = x1 + i * dx
         yi = y1 + i * dy
         points.append((xi, yi))
-        
+
     return points
