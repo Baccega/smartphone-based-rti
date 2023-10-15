@@ -26,8 +26,8 @@ device = getPytorchDevice()
     
 torch.manual_seed(42)
 
-dirX = fromLightDirToIndex(0.7500)
-dirY = fromLightDirToIndex(-0.4330)
+dirX = 0.7500
+dirY = 0.4330
 
 prevDirX = 0
 prevDirY = 0
