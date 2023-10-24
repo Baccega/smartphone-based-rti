@@ -42,7 +42,10 @@ def mouse_click(event, x, y, flags, param):
         boundedX, boundedY = boundXY(x, y)
         dirX = boundedX
         dirY = boundedY * -1
+        print("Light direction: ({}, {})".format(dirX, dirY))
 
+    # if event == cv.EVENT_LBUTTONDOWN:
+    #     click()
     if not isDragging and event == cv.EVENT_LBUTTONDOWN:
         click()
         isDragging = True

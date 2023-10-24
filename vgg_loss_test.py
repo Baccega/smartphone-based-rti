@@ -41,7 +41,8 @@ def main():
 
     # TODO: Get these points dynamically
     x1, y1 = 0.7500, 0.4330
-    x2, y2 = 0.8529, -0.4924
+    # x2, y2 = 0.8529, -0.4924
+    x2, y2 = 0.6113, 0.1986
 
     points = get_intermediate_light_directions(x1, y1, x2, y2, N_IN_BETWEEN)
 

@@ -232,20 +232,29 @@ def main():
     if (interpolation_mode == 5 or interpolation_mode == 6) and inputModelTraining(
         model_path
     ):
-        if not os.path.exists(
-            constants["GAUSSIAN_MATRIX_FILE_PATH_XY"]
-        ) or not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"]):
-            gaussian_matrix_xy = generateGaussianMatrix(
-                0, torch.tensor(constants["NEURAL_SIGMA_XY"]), constants["NEURAL_H"]
-            )
-            gaussian_matrix_uv = generateGaussianMatrix(
-                0, torch.tensor(constants["NEURAL_SIGMA_UV"]), constants["NEURAL_H"]
-            )
-            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"], gaussian_matrix_xy)
-            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"], gaussian_matrix_uv)
-        else:
-            gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
-            gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
+        # if not os.path.exists(
+        #     constants["GAUSSIAN_MATRIX_FILE_PATH_XY"]
+        # ) or not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"]):
+        #     gaussian_matrix_xy = generateGaussianMatrix(
+        #         0, torch.tensor(constants["NEURAL_SIGMA_XY"]), constants["NEURAL_H"]
+        #     )
+        #     gaussian_matrix_uv = generateGaussianMatrix(
+        #         0, torch.tensor(constants["NEURAL_SIGMA_UV"]), constants["NEURAL_H"]
+        #     )
+        #     writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"], gaussian_matrix_xy)
+        #     writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"], gaussian_matrix_uv)
+        # else:
+        #     gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
+        #     gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
+
+        gaussian_matrix_xy = generateGaussianMatrix(
+            0, torch.tensor(constants["NEURAL_SIGMA_XY"]), constants["NEURAL_H"]
+        )
+        gaussian_matrix_uv = generateGaussianMatrix(
+            0, torch.tensor(constants["NEURAL_SIGMA_UV"]), constants["NEURAL_H"]
+        )
+        writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"], gaussian_matrix_xy)
+        writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"], gaussian_matrix_uv)
 
         train_neural_model(
             model_path,

@@ -105,7 +105,9 @@ class NeuralModel(nn.Module):
         )
 
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(constants["NEURAL_INPUT_SIZE"], 256),
+            nn.Linear(constants["NEURAL_INPUT_SIZE"], 512),
+            nn.ReLU(),
+            nn.Linear(512, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
