@@ -337,3 +337,38 @@ Magari va ingrandita la rete
 
 Provare a perturbare la luce 
 (fare il training con un luce = luce + gaussiana con sigma 0.005)
+
+----
+
+Le immagini sono 320x320, influisce qualcosa sul training?
+No, perché diamo i pixel singoli, non l'immagine intera
+
+- Qual'è il valore ottimale di SIGMA_XY (con valori quantitativi, non qualitativi)
+    - PSNR? 
+
+- Quali basi utilizzare. Non è detto che l'espansione Fourier-like sia la migliore per i nostri scopi. Per esempio, ho la sensazione che renda problematica la gestione dei bordi delle immagini
+    - Transformata coseno? 
+    
+
+- Quanto è sensibile all'ordine con cui diamo i dati durante il training. Adesso ad esempio randomizziamo tutto, ma forse usando patch di pixels vicini il risultato potrebbe essere diverso
+
+- Quanto influisce il fatto che forniamo in input sempre gli stessi valori (interi) di XY. E se dessimo anche coordinate sub-pixel?
+
+
+venus
+nvidia 4080
+i9 24 core
+
+ingrandire batch size 
+
+python -m pip .... 
+
+per usare pip dentro l'ambiente
+
+spostare modello in gpu
+
+nvidia-smi
+gpu utilization deve essere alta (quasi 100%)
+attenzione a non usare tutta la memoria della gpu
+
+serve vpn
