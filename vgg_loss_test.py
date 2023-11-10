@@ -12,7 +12,7 @@ from constants import constants
 from interpolation import getNeuralModelInterpolationFunction
 from utils import getChoosenSynthPaths, get_intermediate_light_directions
 
-N_IN_BETWEEN = 10
+N_IN_BETWEEN = 3
 
 
 def main():
@@ -65,7 +65,7 @@ def main():
         ],
         dtype=np.uint8,
     )
-    outputs = interpolateImage(x1, y1, True)
+    outputs = interpolateImage(x1, y1, True).cpu().numpy()
     for x in range(constants["SQUARE_GRID_DIMENSION"]):
         for y in range(constants["SQUARE_GRID_DIMENSION"]):
             index = y + (x * constants["SQUARE_GRID_DIMENSION"])
@@ -86,7 +86,7 @@ def main():
 
     cv.imshow(f"Target image", frame)
 
-    outputs = interpolateImage(x2, y2, True)
+    outputs = interpolateImage(x2, y2, True).cpu().numpy()
     for x in range(constants["SQUARE_GRID_DIMENSION"]):
         for y in range(constants["SQUARE_GRID_DIMENSION"]):
             index = y + (x * constants["SQUARE_GRID_DIMENSION"])
@@ -109,7 +109,7 @@ def main():
             ],
             dtype=np.uint8,
         )
-        outputs = interpolateImage(point[0], point[1], True)
+        outputs = interpolateImage(point[0], point[1], True).cpu().numpy()
         for x in range(constants["SQUARE_GRID_DIMENSION"]):
             for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 index = y + (x * constants["SQUARE_GRID_DIMENSION"])
@@ -139,7 +139,7 @@ def main():
     x_labels.append("(2)")
     plt.xticks(ticks=range(len(losses)), labels=x_labels)
 
-    plt.show()
+    # plt.show()
 
     print("Done")
     cv.waitKey(0)

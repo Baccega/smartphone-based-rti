@@ -40,7 +40,8 @@ class ExtractedPixelsDataset(Dataset):
             * n_extracted_datapoints
         )
         # Length = size of 2 positions + 2 light directions + label
-        self.data = np.empty([total, 2 + 2 + 1])
+        self.data = torch.empty([total, 2 + 2 + 1], dtype=torch.float32)
+        # self.data = np.empty([total, 2 + 2 + 1])
 
         print("Preparing dataset data")
         for x in tqdm(range(constants["SQUARE_GRID_DIMENSION"])):
@@ -95,12 +96,12 @@ class NeuralModel(nn.Module):
 
         self.register_buffer(
             "gaussian_matrix_xy",
-            torch.tensor(gaussian_matrix_xy.astype(np.float32)).to(device),
+            torch.tensor(gaussian_matrix_xy.astype(np.float32)),
             persistent=True,
         )
         self.register_buffer(
             "gaussian_matrix_uv",
-            torch.tensor(gaussian_matrix_uv.astype(np.float32)).to(device),
+            torch.tensor(gaussian_matrix_uv.astype(np.float32)),
             persistent=True,
         )
 
@@ -108,6 +109,8 @@ class NeuralModel(nn.Module):
             nn.Linear(constants["NEURAL_INPUT_SIZE"], 512),
             nn.ReLU(),
             nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
@@ -120,7 +123,7 @@ class NeuralModel(nn.Module):
             nn.Linear(16, 16),
             nn.ReLU(),
             nn.Linear(16, 1),
-        ).to(device)
+        )
 
     def forward(self, x):
         position = (6.283185 * (x[:, :2] @ self.gaussian_matrix_xy)).clone().detach()
@@ -128,7 +131,7 @@ class NeuralModel(nn.Module):
 
         light = (6.283185 * (x[:, -2:] @ self.gaussian_matrix_uv)).clone().detach()
         light = torch.cat([torch.cos(light), torch.sin(light)], dim=-1)
-        x = torch.cat([position, light], dim=-1).float()
+        x = torch.cat([position, light], dim=-1)
         out = self.linear_relu_stack(x)
         return out
 
@@ -146,12 +149,13 @@ def train_neural_model(
     model = NeuralModel(
         gaussian_matrix_xy=gaussian_matrix_xy, gaussian_matrix_uv=gaussian_matrix_uv
     )
+    model = model.to(device)
 
     dataset = ExtractedPixelsDataset(
         extracted_data_file_path, extracted_data=extracted_data
     )
     dataloader = DataLoader(
-        dataset, batch_size=constants["NEURAL_BATCH_SIZE"], shuffle=True
+        dataset, batch_size=constants["NEURAL_BATCH_SIZE"], shuffle=True, num_workers=4
     )
 
     # Mean Absolute Error
@@ -159,7 +163,7 @@ def train_neural_model(
 
     optimizer = optim.Adam(model.parameters(), lr=constants["NEURAL_LEARNING_RATE"])
 
-    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.1)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=15, gamma=0.1)
 
     print("Starting training:")
 

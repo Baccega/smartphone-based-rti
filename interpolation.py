@@ -94,6 +94,7 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
     pca_data = loadDataFile(pca_data_file_path)
     gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
     model = PCAModel(gaussian_matrix)
+    model = model.to(device)
     model.load_state_dict(torch.load(pca_model_path))
     model.eval()
 
@@ -121,7 +122,7 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
                         ),
                     ),
                     dim=-1,
-                )
+                ).to(device)
 
             outputs = model(inputs)
             return outputs
@@ -158,7 +159,7 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
                             ),
                         ),
                         dim=-1,
-                    )
+                    ).to(device)
 
             outputs = model(inputs)
             return outputs
@@ -170,6 +171,7 @@ def getNeuralModelInterpolationFunction(model_path):
     gaussian_matrix_xy = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_XY"])
     gaussian_matrix_uv = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH_UV"])
     model = NeuralModel(gaussian_matrix_xy, gaussian_matrix_uv)
+    model = model.to(device)
     model.load_state_dict(torch.load(model_path))
     model.eval()
 
@@ -201,7 +203,7 @@ def getNeuralModelInterpolationFunction(model_path):
                         ),
                     ),
                     dim=-1,
-                )
+                ).to(device)
 
             outputs = model(inputs)
             return outputs

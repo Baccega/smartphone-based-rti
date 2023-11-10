@@ -337,7 +337,7 @@ def getPytorchDevice():
     # Check if CUDA is available
     if torch.cuda.is_available():
         print("Using CUDA")
-        device = torch.device("cuda:0")
+        device = torch.device("cuda")
     # Check if MPS is available
     # elif torch.backends.mps.is_available():
     #     print("Using MPS")

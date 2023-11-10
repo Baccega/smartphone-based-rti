@@ -1,14 +1,11 @@
-opencv
+opencv-python
 scipy
 numpy
 ffmpeg-python
 tqdm
 matplotlib
-pytorch
+torch
 torchvision
 torchaudio
 scikit-learn
 kornia
-gst-plugins-base
-gst-plugins-good
-gstreamer
