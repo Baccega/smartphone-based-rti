@@ -44,6 +44,17 @@ def main():
     # x2, y2 = 0.8529, -0.4924
     x2, y2 = 0.6113, 0.1986
 
+    ground_truth_path = "assets/synthRTI/Single/Object2/material3/Dome/image20.jpg"
+    # Get ground truth image
+    ground_truth_image = cv.imread(ground_truth_path)
+    ground_truth_image = cv.resize(
+        ground_truth_image,
+        (
+            constants["SQUARE_GRID_DIMENSION"],
+            constants["SQUARE_GRID_DIMENSION"],
+        ),
+    )
+
     points = get_intermediate_light_directions(x1, y1, x2, y2, N_IN_BETWEEN)
 
     for i, point in enumerate(points, 1):
@@ -141,9 +152,13 @@ def main():
 
     # plt.show()
 
-    print("Done")
-    cv.waitKey(0)
+    # Show ground truth image
+    cv.imshow("Ground truth", ground_truth_image)
 
+    while cv.waitKey(1) != ord("q"):
+        pass
+
+    print("Done")
 
 if __name__ == "__main__":
     main()
