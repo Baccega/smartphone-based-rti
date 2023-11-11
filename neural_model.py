@@ -84,7 +84,7 @@ class ExtractedPixelsDataset(Dataset):
 
         # Add noise to light direction in input
         noise = np.random.normal(loc=0, scale=0.005)
-        input[2:] += noise
+        # input[2:] += noise
     
         label = self.data[idx][-1]
         return input, label
@@ -106,11 +106,11 @@ class NeuralModel(nn.Module):
         )
 
         self.linear_relu_stack = nn.Sequential(
-            nn.Linear(constants["NEURAL_INPUT_SIZE"], 512),
+            nn.Linear(constants["NEURAL_INPUT_SIZE"], 1024),
+            nn.ReLU(),
+            nn.Linear(1024, 512),
             nn.ReLU(),
             nn.Linear(512, 256),
-            nn.ReLU(),
-            nn.Linear(256, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
             nn.ReLU(),
