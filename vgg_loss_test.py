@@ -141,14 +141,14 @@ def main():
     losses.append(last_loss)
 
     # Plot vgg loss for each image
-    plt.plot(losses)
-    plt.xlabel("Image")
-    plt.ylabel("Loss")
-    plt.title("VGG Perceptual Loss")
+    # plt.plot(losses)
+    # plt.xlabel("Image")
+    # plt.ylabel("Loss")
+    # plt.title("VGG Perceptual Loss")
 
-    x_labels = [str(i) for i in range(1, len(losses))]
-    x_labels.append("(2)")
-    plt.xticks(ticks=range(len(losses)), labels=x_labels)
+    # x_labels = [str(i) for i in range(1, len(losses))]
+    # x_labels.append("(2)")
+    # plt.xticks(ticks=range(len(losses)), labels=x_labels)
 
     # plt.show()
 
