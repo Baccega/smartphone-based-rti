@@ -372,3 +372,56 @@ gpu utilization deve essere alta (quasi 100%)
 attenzione a non usare tutta la memoria della gpu
 
 serve vpn
+
+----
+
+
+numeri quantitativi 
+provare con un altro dataset con più luci 
+
+
+perturbare le luci -> male
+
+1)
+
+provare a dare un insieme di pixel non intere (interpolando il valore nel ground truth)
+per ridurre l'overfitting e per dare più punti dove la rete sbaglia di più
+fare un sampling?
+https://docs.scipy.org/doc/scipy/reference/generated/scipy.interpolate.interp2d.html
+
+
+ad ogni epoca cambi la distrubuzione con il quale prendi i punti subpixel 
+(cambiare il codice di training)
+
+
+
+2)
+
+invece di usare le armoniche di fourier, usare la trasformata coseno (dct) 
+
+
+
+si può già scrivere
+intanto fermiamoci qui
+
+nuovo dataset con un sottoinsieme di immagini e calcolare la loss, sssmi, ... e confrontarlo con il ground truth
+
+domanda di laure 1-11 dicembre
+upload della tesi 5-19 febbraio
+
+prima di natale esperimenti, poi tesi
+
+8-10 gennaio iniziare seriamente a scriverla
+
+direttamente sulla macchina
+
+
+
+titolo: An implicit neural representation for RTI
+
+abstract: 
+2-3 righe cos'é RTI, si basa sulla creazione di una funzione
+in questa tesi si propone di usare implicit neural representation per approssimare questa funzione
+
+
+nella tesi sccrivere che è un estensione del paper PCA (che funzionava diversamente)
