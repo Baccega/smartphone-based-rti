@@ -68,9 +68,9 @@ def inputDebug():
 
 def inputDataset():
     return safeIntInput(
-        "Select dataset (1. CoinDataset, 2. SynthDataset): ",
+        "Select dataset (1. CoinDataset, 2. SynthDataset, 3. RTI-Dataset): ",
         1,
-        2,
+        3,
     )
 
 

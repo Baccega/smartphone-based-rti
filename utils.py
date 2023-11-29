@@ -140,6 +140,47 @@ def getChoosenSynthPaths(synth, interpolation_mode=0):
     )
 
 
+
+def getRtiPaths(interpolation_mode=0):
+    """
+    Get constants based on the rti object and interpolation mode
+    """
+    mode_str = "RBF"
+    if interpolation_mode == 2:
+        mode_str = "PTM"
+    elif interpolation_mode == 3 or interpolation_mode == 4:
+        mode_str = "PCA"
+    elif interpolation_mode == 5 or interpolation_mode == 6:
+        mode_str = "NEURAL"
+
+    base_folder = "assets/rti-dataset"
+    data_folder_path = "{}/train".format(base_folder)
+    data_light_directions_file_path = "{}/light_train".format(base_folder)
+    test_folder_path = "{}/test".format(base_folder)
+    test_light_directions_file_path = "{}/light_test".format(base_folder)
+    extracted_data_file_path = constants["RTI_EXTRACTED_DATA_FILE_PATH"]
+    test_data_file_path = constants["RTI_TEST_DATA_FILE_PATH"]
+    interpolated_data_file_path = constants["RTI_INTERPOLATED_DATA_{}_FILE_PATH".format(mode_str)]
+    model_path = constants["RTI_{}_MODEL".format(mode_str)]
+    pca_data_file_path = constants["RTI_PCA_DATA_FILE_PATH"]
+    datapoints_file_path = constants["RTI_DATAPOINTS_FILE_PATH"]
+    test_datapoints_file_path = constants["RTI_TEST_DATAPOINTS_FILE_PATH"]
+
+    return (
+        data_folder_path,
+        data_light_directions_file_path,
+        test_folder_path,
+        test_light_directions_file_path,
+        extracted_data_file_path,
+        test_data_file_path,
+        interpolated_data_file_path,
+        model_path,
+        pca_data_file_path,
+        datapoints_file_path,
+        test_datapoints_file_path,
+    )
+
+
 def generateGaussianMatrix(mean, standard_deviation, size):
     first = []
     second = []

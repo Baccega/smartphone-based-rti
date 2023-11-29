@@ -15,6 +15,7 @@ from utils import (
     loadDataFile,
     getChoosenCoinVideosPaths,
     getChoosenSynthPaths,
+    getRtiPaths,
     writeDataFile,
     generateGaussianMatrix,
 )
@@ -179,6 +180,73 @@ def synthSubMain(interpolation_mode):
     )
 
 
+def rtiSubMain(interpolation_mode):
+    (
+        data_folder_path,
+        data_light_directions_file_path,
+        test_folder_path,
+        test_light_directions_file_path,
+        extracted_data_file_path,
+        test_data_file_path,
+        interpolated_data_file_path,
+        model_path,
+        pca_data_file_path,
+        datapoints_file_path,
+        test_datapoints_file_path,
+    ) = getRtiPaths(interpolation_mode)
+
+    if (not os.path.exists(data_folder_path)) or (
+        not os.path.exists(data_light_directions_file_path)
+    ):
+        raise (Exception("Rti assets not founded!"))
+
+    print("*** Analysis *** \n\tRti-dataset folder: '{}'".format(data_folder_path))
+
+    extracted_data = None
+    test_data = None
+
+    print("---------")
+    print(data_folder_path)
+    print(data_light_directions_file_path)
+    print(test_folder_path)
+    print(test_light_directions_file_path)
+    print(extracted_data_file_path)
+    print(test_data_file_path)
+    print(interpolated_data_file_path)
+    print(model_path)
+    print(pca_data_file_path)
+    print(datapoints_file_path)
+    print(test_datapoints_file_path)
+    print("---------")
+    return
+
+    # Ask to extract data (if it already exists)
+    if inputExtractedData(extracted_data_file_path):
+        # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
+        extracted_data, test_data = extractSynthDataFromAssets(
+            data_folder_path,
+            data_light_directions_file_path,
+            test_folder_path,
+            test_light_directions_file_path,
+        )
+        writeDataFile(extracted_data_file_path, extracted_data)
+        writeDataFile(test_data_file_path, test_data)
+    else:
+        extracted_data = loadDataFile(extracted_data_file_path)
+        test_data = loadDataFile(test_data_file_path)
+
+    return (
+        extracted_data,
+        test_data,
+        interpolated_data_file_path,
+        model_path,
+        pca_data_file_path,
+        datapoints_file_path,
+        test_datapoints_file_path,
+    )
+
+
+
 def main():
     dataset = inputDataset()
     interpolation_mode = inputInterpolatedMode()
@@ -193,7 +261,7 @@ def main():
             datapoints_file_path,
             test_datapoints_file_path,
         ) = coinSubMain(interpolation_mode)
-    else:
+    elif dataset == 2:
         (
             extracted_data,
             test_data,
@@ -203,6 +271,16 @@ def main():
             datapoints_file_path,
             test_datapoints_file_path,
         ) = synthSubMain(interpolation_mode)
+    else:
+        (
+            extracted_data,
+            test_data,
+            interpolated_data_file_path,
+            model_path,
+            pca_data_file_path,
+            datapoints_file_path,
+            test_datapoints_file_path,
+        ) = rtiSubMain(interpolation_mode)
 
     # Save lightdirection datapoints (interactive relighting debug)
     saveDatapointsToFile(datapoints_file_path, extracted_data)

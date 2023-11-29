@@ -143,4 +143,18 @@ constants = {
     "SYNTH_MULTI_OBJECT_2_MATERIAL_3_INTERPOLATED_DATA_PTM_FILE_PATH": "data/synth/multi_2_3_ptm_interpolated_data.npz",
     "SYNTH_MULTI_OBJECT_2_MATERIAL_3_INTERPOLATED_DATA_PCA_FILE_PATH": "data/synth/multi_2_3_pca_interpolated_data.npz",
     "SYNTH_MULTI_OBJECT_2_MATERIAL_3_INTERPOLATED_DATA_NEURAL_FILE_PATH": "data/synth/multi_2_3_neural_interpolated_data.npz",
+    # ---  RTI DATASET FILE NAMES CONSTANTS
+    "RTI_EXTRACTED_DATA_FILE_PATH": "data/rti/extracted_data.npz",
+    "RTI_TEST_DATA_FILE_PATH": "data/rti/test_data.npz",
+    "RTI_PCA_MODEL": "data/rti/pca_model.pt",
+    "RTI_PCA_DATA_FILE_PATH": "data/rti/pca_data.npz",
+    "RTI_NEURAL_MODEL": "data/rti/neural_model.pt",
+    "RTI_PTM_MODEL": "No model",
+    "RTI_RBF_MODEL": "No model",
+    "RTI_DATAPOINTS_FILE_PATH": "data/rti/datapoints.npz",
+    "RTI_TEST_DATAPOINTS_FILE_PATH": "data/rti/test_datapoints.npz",
+    "RTI_INTERPOLATED_DATA_RBF_FILE_PATH": "data/rti/rbf_interpolated_data.npz",
+    "RTI_INTERPOLATED_DATA_PTM_FILE_PATH": "data/rti/ptm_interpolated_data.npz",
+    "RTI_INTERPOLATED_DATA_PCA_FILE_PATH": "data/rti/pca_interpolated_data.npz",
+    "RTI_INTERPOLATED_DATA_NEURAL_FILE_PATH": "data/rti/neural_interpolated_data.npz",
 }
