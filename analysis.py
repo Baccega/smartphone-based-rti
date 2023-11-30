@@ -22,7 +22,7 @@ from utils import (
 from pca_model import train_pca_model
 from neural_model import train_neural_model
 from analyze_data import analyze_data
-from extract_data import extractCoinDataFromVideos, extractSynthDataFromAssets
+from extract_data import extractCoinDataFromVideos, extractSynthDataFromAssets, extractRtiDataFromAssets
 import os
 import torch
 from constants import constants
@@ -205,25 +205,10 @@ def rtiSubMain(interpolation_mode):
     extracted_data = None
     test_data = None
 
-    print("---------")
-    print(data_folder_path)
-    print(data_light_directions_file_path)
-    print(test_folder_path)
-    print(test_light_directions_file_path)
-    print(extracted_data_file_path)
-    print(test_data_file_path)
-    print(interpolated_data_file_path)
-    print(model_path)
-    print(pca_data_file_path)
-    print(datapoints_file_path)
-    print(test_datapoints_file_path)
-    print("---------")
-    return
-
     # Ask to extract data (if it already exists)
     if inputExtractedData(extracted_data_file_path):
         # [for each x, y : {"lightDirs_x|lightDirs_y": pixelIntensities}]
-        extracted_data, test_data = extractSynthDataFromAssets(
+        extracted_data, test_data = extractRtiDataFromAssets(
             data_folder_path,
             data_light_directions_file_path,
             test_folder_path,

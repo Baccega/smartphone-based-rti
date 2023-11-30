@@ -230,6 +230,7 @@ def extractSynthDataFromFolder(folder_path, light_directions_file_path):
     return np.asarray(data)
 
 
+
 def extractSynthDataFromAssets(
     data_folder_path,
     data_light_directions_file_path,
@@ -241,6 +242,67 @@ def extractSynthDataFromAssets(
 
     print("Extracting test data from images...")
     test_data = extractSynthDataFromFolder(
+        test_folder_path, test_light_directions_file_path
+    )
+
+    return data, test_data
+
+
+def extractRtiDataFromFolder(folder_path, light_directions_file_path):
+    data = [
+        [[] * constants["SQUARE_GRID_DIMENSION"]] * constants["SQUARE_GRID_DIMENSION"]
+        for i in range(constants["SQUARE_GRID_DIMENSION"])
+    ]
+
+    light_directions_file = open(light_directions_file_path, "r")
+    count = 0
+
+    for line in light_directions_file.readlines():
+        splitted_line = line.split(",")
+        image_path = "{}/image{}.jpeg".format(folder_path, count)
+        light_dir_x = float(splitted_line[0].strip())
+        light_dir_y = float(splitted_line[1].strip())
+        # light_dir_z = fromLightDirToIndex(splitted_line[2])
+
+        full_res_image = cv.imread(image_path, cv.IMREAD_GRAYSCALE)
+
+        image = cv.resize(
+            full_res_image,
+            (
+                constants["SQUARE_GRID_DIMENSION"],
+                constants["SQUARE_GRID_DIMENSION"],
+            ),
+        )
+
+        for x in range(constants["SQUARE_GRID_DIMENSION"]):
+            for y in range(constants["SQUARE_GRID_DIMENSION"]):
+                key = "{}|{}".format(
+                    light_dir_x,
+                    light_dir_y,
+                )
+                # If data[x][y] exists: update
+                if type(data[x][y]) is dict:
+                    data[x][y][key] = image[x][y]
+                # Else: create it
+                else:
+                    data[x][y] = {
+                        key: image[x][y]
+                    }
+        count += 1
+
+    return np.asarray(data)
+
+def extractRtiDataFromAssets(
+    data_folder_path,
+    data_light_directions_file_path,
+    test_folder_path,
+    test_light_directions_file_path,
+):
+    print("Extracting data from images...")
+    data = extractRtiDataFromFolder(data_folder_path, data_light_directions_file_path)
+
+    print("Extracting test data from images...")
+    test_data = extractRtiDataFromFolder(
         test_folder_path, test_light_directions_file_path
     )
 
