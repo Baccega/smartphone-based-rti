@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from myIO import inputSynth
 from constants import constants
 from interpolation import getNeuralModelInterpolationFunction
-from utils import getChoosenSynthPaths, get_intermediate_light_directions
+from utils import getChoosenSynthPaths, getRtiPaths, get_intermediate_light_directions
 
-N_IN_BETWEEN = 3
+N_IN_BETWEEN = 5
 
 
 def main():
@@ -23,7 +23,6 @@ def main():
     vgg_model.eval()
 
     # Load neural model trained on 2 images
-    synth = inputSynth()
     (
         _,
         _,
@@ -36,15 +35,37 @@ def main():
         pca_data_file_path,
         datapoints_file_path,
         test_datapoints_file_path,
-    ) = getChoosenSynthPaths(synth, 6)
+    ) = getRtiPaths(6)
+    # TODO: Get these points dynamically
+    x1, y1 = 0.277, 0.141
+    # x2, y2 = 0.8529, -0.4924
+    x2, y2 = -0.883, 0.008
+
+    ground_truth_path = "assets/rti-dataset/train/image0.jpeg"
+    
+    # synth = inputSynth()
+    # (
+    #     _,
+    #     _,
+    #     _,
+    #     _,
+    #     _,
+    #     _,
+    #     interpolated_data_file_path,
+    #     neural_model_path,
+    #     pca_data_file_path,
+    #     datapoints_file_path,
+    #     test_datapoints_file_path,
+    # ) = getChoosenSynthPaths(synth, 6)
+    # # TODO: Get these points dynamically
+    # x1, y1 = 0.7500, 0.4330
+    # # x2, y2 = 0.8529, -0.4924
+    # x2, y2 = 0.6113, 0.1986
+
+    # ground_truth_path = "assets/synthRTI/Single/Object2/material3/Dome/image20.jpg"
+    
     print("Model path: {}".format(neural_model_path))
 
-    # TODO: Get these points dynamically
-    x1, y1 = 0.7500, 0.4330
-    # x2, y2 = 0.8529, -0.4924
-    x2, y2 = 0.6113, 0.1986
-
-    ground_truth_path = "assets/synthRTI/Single/Object2/material3/Dome/image20.jpg"
     # Get ground truth image
     ground_truth_image = cv.imread(ground_truth_path)
     ground_truth_image = cv.resize(
