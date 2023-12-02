@@ -99,7 +99,7 @@ def analyze_data(
             count = 0
             for light_pair in test_light_directions:
                 ground_truths[count][x][y] = test_data[x][y][
-                    "{}|{}".format(int(light_pair[0]), int(light_pair[1]))
+                    "{}|{}".format(float(light_pair[0]), float(light_pair[1]))
                 ]
                 count += 1
             count = 0
