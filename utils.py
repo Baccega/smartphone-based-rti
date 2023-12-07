@@ -291,7 +291,7 @@ def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]
         for i in range(len(datapoints)):
             blank_image = cv.circle(
                 blank_image,
-                (denormalize(datapoints[i][0]), denormalize(datapoints[i][1])),
+                (denormalize(datapoints[i][0]), denormalize(float(datapoints[i][1]) * -1)),
                 radius=0,
                 color=(0, 255, 0),
                 thickness=-1,
@@ -302,7 +302,7 @@ def createLightDirectionFrame(light_direction, datapoints=[], test_datapoints=[]
                 blank_image,
                 (
                     denormalize(test_datapoints[i][0]),
-                    denormalize(test_datapoints[i][1]),
+                    denormalize(float(test_datapoints[i][1]) * -1),
                 ),
                 radius=0,
                 color=(0, 0, 255),
