@@ -13,9 +13,9 @@ from utils import (
     createLightDirectionFrame,
     getChoosenCoinVideosPaths,
     getChoosenSynthPaths,
+    getRtiPaths,
     loadDataFile,
     getPytorchDevice,
-    fromLightDirToIndex,
 )
 from interpolation import (
     getPCAModelInterpolationFunction,
@@ -190,7 +190,7 @@ if __name__ == "__main__":
             datapoints_file_path,
             test_datapoints_file_path,
         ) = getChoosenCoinVideosPaths(coin, interpolation_mode)
-    else:
+    elif dataset == 2:
         synth = inputSynth()
 
         (
@@ -206,6 +206,20 @@ if __name__ == "__main__":
             datapoints_file_path,
             test_datapoints_file_path,
         ) = getChoosenSynthPaths(synth, interpolation_mode)
+    else:
+        (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            interpolated_data_file_path,
+            neural_model_path,
+            pca_data_file_path,
+            datapoints_file_path,
+            test_datapoints_file_path,
+        ) = getRtiPaths(interpolation_mode)
 
     if interpolation_mode == 4 and (
         (not os.path.exists(neural_model_path))

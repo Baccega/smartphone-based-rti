@@ -35,7 +35,7 @@ constants = {
     "PCA_INPUT_SIZE": 8 + (2 * 10),  # PCA_ORTHOGONAL_BASES + (2 * H)
     "GAUSSIAN_MATRIX_FILE_PATH": "data/gaussian_matrix.npz",
     # ---  NEURAL MODEL CONSTANTS
-    "NEURAL_BATCH_SIZE": 256 * 4,
+    "NEURAL_BATCH_SIZE": 256 * 8,
     "NEURAL_LEARNING_RATE": 0.01,
     "NEURAL_N_EPOCHS": 50,
     "NEURAL_H": 12,
