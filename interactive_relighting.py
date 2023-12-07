@@ -152,7 +152,7 @@ def mainRealTime(
             for x in range(constants["SQUARE_GRID_DIMENSION"]):
                 for y in range(constants["SQUARE_GRID_DIMENSION"]):
                     i = y + (x * constants["SQUARE_GRID_DIMENSION"])
-                    frame[x][y] = outputs[i]
+                    frame[x][y] = max(0, min(255, outputs[i]))
 
             lightDirectionFrame = createLightDirectionFrame(
                 [dirX, dirY], datapoints, test_datapoints
