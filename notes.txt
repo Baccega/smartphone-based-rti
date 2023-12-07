@@ -424,4 +424,7 @@ abstract:
 in questa tesi si propone di usare implicit neural representation per approssimare questa funzione
 
 
-nella tesi sccrivere che è un estensione del paper PCA (che funzionava diversamente)
+nella tesi scrivere che è un estensione del paper PCA (che funzionava diversamente)
+
+
+(echo "3" && echo "6" && echo "n" && echo "n" && echo "y") | python analysis.py
