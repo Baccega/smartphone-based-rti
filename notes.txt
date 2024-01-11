@@ -428,3 +428,59 @@ nella tesi scrivere che è un estensione del paper PCA (che funzionava diversame
 
 
 (echo "3" && echo "6" && echo "n" && echo "n" && echo "y") | python analysis.py
+
+
+An Implicit Neural Representation for Reflectance Transformation Imaging (RTI)
+
+
+Reflectance Transformation Imaging (RTI) is a widely used method for obtaining detailed per-pixel reflectance data by photographing an object under varying lighting conditions. The gathered information can then be utilized to re-light the subject interactively and reveal surface details that would be impossible to see with a single photo. In this thesis, we propose to use an Implicit Neural Representation to approximate the interpolation function that we use to obtain the reflectance data.
+
+----------
+
+tirocinio?
+
+introduzione ~15 pagine
+
+spiego che cosè rti, cosa serve, ... 
+
+related work: 
+citazione di articoli correlati (neural rti)
+articoli che fanno relighting con altre tecniche? 
+discussione di tecniche di relighting, dome, 
+google scholar -> dal nostro articolo -> chi cita e cosa cita -> avanti così
+non citare e basta, espandere e citare, mettere immagini 
+cerca di fare un discorso unico senza fare troppi salti, magari anche cronologicamente 
+
+
+state of the art
+paper da citare? lavoro che devo fare io 
+
+
+
+descrittiva
+- scrivere quello che ho fatto 
+e anche quello che abbiamo fatto nel progetto 
+riprendo l'articolo -> dico che è stato modificato (relighting, ... ) dataset differenti 
+
+parte sperimentale -> risultati (confrontare immagini e risultati numerici)
+confronto con altri metodi 
+esperimenti variando sigma, o numero di immagini in input
+
+ultimo dataset sinteitco ()
+2 reti, PCA, RTI -> confronto con immagini di test,
+togli 1,5,10,20% di luci dal train set e valuti il test set (tieni anche l'immagine con ssim, .. ed il modello!) 
+grafico -> n_luci x errore
+1 grafici in totale con due curve (una per PCA ed una per NeuralRTI)
+
+poi mostrare un bel pò di output (immagini)
+
+
+
+devo mandare il modulo 
+
+
+definire qualche esperimento, intanto scrivo la parte introduttiva e descrittiva
+
+
+
+
