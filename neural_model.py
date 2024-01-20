@@ -14,7 +14,6 @@ from utils import (
     getChoosenCoinVideosPaths,
     loadDataFile,
     writeDataFile,
-    fromIndexToLightDir,
     normalizeXY,
     getPytorchDevice,
 )

@@ -14,7 +14,6 @@ from utils import (
     getChoosenCoinVideosPaths,
     loadDataFile,
     writeDataFile,
-    fromIndexToLightDir,
     getPytorchDevice
 )
 import cv2 as cv
@@ -77,8 +76,8 @@ class ExtractedPixelsDataset(Dataset):
             for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 for z in range(n_extracted_datapoints):
                     lightDirection = extracted_datapoints[z]
-                    light_direction_x = float(fromIndexToLightDir(lightDirection.split("|")[0]))
-                    light_direction_y = float(fromIndexToLightDir(lightDirection.split("|")[1]))
+                    light_direction_x = float(lightDirection.split("|")[0])
+                    light_direction_y = float(lightDirection.split("|")[1])
                     i = (x * constants["SQUARE_GRID_DIMENSION"] * n_extracted_datapoints) + (y * n_extracted_datapoints) + z 
                     self.data[i] = torch.cat(
                         (
@@ -158,8 +157,8 @@ def train_pca_model(model_path, extracted_data, gaussian_matrix, pca_data_file_p
             for i, data in enumerate(tepoch):
                 # get the inputs; data is a list of [inputs, labels]
                 inputs, labels = data
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                inputs = inputs.float().to(device)
+                labels = labels.float().to(device)
 
                 # zero the parameter gradients
                 optimizer.zero_grad()
