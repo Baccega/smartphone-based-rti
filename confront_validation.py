@@ -14,6 +14,7 @@ from utils import getChoosenSynthPaths, getRtiPaths, get_intermediate_light_dire
 
 N_TO_CHECK = 5
 
+SAVE=True
 
 def main():
     print("Confront validation")
@@ -62,8 +63,10 @@ def main():
                 index = y + (x * constants["SQUARE_GRID_DIMENSION"])
                 frame[x][y] = max(0, min(255, outputs[index]))
 
-        # Show image
-        cv.imshow(f"Image {i}; {point[0]}, {point[1]}", frame)
+        if SAVE:
+            cv.imwrite(f"image{i}_interpolated.jpeg", frame)
+        else:
+            cv.imshow(f"Image {i}; {point[0]}, {point[1]}", frame)
 
         ground_truth_image = cv.imread(point[2])
         ground_truth_image = cv.resize(
@@ -73,10 +76,14 @@ def main():
                 constants["SQUARE_GRID_DIMENSION"],
             ),
         )
-        cv.imshow(f"Ground truth {i}; {point[0]}, {point[1]}", ground_truth_image)
+        if SAVE:
+            cv.imwrite(f"image{i}_ground_truth.jpeg", ground_truth_image)
+        else:
+            cv.imshow(f"Ground truth {i}; {point[0]}, {point[1]}", ground_truth_image)
 
-    while cv.waitKey(1) != ord("q"):
-        pass
+    if not SAVE:
+        while cv.waitKey(1) != ord("q"):
+            pass
 
     print("Done")
 
