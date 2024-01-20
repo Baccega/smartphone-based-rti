@@ -6,8 +6,11 @@ sigmas=(1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0)
 # Loop through each sigma
 for sigma in "${sigmas[@]}"
 do
-    # Step 1: Modify the constants.py file
-    sed -i "s/NEURAL_SIGMA_XY: .*/NEURAL_SIGMA_XY: $sigma,/" constants.py
+    # Step 1: Modify the constants.py file (Linux)
+    # sed -i "s/^[ \t]*\"NEURAL_SIGMA_XY\": .*/    \"NEURAL_SIGMA_XY\": $sigma,/" constants.py
+    # Step 1: Modify the constants.py file (Mac)
+    sed -i '' "s/^[ \t]*\"NEURAL_SIGMA_XY\": .*/    \"NEURAL_SIGMA_XY\": $sigma,/" constants.py
+
 
     # Step 2: Run analysis.py with specific inputs and redirect output to a file
     output_file="analysis_output_sigma_${sigma}.txt"
@@ -15,10 +18,11 @@ do
 
     # Step 3: Copy the model and output file to a new directory
     new_folder="results/sigma_${sigma}_results"
+    rm -rf new_folder
     mkdir -p "$new_folder"
     cp data/rti/neural_model.pt "$new_folder/"
-    cp data/rti/gaussian_matrix_uv.npz "$new_folder/"
-    cp data/rti/gaussian_matrix_xy.npz "$new_folder/"
+    cp data/gaussian_matrix_uv.npz "$new_folder/"
+    cp data/gaussian_matrix_xy.npz "$new_folder/"
     cp "$output_file" "$new_folder/"
 
     # Step 4: Remove the output file
