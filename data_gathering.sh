@@ -18,7 +18,7 @@ run_data_gathering() {
         fi
         
         # Step 2: Run analysis.py with specific inputs and redirect output to a file
-        output_file="analysis_output_sigma_${sigma_value}.txt"
+        output_file="analysis_output.txt"
         (echo "3" && echo "6" && echo "y" && echo "y" && echo "y") | python analysis.py > "$output_file"
 
         # Step 3: Copy the model and output file to a new directory
@@ -35,11 +35,16 @@ run_data_gathering() {
 
         # Step 5: Run confront validation
         python confront_validation.py
-        cp image1_interpolated.jpeg "$new_folder/"
-        cp image2_interpolated.jpeg "$new_folder/"
-        cp image3_interpolated.jpeg "$new_folder/"
-        cp image4_interpolated.jpeg "$new_folder/"
-        cp image5_interpolated.jpeg "$new_folder/"
+        cp image1_interpolated_pca.jpeg "$new_folder/"
+        cp image2_interpolated_pca.jpeg "$new_folder/"
+        cp image3_interpolated_pca.jpeg "$new_folder/"
+        cp image4_interpolated_pca.jpeg "$new_folder/"
+        cp image5_interpolated_pca.jpeg "$new_folder/"
+        cp image1_interpolated_neural.jpeg "$new_folder/"
+        cp image2_interpolated_neural.jpeg "$new_folder/"
+        cp image3_interpolated_neural.jpeg "$new_folder/"
+        cp image4_interpolated_neural.jpeg "$new_folder/"
+        cp image5_interpolated_neural.jpeg "$new_folder/"
         cp image1_ground_truth.jpeg "$new_folder/"
         cp image2_ground_truth.jpeg "$new_folder/"
         cp image3_ground_truth.jpeg "$new_folder/"
@@ -47,11 +52,16 @@ run_data_gathering() {
         cp image5_ground_truth.jpeg "$new_folder/"
 
         # Step 6: Remove the images
-        rm image1_interpolated.jpeg
-        rm image2_interpolated.jpeg
-        rm image3_interpolated.jpeg
-        rm image4_interpolated.jpeg
-        rm image5_interpolated.jpeg
+        rm image1_interpolated_pca.jpeg
+        rm image2_interpolated_pca.jpeg
+        rm image3_interpolated_pca.jpeg
+        rm image4_interpolated_pca.jpeg
+        rm image5_interpolated_pca.jpeg
+        rm image1_interpolated_neural.jpeg
+        rm image2_interpolated_neural.jpeg
+        rm image3_interpolated_neural.jpeg
+        rm image4_interpolated_neural.jpeg
+        rm image5_interpolated_neural.jpeg
         rm image1_ground_truth.jpeg
         rm image2_ground_truth.jpeg
         rm image3_ground_truth.jpeg
