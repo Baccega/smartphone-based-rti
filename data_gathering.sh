@@ -72,14 +72,14 @@ run_data_gathering() {
 }
 
 # Define an array of xy_sigma values
-# xy_sigmas=("NEURAL_SIGMA_XY" 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0)
-xy_sigmas=("NEURAL_SIGMA_XY" 3.0 1.0)
+xy_sigmas=("NEURAL_SIGMA_XY" 3.0 1.0 1.5 2.0 2.5 3.0 3.5 4.0 4.5 5.0 5.5)
+# xy_sigmas=("NEURAL_SIGMA_XY" 3.0 1.0)
 # Define an array of uv_sigma values
-# uv_sigmas=("NEURAL_SIGMA_UV" 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85)
-uv_sigmas=("NEURAL_SIGMA_UV" 0.6 0.4)
+uv_sigmas=("NEURAL_SIGMA_UV" 0.6 0.4 0.45 0.5 0.55 0.6 0.65 0.7 0.75 0.8 0.85)
+# uv_sigmas=("NEURAL_SIGMA_UV" 0.6 0.4)
 # Define an array of data_removal values    
-# data_removal=("REMOVE_DATA_PROBABILITY" 1.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0)
-data_removal=("REMOVE_DATA_PROBABILITY" 0.0 0.0 0.4)
+data_removal=("REMOVE_DATA_PROBABILITY" 0.0 0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9)
+# data_removal=("REMOVE_DATA_PROBABILITY" 0.0 0.0 0.4)
 
 # Run tests for xy_sigmas
 run_data_gathering "${xy_sigmas[@]}"
