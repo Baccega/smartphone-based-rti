@@ -38,7 +38,7 @@ constants = {
     # ---  NEURAL MODEL CONSTANTS
     "NEURAL_BATCH_SIZE": 256 * 8,
     "NEURAL_LEARNING_RATE": 0.01,
-    "NEURAL_N_EPOCHS": 10,
+    "NEURAL_N_EPOCHS": 50,
     "NEURAL_H": 12,
     "NEURAL_SIGMA_XY": 3.0,
     "NEURAL_SIGMA_UV": 0.6,
