@@ -278,13 +278,13 @@ def main():
     if (interpolation_mode == 3 or interpolation_mode == 4) and inputModelTraining(
         model_path
     ):
-        if not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"]):
-            gaussian_matrix = generateGaussianMatrix(
-                0, torch.tensor(constants["PCA_SIGMA"]), constants["PCA_H"]
-            )
-            writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"], gaussian_matrix)
-        else:
-            gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
+        # if not os.path.exists(constants["GAUSSIAN_MATRIX_FILE_PATH"]):
+        gaussian_matrix = generateGaussianMatrix(
+            0, torch.tensor(constants["PCA_SIGMA"]), constants["PCA_H"]
+        )
+        writeDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"], gaussian_matrix)
+        # else:
+        #     gaussian_matrix = loadDataFile(constants["GAUSSIAN_MATRIX_FILE_PATH"])
 
         train_pca_model(
             model_path,
