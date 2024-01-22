@@ -147,9 +147,9 @@ constants = {
     # ---  RTI DATASET FILE NAMES CONSTANTS
     "RTI_EXTRACTED_DATA_FILE_PATH": "data/rti/extracted_data.npz",
     "RTI_TEST_DATA_FILE_PATH": "data/rti/test_data.npz",
-    "RTI_PCA_MODEL": "data/rti/pca_model.pt",
+    "RTI_PCA_MODEL": "data/rti/model_pca.pt",
     "RTI_PCA_DATA_FILE_PATH": "data/rti/pca_data.npz",
-    "RTI_NEURAL_MODEL": "data/rti/neural_model.pt",
+    "RTI_NEURAL_MODEL": "data/rti/model_neural.pt",
     "RTI_PTM_MODEL": "No model",
     "RTI_RBF_MODEL": "No model",
     "RTI_DATAPOINTS_FILE_PATH": "data/rti/datapoints.npz",
