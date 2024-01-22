@@ -79,7 +79,7 @@ xy_sigmas=("NEURAL_SIGMA_XY" 3.0 1.0)
 uv_sigmas=("NEURAL_SIGMA_UV" 0.6 0.4)
 # Define an array of data_removal values    
 # data_removal=("REMOVE_DATA_PROBABILITY" 1.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0)
-data_removal=("REMOVE_DATA_PROBABILITY" 1.0 1.0 0.4)
+data_removal=("REMOVE_DATA_PROBABILITY" 0.0 0.0 0.4)
 
 # Run tests for xy_sigmas
 run_data_gathering "${xy_sigmas[@]}"

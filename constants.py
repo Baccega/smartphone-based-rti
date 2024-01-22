@@ -25,7 +25,7 @@ constants = {
     "ANALYSIS_FRAME_SKIP": 5,  # It will skip this frames each iteration during analysis
     "COINS_TEST_N_LIGHTS": 5,
     "SSIM_GAUSSIAN_KERNEL_SIZE": 11,
-    "REMOVE_DATA_PROBABILITY": 1.0,
+    "REMOVE_DATA_PROBABILITY": 0.0,
     # ---  PCA MODEL CONSTANTS
     "PCA_BATCH_SIZE": 64,
     "PCA_LEARNING_RATE": 0.0001,
@@ -38,7 +38,7 @@ constants = {
     # ---  NEURAL MODEL CONSTANTS
     "NEURAL_BATCH_SIZE": 256 * 8,
     "NEURAL_LEARNING_RATE": 0.01,
-    "NEURAL_N_EPOCHS": 50,
+    "NEURAL_N_EPOCHS": 10,
     "NEURAL_H": 12,
     "NEURAL_SIGMA_XY": 3.0,
     "NEURAL_SIGMA_UV": 0.6,
