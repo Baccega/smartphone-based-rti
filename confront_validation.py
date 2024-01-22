@@ -12,7 +12,7 @@ from interpolation import (
 )
 from utils import getRtiPaths, get_intermediate_light_directions
 
-CONFRONT_PCA = True
+IS_PCA = False
 SAVE = True
 
 
@@ -20,32 +20,34 @@ def main():
     print("Confront validation")
 
     # Load neural model trained on 2 images
-    (
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        pca_model_path,
-        pca_data_file_path,
-        _,
-        _,
-    ) = getRtiPaths(4)
-    (
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        _,
-        neural_model_path,
-        _,
-        _,
-        _,
-    ) = getRtiPaths(6)
+    if IS_PCA:
+        (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            model_path,
+            pca_data_file_path,
+            _,
+            _,
+        ) = getRtiPaths(4)
+    else:
+        (
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
+            model_path,
+            _,
+            _,
+            _,
+        ) = getRtiPaths(6)
 
     # First 5 points in validation set
     points = [
@@ -56,15 +58,16 @@ def main():
         (0.726,0.615,"assets/rti-dataset/val/image19.jpeg"),
     ]
 
-    print("PCA Model path: {}".format(pca_model_path))
-    print("Neural Model path: {}".format(neural_model_path))
+    print("Model path: {}".format(model_path))
 
     # Get in-between interpolated images
     
-    _, interpolateImageNeural = getNeuralModelInterpolationFunction(neural_model_path)
-    _, interpolateImagePCA = getPCAModelInterpolationFunction(
-        pca_data_file_path, pca_model_path
-    )
+    if IS_PCA:
+        _, interpolateImage = getPCAModelInterpolationFunction(
+            pca_data_file_path, model_path
+        )
+    else:
+        _, interpolateImage = getNeuralModelInterpolationFunction(model_path)
 
     for i, point in enumerate(points, 1):
         frame = np.zeros(
@@ -75,36 +78,17 @@ def main():
             ],
             dtype=np.uint8,
         )
-        outputs = interpolateImageNeural(point[0], point[1], True).cpu().numpy()
+        outputs = interpolateImage(point[0], point[1], True).cpu().numpy()
         for x in range(constants["SQUARE_GRID_DIMENSION"]):
             for y in range(constants["SQUARE_GRID_DIMENSION"]):
                 index = y + (x * constants["SQUARE_GRID_DIMENSION"])
                 frame[x][y] = max(0, min(255, outputs[index]))
 
         if SAVE:
-            cv.imwrite(f"image{i}_interpolated_neural.jpeg", frame)
+            model = IS_PCA and "pca" or "neural"
+            cv.imwrite(f"image{i}_interpolated_{model}.jpeg", frame)
         else:
             cv.imshow(f"Image {i}; {point[0]}, {point[1]}", frame)
-
-        if CONFRONT_PCA:
-            frame = np.zeros(
-                shape=[
-                    constants["SQUARE_GRID_DIMENSION"],
-                    constants["SQUARE_GRID_DIMENSION"],
-                    3,
-                ],
-                dtype=np.uint8,
-            )
-            outputs = interpolateImagePCA(point[0], point[1], True).cpu().numpy()
-            for x in range(constants["SQUARE_GRID_DIMENSION"]):
-                for y in range(constants["SQUARE_GRID_DIMENSION"]):
-                    index = y + (x * constants["SQUARE_GRID_DIMENSION"])
-                    frame[x][y] = max(0, min(255, outputs[index]))
-
-            if SAVE:
-                cv.imwrite(f"image{i}_interpolated_pca.jpeg", frame)
-            else:
-                cv.imshow(f"Image {i}; {point[0]}, {point[1]}", frame)
 
         ground_truth_image = cv.imread(point[2])
         ground_truth_image = cv.resize(
