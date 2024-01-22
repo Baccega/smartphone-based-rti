@@ -137,7 +137,8 @@ def train_pca_model(model_path, extracted_data, gaussian_matrix, pca_data_file_p
     print("Training data: " + extracted_data_file_path)
 
     model = PCAModel(gaussian_matrix=gaussian_matrix)
-
+    model = model.to(device)
+    
     dataset = ExtractedPixelsDataset(extracted_data_file_path, pca_data_file_path, extracted_data=extracted_data)
     dataloader = DataLoader(dataset, batch_size=constants["PCA_BATCH_SIZE"], shuffle=True)
 
