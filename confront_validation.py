@@ -49,11 +49,11 @@ def main():
 
     # First 5 points in validation set
     points = [
-        (0.157, 0.484, "assets/rti-dataset/val/image0.jpeg"),
-        (0.090, 0.318, "assets/rti-dataset/val/image1.jpeg"),
-        (-0.089, 0.204, "assets/rti-dataset/val/image2.jpeg"),
-        (0.161, 0.884, "assets/rti-dataset/val/image3.jpeg"),
-        (0.278, 0.722, "assets/rti-dataset/val/image4.jpeg"),
+        (0.157,0.484,"assets/rti-dataset/val/image0.jpeg"),
+        (0.090,0.318,"assets/rti-dataset/val/image1.jpeg"),
+        (-0.944,-0.228,"assets/rti-dataset/val/image15.jpeg"),
+        (0.161,0.884,"assets/rti-dataset/val/image3.jpeg"),
+        (0.726,0.615,"assets/rti-dataset/val/image19.jpeg"),
     ]
 
     print("PCA Model path: {}".format(pca_model_path))
