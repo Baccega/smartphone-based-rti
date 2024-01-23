@@ -41,7 +41,7 @@ constants = {
     "NEURAL_N_EPOCHS": 50,
     "NEURAL_H": 12,
     "NEURAL_SIGMA_XY": 3.0,
-    "NEURAL_SIGMA_UV": 0.6,
+    "NEURAL_SIGMA_UV": 0.55,
     "NEURAL_INPUT_SIZE": (4 * 12),  # (4 * H)
     "GAUSSIAN_MATRIX_FILE_PATH_XY": "data/gaussian_matrix_xy.npz",
     "GAUSSIAN_MATRIX_FILE_PATH_UV": "data/gaussian_matrix_uv.npz",
