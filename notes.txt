@@ -480,5 +480,69 @@ poi mostrare un bel pò di output (immagini)
 definire qualche esperimento, intanto scrivo la parte introduttiva e descrittiva
 
 
+----------------
+
+
+sigma P (pixels)
+sigma L (luce)
+
+esagerare, da 0.1 a 20 (sempre 8 immagini)
+
+controllare il mio output e il ground truth
+in generale sarebbe meglio avere immagini da 0 ed 1
+trasformarla in double e la divido per 255  -> fare metriche
+
+una pagina con solo immagini
+una con tabella e grafici
+
+scrivere il numero di luci al posto della probabilitá
+e scrivere che sigma ho usato
+
+volendo si può mostrarne un paio con sigma alto e sigma basso
+e riportare quante immagini ha il dataset
+
+fare un interpolazione tra una luce e un altra (generare quelle intermedie)
+
+come figure vanno bene queste
+
+psnr dovrebbe essere  intorno a 30 
+ssim 0...1
+l1 va da 0..1
+
+
+più immagini mostro meglio è (con ground truth e PCA), 3 immagini per dataset/direzione della luce
+
+plot della direzione delle luci sarebbe figo per quello che rimuove luci dal dataset
+
+neural networks va in releted works 
+suddividere i related works in tipologia di metodi che fanno rti
+
+togliere citazioni sui titoli
+
+non citare singolarmente le funzioni di opencv (toglierle)
+
+minimo 50 references (veri)
+rimuovere porzioni di codice che non sono fondamentali
+
+non usare `delay` mbox (al post) t_s - t_m, where 
+matrici in maiuscolo
+
+sistema la parte di related works ed introduzione (aggiungere roba)
+
+la settimana prossima rimando la bozza (venerdì la guardiamo assieme)
+l'ultima settimana si sistemiamo i risultati
+
+capitolo 3 può andare circa così 
+
+TODO next week:
+- [ ] Aggiungere molto contenuto in Introduzione e Related works
+- [ ] Guardare note di Mara
+- [ ] Sistemare SSIM PSNR L1
+TODO last week:
+- [ ] Sistemare esperimenti (aggiungere confronti, ...)
+- [ ] 
+
+
+
 
 
