@@ -93,16 +93,13 @@ def analyze_data(
         for y in range(N):
             values = interpolation_function(x, y, test_light_directions)
 
-            for i in range(len(light_keys)):
-                outputs[i][x][y] = values[i]
-
             count = 0
             for light_pair in test_light_directions:
+                outputs[count][x][y] = max(0, min(255, values[count]))
                 ground_truths[count][x][y] = test_data[x][y][
                     "{}|{}".format(float(light_pair[0]), float(light_pair[1]))
                 ]
                 count += 1
-            count = 0
 
     # cv.imshow("ground truths", ground_truths[0])
     # cv.imshow("outputs", outputs[0])
