@@ -5,7 +5,7 @@ import cv2 as cv
 from tqdm import tqdm
 from constants import constants
 from interpolation import (
-    getLinerRBFInterpolationFunction,
+    getLinearRBFInterpolationFunction,
     getPTMInterpolationFunction,
     getPCAModelInterpolationFunction,
     getNeuralModelInterpolationFunction,
@@ -53,7 +53,7 @@ def analyze_data(
     if interpolation_mode == 1:
         get_interpolation_function = (
             "LinearRBF",
-            getLinerRBFInterpolationFunction(data),
+            getLinearRBFInterpolationFunction(data),
         )
     if interpolation_mode == 2:
         get_interpolation_function = (

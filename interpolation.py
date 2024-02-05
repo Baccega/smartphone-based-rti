@@ -19,7 +19,7 @@ M = constants["LIGHT_DIRECTION_WINDOW_SIZE"]
 PCA_ORTHOGONAL_BASES = 8
 
 
-def getLinerRBFInterpolationFunction(data):
+def getLinearRBFInterpolationFunction(data):
     keys = list(data[0][0].keys())
     light_directions_x = [i.split("|")[0] for i in keys]
     light_directions_y = [i.split("|")[1] for i in keys]
@@ -267,7 +267,7 @@ def interpolate_data(data, mode, model_path, pca_data_file_path):
     # if mode == 1:
     #     get_interpolation_function = (
     #         "LinearRBF",
-    #         getLinerRBFInterpolationFunction(data),
+    #         getLinearRBFInterpolationFunction(data),
     #     )
     # if mode == 2:
     #     get_interpolation_function = (
