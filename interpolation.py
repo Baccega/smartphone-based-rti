@@ -108,8 +108,8 @@ def getPCAModelInterpolationFunction(pca_data_file_path, pca_model_path):
             inputs = inputs.to(device)
             for i in range(len(missing_light_directions)):
                 light_pair = missing_light_directions[i]
-                light_dir_x = fromIndexToLightDir(light_pair[0])
-                light_dir_y = fromIndexToLightDir(light_pair[1])
+                light_dir_x = light_pair[0]
+                light_dir_y = light_pair[1]
 
                 inputs[i] = torch.cat(
                     (
