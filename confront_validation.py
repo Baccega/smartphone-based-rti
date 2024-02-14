@@ -7,12 +7,11 @@ import cv2 as cv
 
 from constants import constants
 from interpolation import (
-    getNeuralModelInterpolationFunction,
-    getPCAModelInterpolationFunction,
+    getNeuralModelInterpolationFunction
 )
-from utils import getRtiPaths, get_intermediate_light_directions
+from utils import getRtiPaths, getChoosenSynthPaths, get_intermediate_light_directions
 
-IS_PCA = False
+IS_SYNTH = True
 SAVE = True
 
 
@@ -20,8 +19,8 @@ def main():
     print("Confront validation")
 
     # Load neural model trained on 2 images
-    if IS_PCA:
-        (
+    if IS_SYNTH == True:
+       (
             _,
             _,
             _,
@@ -30,10 +29,10 @@ def main():
             _,
             _,
             model_path,
-            pca_data_file_path,
             _,
             _,
-        ) = getRtiPaths(4)
+            _,
+        ) = getChoosenSynthPaths(6)
     else:
         (
             _,
@@ -50,24 +49,29 @@ def main():
         ) = getRtiPaths(6)
 
     # First 5 points in validation set
-    points = [
-        (0.157,0.484,"assets/rti-dataset/val/image0.jpeg"),
-        (0.090,0.318,"assets/rti-dataset/val/image1.jpeg"),
-        (-0.944,-0.228,"assets/rti-dataset/val/image15.jpeg"),
-        (0.161,0.884,"assets/rti-dataset/val/image3.jpeg"),
-        (0.726,0.615,"assets/rti-dataset/val/image19.jpeg"),
-    ]
+        
+    if IS_SYNTH == True:
+        points = [
+            (0.9397,0.000,"assets/synthRTI/Single/Object2/material3/image02.jpg"),
+            (-0.9397,-0.000,"assets/synthRTI/Single/Object2/material3/image06.jpg"),
+            (0.2932,-0.7077,"assets/synthRTI/Single/Object2/material3/image10.jpg"),
+            (-0.2932,0.7077,"assets/synthRTI/Single/Object2/material3/image12.jpg"),
+            (-0.4619,0.1913,"assets/synthRTI/Single/Object2/material3/image15.jpg") 
+        ]
+    else:
+        points = [
+            (0.157,0.484,"assets/rti-dataset/val/image0.jpeg"),
+            (0.090,0.318,"assets/rti-dataset/val/image1.jpeg"),
+            (-0.944,-0.228,"assets/rti-dataset/val/image15.jpeg"),
+            (0.161,0.884,"assets/rti-dataset/val/image3.jpeg"),
+            (0.726,0.615,"assets/rti-dataset/val/image19.jpeg"),
+        ]
 
     print("Model path: {}".format(model_path))
 
     # Get in-between interpolated images
     
-    if IS_PCA:
-        _, interpolateImage = getPCAModelInterpolationFunction(
-            pca_data_file_path, model_path
-        )
-    else:
-        _, interpolateImage = getNeuralModelInterpolationFunction(model_path)
+    _, interpolateImage = getNeuralModelInterpolationFunction(model_path)
 
     for i, point in enumerate(points, 1):
         frame = np.zeros(
@@ -85,8 +89,7 @@ def main():
                 frame[x][y] = max(0, min(255, outputs[index]))
 
         if SAVE:
-            model = IS_PCA and "pca" or "neural"
-            cv.imwrite(f"image{i}_interpolated_{model}.jpeg", frame)
+            cv.imwrite(f"image{i}_interpolated_neural.jpeg", frame)
         else:
             cv.imshow(f"Image {i}; {point[0]}, {point[1]}", frame)
 
