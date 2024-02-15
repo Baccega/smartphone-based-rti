@@ -4,7 +4,7 @@ import torch.nn as nn
 import torchvision.transforms as transforms
 import numpy as np
 import cv2 as cv
-
+from myIO import inputSynth
 from constants import constants
 from interpolation import (
     getNeuralModelInterpolationFunction
@@ -20,6 +20,7 @@ def main():
 
     # Load neural model trained on 2 images
     if IS_SYNTH == True:
+       synth = inputSynth()
        (
             _,
             _,
@@ -32,7 +33,7 @@ def main():
             _,
             _,
             _,
-        ) = getChoosenSynthPaths(6)
+        ) = getChoosenSynthPaths(synth, 6)
     else:
         (
             _,
@@ -52,11 +53,11 @@ def main():
         
     if IS_SYNTH == True:
         points = [
-            (0.9397,0.000,"assets/synthRTI/Single/Object2/material3/image02.jpg"),
-            (-0.9397,-0.000,"assets/synthRTI/Single/Object2/material3/image06.jpg"),
-            (0.2932,-0.7077,"assets/synthRTI/Single/Object2/material3/image10.jpg"),
-            (-0.2932,0.7077,"assets/synthRTI/Single/Object2/material3/image12.jpg"),
-            (-0.4619,0.1913,"assets/synthRTI/Single/Object2/material3/image15.jpg") 
+            (0.9397,0.000,"assets/synthRTI/Single/Object2/material3/Test/image02.jpg"),
+            (-0.9397,-0.000,"assets/synthRTI/Single/Object2/material3/Test/image06.jpg"),
+            (0.2932,-0.7077,"assets/synthRTI/Single/Object2/material3/Test/image10.jpg"),
+            (-0.2932,0.7077,"assets/synthRTI/Single/Object2/material3/Test/image12.jpg"),
+            (-0.4619,0.1913,"assets/synthRTI/Single/Object2/material3/Test/image15.jpg") 
         ]
     else:
         points = [
