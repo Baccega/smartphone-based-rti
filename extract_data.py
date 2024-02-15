@@ -227,6 +227,12 @@ def extractSynthDataFromFolder(folder_path, light_directions_file_path):
                         }
         count += 1
 
+    for key in list(data[0][0].keys()):
+        if random.random() < constants["REMOVE_DATA_PROBABILITY"]:
+            for x in range(constants["SQUARE_GRID_DIMENSION"]):
+                for y in range(constants["SQUARE_GRID_DIMENSION"]):
+                        del data[x][y][key]
+
     return np.asarray(data)
 
 
